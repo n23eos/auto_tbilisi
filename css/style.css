@@ -16,6 +16,8 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Якорные ссылки не должны прятать заголовок под липкой шапкой */
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -42,18 +44,78 @@ a:hover {
   outline-offset: 3px;
 }
 
-/* ---------- Nav · N9 edge-aligned, поверх видео ---------- */
+/* ---------- Появление блоков при прокрутке ----------
+   Прячем только если JS работает — иначе контент останется видимым.
+   Эффект тонкий: 14px сдвига, одно срабатывание, без повторов. */
+
+.has-js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 620ms var(--ease-out) var(--reveal-delay, 0ms),
+    transform 620ms var(--ease-out) var(--reveal-delay, 0ms);
+}
+
+.has-js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Ступенчатая задержка внутри группы — блоки проявляются друг за другом */
+.has-js [data-reveal-group] > * {
+  --reveal-delay: 0ms;
+}
+
+.has-js [data-reveal-group] > *:nth-child(2) { --reveal-delay: 90ms; }
+.has-js [data-reveal-group] > *:nth-child(3) { --reveal-delay: 180ms; }
+.has-js [data-reveal-group] > *:nth-child(4) { --reveal-delay: 270ms; }
+.has-js [data-reveal-group] > *:nth-child(5) { --reveal-delay: 360ms; }
+
+/* ---------- Nav · N10 — поверх видео, при прокрутке становится светлой ---------- */
 
 .nav {
-  position: absolute;
+  position: fixed;
   inset-inline: 0;
   top: 0;
   z-index: var(--z-nav);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-md);
   padding: var(--space-lg) clamp(1rem, 4vw, 3rem);
   color: var(--color-ink-invert);
+  transition:
+    background-color var(--dur-med) var(--ease-out),
+    padding var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+/* Прокрутили ниже видео — шапка садится на светлую подложку */
+.nav.is-solid {
+  background: oklch(97.5% 0.006 85 / 0.92);
+  backdrop-filter: blur(10px);
+  padding-block: var(--space-sm);
+  box-shadow: 0 1px 0 var(--color-line);
+}
+
+.nav.is-solid .nav__brand {
+  color: var(--color-ink);
+}
+
+.nav.is-solid .nav__brand-dot {
+  color: var(--color-accent);
+}
+
+.nav.is-solid .nav__cta {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.nav.is-solid .nav__cta:hover {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 .nav__brand {
@@ -65,6 +127,7 @@ a:hover {
   text-decoration: none;
   white-space: nowrap;
   color: var(--color-ink-invert);
+  transition: color var(--dur-med) var(--ease-out);
 }
 
 .nav__brand:hover {
@@ -112,7 +175,8 @@ a:hover {
   justify-content: flex-end;
   padding: var(--space-3xl) clamp(1rem, 4vw, 3rem) var(--space-xl);
   overflow: hidden;
-  background: var(--color-ink);
+  /* Стоп-кадр как подложка — видео плавно проявляется поверх него */
+  background: var(--color-ink) url("../media/hero-poster.jpg") center / cover no-repeat;
 }
 
 .marquee__video,
@@ -126,6 +190,12 @@ a:hover {
 .marquee__video {
   object-fit: cover;
   z-index: var(--z-base);
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+
+.marquee__video.is-ready {
+  opacity: 1;
 }
 
 /* Затемнение сверху (под шапку) и снизу (под заголовок) — чтобы белый текст читался */
@@ -346,6 +416,14 @@ a:hover {
   border: var(--rule-hair);
   border-radius: var(--radius-md);
   padding: var(--space-xl);
+  transition:
+    border-color var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
+}
+
+.formats__card:hover {
+  border-color: var(--color-line-strong);
+  transform: translateY(-3px);
 }
 
 .formats__card h3 {
@@ -417,6 +495,18 @@ a:hover {
   padding-bottom: var(--space-lg);
   color: var(--color-ink-muted);
   max-width: 56ch;
+}
+
+/* Ответ мягко проявляется, а не выпрыгивает */
+.faq__item[open] p {
+  animation: faq-open 300ms var(--ease-out);
+}
+
+@keyframes faq-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 /* ---------- Контакты + форма ---------- */
@@ -630,6 +720,26 @@ a:hover {
 
   .road__dash {
     animation: none;
+  }
+
+  .faq__item[open] p {
+    animation: none;
+  }
+
+  .formats__card:hover {
+    transform: none;
+  }
+
+  /* Блоки просто на месте, без выезда */
+  .has-js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .marquee__video {
+    transition: none;
+    opacity: 1;
   }
 }
 

@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
-  <link rel="stylesheet" href="css/tokens.css?v=2">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/tokens.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=3">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
 </head>
 <body>
@@ -46,16 +46,16 @@
   </div>
 
   <!-- Стат-полоса · T4, только реальные цифры -->
-  <section class="stats" aria-label="Факты о школе">
-    <div class="stats__item">
+  <section class="stats" aria-label="Факты о школе" data-reveal-group>
+    <div class="stats__item" data-reveal>
       <span class="stats__num">110 000+</span>
       <span class="stats__label">подписчиков в Facebook</span>
     </div>
-    <div class="stats__item">
+    <div class="stats__item" data-reveal>
       <span class="stats__num">100 %</span>
       <span class="stats__label">рекомендаций по отзывам на странице</span>
     </div>
-    <div class="stats__item">
+    <div class="stats__item" data-reveal>
       <span class="stats__num">ПДД + руль</span>
       <span class="stats__label">полный курс: теория и практика вождения</span>
     </div>
@@ -63,12 +63,12 @@
 
   <!-- О школе -->
   <section class="about" id="about">
-    <div class="about__text">
+    <div class="about__text" data-reveal>
       <h2 class="section-title">Русскоязычное отделение автошколы в Грузии</h2>
       <p>Переехали в Тбилиси и хотите получить права — но грузинского пока не знаете? Мы ведём весь курс на русском языке: разбираем теорию ПДД Грузии, отрабатываем вождение на площадке и в городе, готовим к экзамену.</p>
       <p>Теорию можно проходить онлайн из любой точки, практика — очно в Тбилиси. Инструкторы объясняют спокойно и по делу: без криков, без спешки, с первого занятия за рулём.</p>
     </div>
-    <ul class="about__list">
+    <ul class="about__list" data-reveal>
       <li>Полный курс: теория ПДД + вождение</li>
       <li>Занятия очно и онлайн</li>
       <li>Обучение с нуля — опыт не нужен</li>
@@ -78,30 +78,30 @@
 
   <!-- Программа · F4 step sequence -->
   <section class="steps" id="program">
-    <h2 class="section-title">Как проходит обучение</h2>
-    <ol class="steps__list">
-      <li class="steps__item">
+    <h2 class="section-title" data-reveal>Как проходит обучение</h2>
+    <ol class="steps__list" data-reveal-group>
+      <li class="steps__item" data-reveal>
         <span class="steps__num">01</span>
         <div>
           <h3>Теория ПДД</h3>
           <p>Правила дорожного движения Грузии на русском языке — очно или онлайн. Разбираем билеты и сложные перекрёстки до полного понимания.</p>
         </div>
       </li>
-      <li class="steps__item">
+      <li class="steps__item" data-reveal>
         <span class="steps__num">02</span>
         <div>
           <h3>Площадка</h3>
           <p>Первые часы за рулём в спокойной обстановке: посадка, старт, парковка, манёвры — пока руки не начнут делать всё сами.</p>
         </div>
       </li>
-      <li class="steps__item">
+      <li class="steps__item" data-reveal>
         <span class="steps__num">03</span>
         <div>
           <h3>Город</h3>
           <p>Реальный трафик Тбилиси: круговые движения, подъёмы, перестроения. Ездим по маршрутам, где вы будете ездить каждый день.</p>
         </div>
       </li>
-      <li class="steps__item">
+      <li class="steps__item" data-reveal>
         <span class="steps__num">04</span>
         <div>
           <h3>Экзамен</h3>
@@ -113,13 +113,13 @@
 
   <!-- Форматы -->
   <section class="formats" id="formats">
-    <h2 class="section-title">Форматы занятий</h2>
-    <div class="formats__grid">
-      <article class="formats__card">
+    <h2 class="section-title" data-reveal>Форматы занятий</h2>
+    <div class="formats__grid" data-reveal-group>
+      <article class="formats__card" data-reveal>
         <h3>Очно в Тбилиси</h3>
         <p>Теория в классе на пр-те Важа Пшавела 9 и практика вождения по городу с инструктором.</p>
       </article>
-      <article class="formats__card formats__card--wide">
+      <article class="formats__card formats__card--wide" data-reveal>
         <h3>Теория онлайн</h3>
         <p>Живые занятия по теории из дома — удобно, если вы ещё в пути в Грузию или совмещаете с работой. Вождение затем проходит очно.</p>
       </article>
@@ -129,7 +129,7 @@
 
   <!-- FAQ -->
   <section class="faq" id="faq">
-    <h2 class="section-title">Частые вопросы</h2>
+    <h2 class="section-title" data-reveal>Частые вопросы</h2>
     <details class="faq__item">
       <summary>Обучение действительно полностью на русском?</summary>
       <p>Да. И теория ПДД, и занятия по вождению проходят на русском языке — это русскоязычное отделение автошколы в Тбилиси.</p>
@@ -154,7 +154,7 @@
 
   <!-- Контакты + форма -->
   <section class="contact" id="contact">
-    <div class="contact__info">
+    <div class="contact__info" data-reveal>
       <h2 class="section-title">Записаться или спросить</h2>
       <p class="contact__lede">Оставьте имя и номер — перезвоним, ответим на вопросы и подберём программу. Или свяжитесь напрямую:</p>
       <ul class="contact__links">
@@ -165,7 +165,7 @@
       </ul>
     </div>
 
-    <form class="callback" id="callback-form" action="https://formsubmit.co/revelmaat@yahoo.com" method="POST" novalidate>
+    <form class="callback" data-reveal id="callback-form" action="https://formsubmit.co/revelmaat@yahoo.com" method="POST" novalidate>
       <input type="hidden" name="_subject" value="Заявка с сайта: заказ звонка">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_template" value="table">
@@ -213,6 +213,6 @@
     </p>
   </footer>
 
-  <script src="js/main.js?v=2" defer></script>
+  <script src="js/main.js?v=3" defer></script>
 </body>
 </html>

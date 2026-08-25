@@ -1,20 +1,81 @@
-// Видео в шапке: не проигрываем при экономии трафика и отключённой анимации
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Помечаем, что JS работает — только тогда прячем блоки до появления
+document.documentElement.classList.add('has-js');
+
+// Видео в шапке: плавно проявляется поверх стоп-кадра.
+// При экономии трафика и отключённой анимации не грузим его вовсе.
 (function () {
   const video = document.querySelector('.marquee__video');
   if (!video) return;
 
   const savesData = navigator.connection && navigator.connection.saveData;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (savesData || prefersReducedMotion) {
     video.removeAttribute('autoplay');
     video.pause();
-    // Остаётся постер — статичная панорама города
+    // Остаётся стоп-кадр — статичная панорама города
     video.querySelectorAll('source').forEach(function (source) {
       source.removeAttribute('src');
     });
     video.load();
+    return;
   }
+
+  function showVideo() {
+    video.classList.add('is-ready');
+  }
+
+  if (video.readyState >= 2) {
+    showVideo();
+  } else {
+    video.addEventListener('loadeddata', showVideo, { once: true });
+  }
+})();
+
+// Блоки проявляются, когда доходят до экрана. Один раз, без повторов.
+(function () {
+  const items = document.querySelectorAll('[data-reveal]');
+  if (!items.length) return;
+
+  // Без поддержки наблюдателя показываем всё сразу
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    items.forEach(function (item) {
+      item.classList.add('is-visible');
+    });
+    return;
+  }
+
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.1 });
+
+  items.forEach(function (item) {
+    observer.observe(item);
+  });
+})();
+
+// Шапка становится светлой, когда видео уходит вверх
+(function () {
+  const nav = document.querySelector('.nav');
+  const hero = document.querySelector('.marquee');
+  if (!nav || !hero) return;
+
+  if (!('IntersectionObserver' in window)) {
+    nav.classList.add('is-solid');
+    return;
+  }
+
+  const observer = new IntersectionObserver(function (entries) {
+    // Пока видно хотя бы кусочек видео — шапка прозрачная
+    nav.classList.toggle('is-solid', !entries[0].isIntersecting);
+  }, { rootMargin: '-72px 0px 0px 0px', threshold: 0 });
+
+  observer.observe(hero);
 })();
 
 // Форма «Заказать звонок»: валидация + отправка через FormSubmit (AJAX)
