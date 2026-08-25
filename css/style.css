@@ -42,7 +42,7 @@ a:hover {
   outline-offset: 3px;
 }
 
-/* ---------- Nav · N9 edge-aligned ---------- */
+/* ---------- Nav · N9 edge-aligned, поверх видео ---------- */
 
 .nav {
   position: absolute;
@@ -53,6 +53,7 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   padding: var(--space-lg) clamp(1rem, 4vw, 3rem);
+  color: var(--color-ink-invert);
 }
 
 .nav__brand {
@@ -63,10 +64,15 @@ a:hover {
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
+  color: var(--color-ink-invert);
+}
+
+.nav__brand:hover {
+  color: var(--color-accent-bright);
 }
 
 .nav__brand-dot {
-  color: var(--color-accent);
+  color: var(--color-accent-bright);
   margin-inline: 0.35em;
 }
 
@@ -76,31 +82,64 @@ a:hover {
   font-size: var(--text-sm);
   text-decoration: none;
   white-space: nowrap;
-  border: 1px solid var(--color-accent);
-  color: var(--color-accent);
+  border: 1px solid var(--color-accent-bright);
+  color: var(--color-accent-bright);
+  background: var(--color-scrim-solid);
+  backdrop-filter: blur(6px);
   padding: var(--space-xs) var(--space-lg);
   border-radius: var(--radius-sm);
   transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
 }
 
 .nav__cta:hover {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-accent-bright);
+  color: var(--color-ink);
 }
 
 .nav__cta:active {
   transform: translateY(1px);
 }
 
-/* ---------- Hero · Marquee ---------- */
+/* ---------- Hero · видео 2:1 + заголовок поверх ---------- */
 
 .marquee {
-  min-height: 88svh;
+  position: relative;
+  /* Пропорция 2:1 — высота равна половине ширины, но не ниже 30rem и не выше экрана */
+  height: clamp(30rem, 50vw, 88svh);
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: var(--space-3xl) clamp(1rem, 4vw, 3rem) 0;
+  padding: var(--space-3xl) clamp(1rem, 4vw, 3rem) var(--space-xl);
+  overflow: hidden;
+  background: var(--color-ink);
+}
+
+.marquee__video,
+.marquee__scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.marquee__video {
+  object-fit: cover;
+  z-index: var(--z-base);
+}
+
+/* Затемнение сверху (под шапку) и снизу (под заголовок) — чтобы белый текст читался */
+.marquee__scrim {
+  z-index: var(--z-raised);
+  background:
+    linear-gradient(to bottom, var(--color-scrim) 0%, transparent 22%),
+    linear-gradient(to top, var(--color-scrim) 0%, var(--color-scrim) 30%, transparent 78%);
+}
+
+.marquee__content {
   position: relative;
+  z-index: var(--z-nav);
+  color: var(--color-ink-invert);
 }
 
 .marquee__display {
@@ -127,7 +166,7 @@ a:hover {
 }
 
 .marquee__line--accent .marquee__inner {
-  color: var(--color-accent);
+  color: var(--color-accent-bright);
   animation-delay: 140ms;
 }
 
@@ -136,9 +175,7 @@ a:hover {
 }
 
 .marquee__geo {
-  margin-top: var(--space-xl);
-  margin-bottom: var(--space-xl);
-  color: var(--color-ink-muted);
+  margin-top: var(--space-lg);
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
   opacity: 0;
@@ -149,23 +186,21 @@ a:hover {
   to { opacity: 1; }
 }
 
-/* Дорожная разметка — бегущая пунктирная линия */
+/* Дорожная разметка — бегущая пунктирная линия между видео и контентом */
 
 .road {
-  height: 42px;
-  border-top: var(--rule-hair);
-  border-bottom: var(--rule-hair);
+  height: 34px;
+  background: var(--color-ink);
   display: flex;
   align-items: center;
   overflow: hidden;
-  margin-inline: calc(-1 * clamp(1rem, 4vw, 3rem));
 }
 
 .road__dash {
   height: 6px;
   width: 200%;
   flex: none;
-  background-image: linear-gradient(90deg, var(--color-accent) 0 56px, transparent 56px 100px);
+  background-image: linear-gradient(90deg, var(--color-accent-bright) 0 56px, transparent 56px 100px);
   background-size: 100px 6px;
   animation: drive 1.6s linear infinite;
 }
@@ -598,6 +633,14 @@ a:hover {
   }
 }
 
+/* Печать и очень узкие экраны: видео — не главное, текст важнее */
+@media print {
+  .marquee__video,
+  .road {
+    display: none;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 60rem) {
@@ -624,7 +667,17 @@ a:hover {
 
 @media (max-width: 40rem) {
   .marquee {
-    min-height: 78svh;
+    padding-bottom: var(--space-lg);
+  }
+
+  /* На узком экране заголовок должен помещаться в строку целиком */
+  .marquee__display {
+    font-size: clamp(1.6rem, 8vw, 2.5rem);
+    max-width: none;
+  }
+
+  .marquee__geo {
+    font-size: var(--text-xs);
   }
 
   .nav {

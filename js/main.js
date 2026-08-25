@@ -1,3 +1,22 @@
+// Видео в шапке: не проигрываем при экономии трафика и отключённой анимации
+(function () {
+  const video = document.querySelector('.marquee__video');
+  if (!video) return;
+
+  const savesData = navigator.connection && navigator.connection.saveData;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (savesData || prefersReducedMotion) {
+    video.removeAttribute('autoplay');
+    video.pause();
+    // Остаётся постер — статичная панорама города
+    video.querySelectorAll('source').forEach(function (source) {
+      source.removeAttribute('src');
+    });
+    video.load();
+  }
+})();
+
 // Форма «Заказать звонок»: валидация + отправка через FormSubmit (AJAX)
 (function () {
   const form = document.getElementById('callback-form');

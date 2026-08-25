@@ -23,17 +23,26 @@
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
 
-  <!-- Hero · Marquee -->
+  <!-- Hero · Marquee поверх видео 2:1 -->
   <section class="marquee" id="top">
-    <h1 class="marquee__display">
-      <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
-      <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
-    </h1>
-    <p class="marquee__geo"><span aria-hidden="true">↓</span> Тбилиси · пр-т Важа Пшавела 9</p>
-    <div class="road" aria-hidden="true">
-      <div class="road__dash"></div>
+    <video class="marquee__video" autoplay muted loop playsinline preload="metadata"
+           poster="media/hero-poster.jpg" aria-hidden="true" tabindex="-1">
+      <source src="media/hero.mp4" type="video/mp4">
+    </video>
+    <div class="marquee__scrim" aria-hidden="true"></div>
+
+    <div class="marquee__content">
+      <h1 class="marquee__display">
+        <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
+        <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
+      </h1>
+      <p class="marquee__geo">Автошкола в Тбилиси · пр-т Важа Пшавела 9</p>
     </div>
   </section>
+
+  <div class="road" aria-hidden="true">
+    <div class="road__dash"></div>
+  </div>
 
   <!-- Стат-полоса · T4, только реальные цифры -->
   <section class="stats" aria-label="Факты о школе">

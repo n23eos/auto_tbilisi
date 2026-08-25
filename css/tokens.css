@@ -1,35 +1,40 @@
-/* Hallmark · genre: editorial · macrostructure: Marquee Hero · theme: Sport (dark asphalt · amber road-marking accent · display-heavy Unbounded) · enrichment: Tier-A CSS road animation · nav: N9 · footer: Ft1
+/* Hallmark · genre: editorial · macrostructure: Marquee Hero · theme: Sport-light (тёплая бумага · охра · display-heavy Unbounded) · enrichment: E-video hero 2:1 · nav: N9 · footer: Ft1
  * Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V5
  * audience: русскоязычные в Тбилиси, нужны права в Грузии · use: заявка на звонок · tone: luxury/premium
- * H1 Marquee knobs: size=xxl, alignment=left-bias, underlay=rule-below
- * nav: N9 edge-aligned (wordmark serif? no — sans, CTA outlined, padding spacious)
- * footer: Ft1 mast-headed (wordmark 2xl, tagline roman, links inline)
+ * H1 Marquee knobs: size=xxl, alignment=left-bias, underlay=video-scrim
  */
 
 :root {
-  /* Paper & ink — тёмный асфальт, не чистый чёрный */
-  --color-paper: oklch(16% 0.012 260);
-  --color-paper-2: oklch(20% 0.014 260);
-  --color-paper-3: oklch(24% 0.016 260);
-  --color-ink: oklch(94% 0.008 85);
-  --color-ink-muted: oklch(72% 0.012 85);
-  --color-ink-faint: oklch(52% 0.012 260);
+  /* Бумага и текст — тёплый светлый, без чистого белого */
+  --color-paper: oklch(97.5% 0.006 85);
+  --color-paper-2: oklch(94.5% 0.009 85);
+  --color-paper-3: oklch(91% 0.011 80);
+  --color-ink: oklch(24% 0.018 265);
+  --color-ink-muted: oklch(46% 0.014 265);
+  --color-ink-faint: oklch(62% 0.011 265);
 
-  /* Accent — янтарь дорожной разметки */
-  --color-accent: oklch(80% 0.152 82);
-  --color-accent-deep: oklch(68% 0.14 70);
-  --color-on-accent: oklch(18% 0.02 82);
-  --color-focus: oklch(80% 0.152 82);
+  /* Текст поверх видео */
+  --color-ink-invert: oklch(98% 0.004 85);
+  --color-scrim: oklch(20% 0.02 265 / 0.52);
+  --color-scrim-solid: oklch(20% 0.02 265 / 0.75);
 
-  --color-line: oklch(32% 0.015 260);
-  --color-error: oklch(64% 0.19 25);
-  --color-success: oklch(72% 0.14 150);
+  /* Акцент — охра для текста, яркий янтарь для заливок */
+  --color-accent: oklch(56% 0.135 58);
+  --color-accent-deep: oklch(48% 0.125 55);
+  --color-accent-bright: oklch(78% 0.15 80);
+  --color-on-accent: oklch(99% 0.003 85);
+  --color-focus: oklch(48% 0.125 55);
+
+  --color-line: oklch(86% 0.012 80);
+  --color-line-strong: oklch(72% 0.015 80);
+  --color-error: oklch(52% 0.19 27);
+  --color-success: oklch(48% 0.13 150);
 
   /* Type */
   --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
   --font-body: "Golos Text", "Helvetica Neue", Arial, system-ui, sans-serif;
 
-  --text-display: clamp(2.6rem, 9.5vw, 7.5rem);
+  --text-display: clamp(2.4rem, 7vw, 5.6rem);
   --text-display-s: clamp(2rem, 5.5vw, 4rem);
   --text-2xl: clamp(1.5rem, 3vw, 2.2rem);
   --text-xl: clamp(1.2rem, 2vw, 1.5rem);
@@ -58,7 +63,6 @@
 
   /* Rules & radius */
   --rule-hair: 1px solid var(--color-line);
-  --rule-thick: 4px solid var(--color-accent);
   --radius-sm: 4px;
   --radius-md: 10px;
 
