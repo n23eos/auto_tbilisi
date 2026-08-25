@@ -1,0 +1,70 @@
+/* Hallmark · genre: editorial · macrostructure: Marquee Hero · theme: Sport (dark asphalt · amber road-marking accent · display-heavy Unbounded) · enrichment: Tier-A CSS road animation · nav: N9 · footer: Ft1
+ * Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V5
+ * audience: русскоязычные в Тбилиси, нужны права в Грузии · use: заявка на звонок · tone: luxury/premium
+ * H1 Marquee knobs: size=xxl, alignment=left-bias, underlay=rule-below
+ * nav: N9 edge-aligned (wordmark serif? no — sans, CTA outlined, padding spacious)
+ * footer: Ft1 mast-headed (wordmark 2xl, tagline roman, links inline)
+ */
+
+:root {
+  /* Paper & ink — тёмный асфальт, не чистый чёрный */
+  --color-paper: oklch(16% 0.012 260);
+  --color-paper-2: oklch(20% 0.014 260);
+  --color-paper-3: oklch(24% 0.016 260);
+  --color-ink: oklch(94% 0.008 85);
+  --color-ink-muted: oklch(72% 0.012 85);
+  --color-ink-faint: oklch(52% 0.012 260);
+
+  /* Accent — янтарь дорожной разметки */
+  --color-accent: oklch(80% 0.152 82);
+  --color-accent-deep: oklch(68% 0.14 70);
+  --color-on-accent: oklch(18% 0.02 82);
+  --color-focus: oklch(80% 0.152 82);
+
+  --color-line: oklch(32% 0.015 260);
+  --color-error: oklch(64% 0.19 25);
+  --color-success: oklch(72% 0.14 150);
+
+  /* Type */
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-body: "Golos Text", "Helvetica Neue", Arial, system-ui, sans-serif;
+
+  --text-display: clamp(2.6rem, 9.5vw, 7.5rem);
+  --text-display-s: clamp(2rem, 5.5vw, 4rem);
+  --text-2xl: clamp(1.5rem, 3vw, 2.2rem);
+  --text-xl: clamp(1.2rem, 2vw, 1.5rem);
+  --text-lg: 1.125rem;
+  --text-md: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+
+  /* Spacing — 4pt scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6.5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-short: 160ms;
+  --dur-med: 320ms;
+  --dur-long: 700ms;
+
+  /* Rules & radius */
+  --rule-hair: 1px solid var(--color-line);
+  --rule-thick: 4px solid var(--color-accent);
+  --radius-sm: 4px;
+  --radius-md: 10px;
+
+  /* z-scale */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-nav: 20;
+  --z-overlay: 30;
+}
