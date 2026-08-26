@@ -35,6 +35,10 @@ DATA_DIR = ROOT_DIR / "data"
 IMAGES_DIR = DATA_DIR / "tickets" / "images"
 OUTPUT_JSON = DATA_DIR / f"tickets-{CATEGORY_LABELS[0].lower()}-{LOCALE}.json"
 CACHE_DIR = TOOLS_DIR / ".cache" / f"category-{CATEGORY_ID}" / LOCALE
+# Скачанные JPEG живут в кэше и в git не попадают: в репозитории лежит только WebP.
+CACHE_IMAGES_DIR = TOOLS_DIR / ".cache" / f"category-{CATEGORY_ID}" / "images"
+WEBP_MAX_WIDTH = 800
+WEBP_QUALITY = 82
 
 # Признаки того, что страница отдана в нужном языке и нужной категории.
 LOCALE_MARKER = f"locale-{LOCALE}"
@@ -291,6 +295,40 @@ def download_image(session, url, dest):
         return True
     finally:
         # os.replace переименовал файл — тогда tmp уже нет; если упали раньше, убираем мусор.
+        tmp.unlink(missing_ok=True)
+
+
+def convert_to_webp(src, dest):
+    """Сделать из скачанного JPEG webp-версию для сайта.
+
+    Ширину режем до WEBP_MAX_WIDTH: исходники 1006px, а на странице картинка
+    показывается уже. Основная экономия веса именно от уменьшения — сам по себе
+    WebP на уже сжатом JPEG даёт всего ~2.3x. Ниже 800px не опускаемся: на схемах
+    перестают читаться дорожные знаки, а нечитаемый знак — это неверный ответ ученика.
+    """
+    # Готовый файл повторно не пересобираем. verify_image здесь не зовём:
+    # она сама открывает через Image.open, и тогда рабочий webp никогда бы
+    # не считался "уже готовым без обращения к Pillow" — а именно так
+    # проверяется этот путь в тестах.
+    if dest.exists():
+        return True
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".tmp")
+    try:
+        with Image.open(src) as image:
+            converted = image.convert("RGB")
+            if converted.width > WEBP_MAX_WIDTH:
+                height = round(converted.height * WEBP_MAX_WIDTH / converted.width)
+                converted = converted.resize((WEBP_MAX_WIDTH, height), Image.LANCZOS)
+            converted.save(tmp, format="WEBP", quality=WEBP_QUALITY, method=6)
+        if not verify_image(tmp):
+            return False
+        os.replace(tmp, dest)
+        return True
+    except Exception:
+        return False
+    finally:
         tmp.unlink(missing_ok=True)
 
 

@@ -585,3 +585,70 @@ def test_main_writes_new_database_when_validation_passes(tmp_path, monkeypatch):
 
     written = json_module.loads(target.read_text(encoding="utf-8"))
     assert [t["id"] for t in written["tickets"]] == [1, 2]
+
+
+def test_convert_to_webp_creates_decodable_file(tmp_path):
+    src = tmp_path / "src.jpg"
+    Image.new("RGB", (400, 300), (120, 30, 200)).save(src, format="JPEG")
+    dest = tmp_path / "out.webp"
+    assert pt.convert_to_webp(src, dest) is True
+    assert dest.exists()
+    with Image.open(dest) as image:
+        assert image.format == "WEBP"
+
+
+def test_convert_to_webp_shrinks_wide_image(tmp_path):
+    src = tmp_path / "wide.jpg"
+    Image.new("RGB", (1006, 632), (10, 10, 10)).save(src, format="JPEG")
+    dest = tmp_path / "wide.webp"
+    assert pt.convert_to_webp(src, dest) is True
+    with Image.open(dest) as image:
+        assert image.width == pt.WEBP_MAX_WIDTH
+        # Пропорции сохраняются: 1006x632 -> 800x503.
+        assert image.height == round(632 * pt.WEBP_MAX_WIDTH / 1006)
+
+
+def test_convert_to_webp_keeps_small_image_size(tmp_path):
+    src = tmp_path / "small.jpg"
+    Image.new("RGB", (320, 200), (10, 10, 10)).save(src, format="JPEG")
+    dest = tmp_path / "small.webp"
+    assert pt.convert_to_webp(src, dest) is True
+    with Image.open(dest) as image:
+        assert image.size == (320, 200)
+
+
+def test_convert_to_webp_rejects_corrupt_source(tmp_path):
+    src = tmp_path / "broken.jpg"
+    src.write_text("<html>это не картинка</html>", encoding="utf-8")
+    dest = tmp_path / "broken.webp"
+    assert pt.convert_to_webp(src, dest) is False
+    assert not dest.exists()
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_convert_to_webp_skips_existing_valid_file(tmp_path, monkeypatch):
+    src = tmp_path / "src.jpg"
+    Image.new("RGB", (400, 300), (0, 200, 0)).save(src, format="JPEG")
+    dest = tmp_path / "out.webp"
+    assert pt.convert_to_webp(src, dest) is True
+
+    def fail_open(*args, **kwargs):
+        raise AssertionError("повторная конвертация не нужна")
+
+    monkeypatch.setattr(pt.Image, "open", fail_open)
+    assert pt.convert_to_webp(src, dest) is True
+
+
+def test_convert_to_webp_cleans_up_tmp_on_failure(tmp_path, monkeypatch):
+    src = tmp_path / "src.jpg"
+    Image.new("RGB", (400, 300), (0, 0, 200)).save(src, format="JPEG")
+    dest = tmp_path / "out.webp"
+
+    def boom(src_path, dst_path):
+        raise OSError("диск кончился")
+
+    monkeypatch.setattr(pt.os, "replace", boom)
+    assert pt.convert_to_webp(src, dest) is False
+    assert not list(tmp_path.glob("*.tmp"))
+
+
