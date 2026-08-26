@@ -447,16 +447,24 @@ def test_fetch_page_raises_after_all_retries(tmp_path, monkeypatch, html_ru):
     monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
     monkeypatch.setattr(pt, "RETRY_BACKOFF_SEC", 0)
     session = FlakySession(html_ru, fail_times=99)
-    with pytest.raises(RuntimeError, match="страниц"):
+    # Матчим номер страницы, а не просто слово "страниц" — иначе пропажа
+    # номера из сообщения останется незамеченной.
+    with pytest.raises(RuntimeError, match=r"страница 4"):
         pt.fetch_page(session, 4)
 
 
 def test_fetch_page_rejects_wrong_locale_response(tmp_path, monkeypatch, html_ka):
     monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
     monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    monkeypatch.setattr(pt, "RETRY_BACKOFF_SEC", 0)
     session = FlakySession(html_ka)
     with pytest.raises(RuntimeError, match="локал"):
         pt.fetch_page(session, 1)
+    # Чужая локаль — не сетевой сбой: ретраить её нельзя, должен быть ровно один запрос.
+    assert session.calls == 1
+    # И в кэш её тоже писать нельзя — иначе следующий запуск подцепит чужой язык.
+    assert pt.read_cached_page(1) is None
+    assert not list(tmp_path.glob("page-1.html"))
 
 
 def test_build_session_sets_locale_cookie():
@@ -500,3 +508,63 @@ def test_write_output_replaces_atomically_without_temp_leftovers(tmp_path, monke
     pt.write_output({"meta": {}, "tickets": []})
     assert [p.name for p in tmp_path.iterdir()] == ["tickets-b-ru.json"]
     assert "старое" not in target.read_text(encoding="utf-8")
+
+
+def test_write_output_uses_atomic_replace(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    calls = []
+    real_replace = pt.os.replace
+
+    def spy_replace(src, dst):
+        calls.append((str(src), str(dst)))
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(pt.os, "replace", spy_replace)
+    pt.write_output({"meta": {}, "tickets": []})
+    assert len(calls) == 1
+    src, dst = calls[0]
+    assert src.endswith(".json.tmp")
+    assert dst.endswith("tickets-b-ru.json")
+
+
+def test_write_output_cleans_up_tmp_on_failure(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+
+    def failing_replace(src, dst):
+        raise OSError("диск полон")
+
+    monkeypatch.setattr(pt.os, "replace", failing_replace)
+    with pytest.raises(OSError):
+        pt.write_output({"meta": {}, "tickets": []})
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_main_keeps_old_database_when_validation_fails(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    target.write_text('{"старое": true}', encoding="utf-8")
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    monkeypatch.setattr(pt, "build_session", lambda: object())
+    broken = [make_ticket(id=1), make_ticket(id=1)]  # дубль id — база невалидна
+    monkeypatch.setattr(
+        pt, "collect", lambda session, refresh=False: (broken, 2, {1: 2}, 1)
+    )
+    assert pt.main([]) == 1
+    assert target.read_text(encoding="utf-8") == '{"старое": true}'
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_main_writes_new_database_when_validation_passes(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    monkeypatch.setattr(pt, "build_session", lambda: object())
+    good = [make_ticket(id=1), make_ticket(id=2)]
+    monkeypatch.setattr(
+        pt, "collect", lambda session, refresh=False: (good, 2, {1: 2}, 1)
+    )
+    assert pt.main([]) == 0
+    import json as json_module
+
+    written = json_module.loads(target.read_text(encoding="utf-8"))
+    assert [t["id"] for t in written["tickets"]] == [1, 2]

@@ -376,10 +376,14 @@ def write_output(document):
     """Атомарно записать JSON: провалившаяся запись не портит прошлый результат."""
     OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     tmp = OUTPUT_JSON.with_suffix(".json.tmp")
-    tmp.write_text(
-        json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    os.replace(tmp, OUTPUT_JSON)
+    try:
+        tmp.write_text(
+            json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        os.replace(tmp, OUTPUT_JSON)
+    finally:
+        # os.replace переименовал файл — тогда tmp уже нет; если упали раньше, убираем мусор.
+        tmp.unlink(missing_ok=True)
 
 
 def collect(session, refresh=False):
