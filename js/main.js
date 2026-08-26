@@ -175,3 +175,62 @@ document.documentElement.classList.add('has-js');
       });
   });
 })();
+
+// Плавающая кнопка контактов: раскрытие списка, закрытие по Esc и клику вне
+(function () {
+  const fab = document.querySelector('[data-fab]');
+  if (!fab) return;
+
+  const toggle = fab.querySelector('[data-fab-toggle]');
+  const menu = fab.querySelector('#fab-menu');
+  const formBtn = fab.querySelector('[data-fab-form]');
+
+  function setOpen(isOpen) {
+    fab.classList.toggle('is-open', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    menu.hidden = !isOpen;
+  }
+
+  // Отправляем событие в Google Analytics. Счётчика может не быть — тогда молча пропускаем.
+  function trackContactClick(channel) {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('event', 'contact_click', { channel: channel });
+  }
+
+  toggle.addEventListener('click', function () {
+    setOpen(menu.hidden);
+  });
+
+  // Клик по любому пункту: считаем канал и закрываем список
+  menu.addEventListener('click', function (event) {
+    const item = event.target.closest('.fab__item');
+    if (!item) return;
+    trackContactClick(item.dataset.channel);
+    setOpen(false);
+  });
+
+  // Клик вне кнопки — закрываем
+  document.addEventListener('click', function (event) {
+    if (!menu.hidden && !fab.contains(event.target)) setOpen(false);
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape' || menu.hidden) return;
+    setOpen(false);
+    toggle.focus();
+  });
+
+  // «Оставить заявку» — прокрутка к форме и фокус в первое поле
+  formBtn.addEventListener('click', function () {
+    // Целимся в саму форму, а не в секцию: на телефоне выше неё идёт блок контактов
+    const form = document.getElementById('callback-form');
+    const nameInput = document.getElementById('cb-name');
+    if (form) form.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+    if (nameInput) {
+      // Ждём окончания прокрутки, иначе браузер дёрнет страницу обратно
+      setTimeout(function () {
+        nameInput.focus({ preventScroll: true });
+      }, prefersReducedMotion ? 0 : 600);
+    }
+  });
+})();

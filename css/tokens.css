@@ -25,6 +25,11 @@
   --color-on-accent: oklch(99% 0.003 85);
   --color-focus: oklch(48% 0.125 55);
 
+  /* Зелёный — кнопка связи в углу экрана */
+  --color-contact: oklch(48% 0.125 155);
+  --color-contact-deep: oklch(41% 0.11 155);
+  --color-on-contact: oklch(99% 0.003 85);
+
   --color-line: oklch(86% 0.012 80);
   --color-line-strong: oklch(72% 0.015 80);
   --color-error: oklch(52% 0.19 27);

@@ -718,6 +718,125 @@ a:hover {
   color: var(--color-accent);
 }
 
+/* ---------- Плавающая кнопка контактов (FAB) ----------
+   Фиксирована в правом нижнем углу, поверх всего.
+   Клик по конверту раскрывает список каналов связи. */
+
+.fab {
+  position: fixed;
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.fab__toggle {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-contact);
+  color: var(--color-on-contact);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 20px oklch(20% 0.02 265 / 0.28);
+  transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out);
+}
+
+.fab__toggle:hover {
+  background: var(--color-contact-deep);
+  transform: translateY(-2px);
+}
+
+.fab__toggle:active {
+  transform: translateY(0);
+}
+
+.fab__toggle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: block;
+}
+
+/* Конверт и крестик меняются местами при раскрытии */
+.fab__toggle .fab__icon-close,
+.fab.is-open .fab__toggle .fab__icon-open {
+  display: none;
+}
+
+.fab.is-open .fab__toggle .fab__icon-close {
+  display: block;
+}
+
+.fab__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+}
+
+.fab__menu[hidden] {
+  display: none;
+}
+
+.fab__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  padding: var(--space-xs) var(--space-md);
+  min-height: 44px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 3px 12px oklch(20% 0.02 265 / 0.16);
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+  /* Выезд снизу вверх, каждый пункт с небольшой задержкой */
+  animation: fab-in var(--dur-med) var(--ease-out) backwards;
+}
+
+.fab__item:hover {
+  background: var(--color-contact);
+  border-color: var(--color-contact);
+  color: var(--color-on-contact);
+}
+
+.fab__item svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+/* Пункты появляются снизу вверх: последний в списке — первым */
+.fab__menu li:nth-last-child(1) .fab__item { animation-delay: 0ms; }
+.fab__menu li:nth-last-child(2) .fab__item { animation-delay: 40ms; }
+.fab__menu li:nth-last-child(3) .fab__item { animation-delay: 80ms; }
+.fab__menu li:nth-last-child(4) .fab__item { animation-delay: 120ms; }
+
+@keyframes fab-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -758,10 +877,22 @@ a:hover {
     transition: none;
     opacity: 1;
   }
+
+  .fab__item {
+    animation: none;
+  }
+
+  .fab__toggle:hover {
+    transform: none;
+  }
 }
 
 /* Печать и очень узкие экраны: видео — не главное, текст важнее */
 @media print {
+  .fab {
+    display: none;
+  }
+
   .marquee__video,
   .road {
     display: none;
@@ -834,5 +965,15 @@ a:hover {
   .footer__meta {
     flex-direction: column;
     gap: var(--space-2xs);
+  }
+
+  .fab {
+    right: var(--space-md);
+    bottom: var(--space-md);
+  }
+
+  .fab__toggle {
+    width: 3.25rem;
+    height: 3.25rem;
   }
 }
