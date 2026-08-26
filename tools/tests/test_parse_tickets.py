@@ -251,23 +251,41 @@ def test_read_cached_page_rejects_empty_file(tmp_path, monkeypatch):
     assert pt.read_cached_page(1) is None
 
 
-def test_write_cached_page_leaves_no_temp_files(tmp_path, monkeypatch, html_ru):
+def test_write_cached_page_uses_atomic_replace(tmp_path, monkeypatch, html_ru):
     monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    calls = []
+    real_replace = pt.os.replace
+
+    def spy_replace(src, dst):
+        calls.append((str(src), str(dst)))
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(pt.os, "replace", spy_replace)
     pt.write_cached_page(1, html_ru)
+    assert len(calls) == 1
+    src, dst = calls[0]
+    assert src.endswith(".tmp")
+    assert dst.endswith("page-1.html")
     assert [p.name for p in tmp_path.iterdir()] == ["page-1.html"]
 
 
-def _write_png(path, size=(8, 8)):
-    from PIL import Image
+def test_write_cached_page_cleans_up_tmp_on_failure(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
 
+    def failing_replace(src, dst):
+        raise OSError("диск полон")
+
+    monkeypatch.setattr(pt.os, "replace", failing_replace)
+    with pytest.raises(OSError):
+        pt.write_cached_page(1, html_ru)
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def _write_png(path, size=(8, 8)):
     Image.new("RGB", size, (10, 120, 200)).save(path, format="PNG")
 
 
 def _write_jpeg_bytes(size=(64, 64)):
-    import io
-
-    from PIL import Image
-
     buffer = io.BytesIO()
     Image.new("RGB", size, (200, 60, 10)).save(buffer, format="JPEG")
     return buffer.getvalue()
@@ -327,10 +345,12 @@ def test_download_image_saves_valid_image(tmp_path):
 
 
 def test_download_image_rejects_non_image_content_type(tmp_path):
-    session = FakeSession(FakeResponse(b"<html>error</html>", content_type="text/html"))
+    # Тело — валидный JPEG: отбраковать его может только проверка Content-Type.
+    session = FakeSession(FakeResponse(_write_jpeg_bytes(), content_type="text/html"))
     dest = tmp_path / "b.jpg"
     assert pt.download_image(session, "https://example.com/b.jpg", dest) is False
     assert not dest.exists()
+    assert not list(tmp_path.glob("*.tmp"))
 
 
 def test_download_image_rejects_corrupt_body_and_removes_file(tmp_path):
@@ -338,6 +358,7 @@ def test_download_image_rejects_corrupt_body_and_removes_file(tmp_path):
     dest = tmp_path / "c.jpg"
     assert pt.download_image(session, "https://example.com/c.jpg", dest) is False
     assert not dest.exists()
+    assert not list(tmp_path.glob("*.tmp"))
 
 
 def test_download_image_skips_existing_valid_file(tmp_path):
@@ -355,3 +376,17 @@ def test_download_image_redownloads_existing_broken_file(tmp_path):
     assert pt.download_image(session, "https://example.com/e.jpg", dest) is True
     assert session.calls == 1
     assert pt.verify_image(dest) is True
+
+
+def test_download_image_cleans_up_tmp_on_replace_failure(tmp_path, monkeypatch):
+    session = FakeSession(FakeResponse(_write_jpeg_bytes()))
+    dest = tmp_path / "f.jpg"
+
+    def failing_replace(src, dst):
+        raise OSError("диск полон")
+
+    monkeypatch.setattr(pt.os, "replace", failing_replace)
+    with pytest.raises(OSError):
+        pt.download_image(session, "https://example.com/f.jpg", dest)
+    assert not list(tmp_path.glob("*.tmp"))
+    assert not dest.exists()

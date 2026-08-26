@@ -87,8 +87,12 @@ def write_cached_page(page, html):
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     path = _cache_path(page)
     tmp = path.with_suffix(".html.tmp")
-    tmp.write_text(html, encoding="utf-8")
-    os.replace(tmp, path)
+    try:
+        tmp.write_text(html, encoding="utf-8")
+        os.replace(tmp, path)
+    finally:
+        # os.replace переименовал файл — тогда tmp уже нет; если упали раньше, убираем мусор.
+        tmp.unlink(missing_ok=True)
 
 
 def _clean_text(element):
@@ -261,10 +265,12 @@ def download_image(session, url, dest):
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".tmp")
-    tmp.write_bytes(response.content)
-    if not verify_image(tmp):
-        tmp.unlink()
-        return False
-
-    os.replace(tmp, dest)
-    return True
+    try:
+        tmp.write_bytes(response.content)
+        if not verify_image(tmp):
+            return False
+        os.replace(tmp, dest)
+        return True
+    finally:
+        # os.replace переименовал файл — тогда tmp уже нет; если упали раньше, убираем мусор.
+        tmp.unlink(missing_ok=True)
