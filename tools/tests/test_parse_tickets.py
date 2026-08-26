@@ -632,11 +632,24 @@ def test_convert_to_webp_skips_existing_valid_file(tmp_path, monkeypatch):
     dest = tmp_path / "out.webp"
     assert pt.convert_to_webp(src, dest) is True
 
-    def fail_open(*args, **kwargs):
+    # Требование — не перекодировать повторно. Открывать готовый файл для проверки
+    # можно и нужно, а вот сохранять его заново нельзя.
+    def fail_save(*args, **kwargs):
         raise AssertionError("повторная конвертация не нужна")
 
-    monkeypatch.setattr(pt.Image, "open", fail_open)
+    monkeypatch.setattr(pt.Image.Image, "save", fail_save)
     assert pt.convert_to_webp(src, dest) is True
+
+
+def test_convert_to_webp_rebuilds_corrupt_existing_file(tmp_path):
+    src = tmp_path / "src.jpg"
+    Image.new("RGB", (400, 300), (200, 0, 0)).save(src, format="JPEG")
+    dest = tmp_path / "out.webp"
+    dest.write_text("<html>мусор вместо картинки</html>", encoding="utf-8")
+
+    assert pt.convert_to_webp(src, dest) is True
+    with Image.open(dest) as image:
+        assert image.format == "WEBP"
 
 
 def test_convert_to_webp_cleans_up_tmp_on_failure(tmp_path, monkeypatch):
