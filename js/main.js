@@ -150,7 +150,7 @@ document.documentElement.classList.add('has-js');
       _captcha: 'false'
     };
 
-    fetch('https://formsubmit.co/ajax/info@avtoshkola.ge', {
+    fetch('https://formsubmit.co/ajax/6ed6e9175806c7f41929f562953ff7f2', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
