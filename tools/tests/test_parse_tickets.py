@@ -1,4 +1,5 @@
 import io
+import re
 from pathlib import Path
 
 import pytest
@@ -494,7 +495,10 @@ def test_build_document_sorts_by_id_and_fills_meta():
     assert document["meta"]["categories"] == ["B", "B1"]
     assert document["meta"]["lang"] == "ru"
     assert document["meta"]["total"] == 2
-    assert document["meta"]["parsed_at"].startswith("20")
+    # Спека требует ISO 8601 именно с часовым поясом: проверка на "начинается с 20"
+    # пропустила бы наивное время без смещения.
+    parsed_at = document["meta"]["parsed_at"]
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}", parsed_at)
 
 
 def test_build_document_drops_internal_image_url_field():
