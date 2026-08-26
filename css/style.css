@@ -677,7 +677,8 @@ a:hover {
 /* ---------- Footer · Ft1 ---------- */
 
 .footer {
-  padding: var(--space-2xl) clamp(1rem, 4vw, 3rem);
+  /* снизу оставляем место под плавающую кнопку связи */
+  padding: var(--space-2xl) clamp(1rem, 4vw, 3rem) 6rem;
   border-top: var(--rule-hair);
 }
 
@@ -704,6 +705,8 @@ a:hover {
 /* Контакт для партнёров — тише клиентских, отделён линией */
 .footer__partners {
   margin-top: var(--space-lg);
+  /* справа держим полосу под плавающую кнопку связи */
+  padding-right: 4.5rem;
   padding-top: var(--space-md);
   border-top: var(--rule-hair);
   color: var(--color-ink-faint);
@@ -731,6 +734,22 @@ a:hover {
   flex-direction: column;
   align-items: flex-end;
   gap: var(--space-sm);
+}
+
+/* Прячем кнопку, когда на экране блок с формой заявки:
+   там она дублирует сама себя и накрывает кнопку отправки. */
+.fab.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.5rem);
+  pointer-events: none;
+}
+
+.fab {
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out),
+    visibility var(--dur-med) var(--ease-out);
 }
 
 .fab__toggle {

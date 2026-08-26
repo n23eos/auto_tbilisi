@@ -181,6 +181,15 @@ document.documentElement.classList.add('has-js');
   const fab = document.querySelector('[data-fab]');
   if (!fab) return;
 
+  // Пока виден блок с формой заявки — кнопку убираем с экрана,
+  // иначе она накрывает кнопку «Перезвоните мне».
+  const contactSection = document.getElementById('contact');
+  if (contactSection && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      fab.classList.toggle('is-hidden', entries[0].isIntersecting);
+    }, { threshold: 0.12 }).observe(contactSection);
+  }
+
   const toggle = fab.querySelector('[data-fab-toggle]');
   const menu = fab.querySelector('#fab-menu');
   const formBtn = fab.querySelector('[data-fab-form]');
