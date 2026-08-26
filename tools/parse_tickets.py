@@ -7,7 +7,9 @@
 константы, из них выводятся URL, cookie, имя JSON и путь к картинкам.
 """
 
+import os
 import re
+from pathlib import Path
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -19,6 +21,17 @@ LOCALE = "ru"
 
 BASE_URL = "https://teoria.on.ge"
 LIST_URL = f"{BASE_URL}/tickets/{CATEGORY_ID}"
+
+TOOLS_DIR = Path(__file__).resolve().parent
+ROOT_DIR = TOOLS_DIR.parent
+DATA_DIR = ROOT_DIR / "data"
+IMAGES_DIR = DATA_DIR / "tickets" / "images"
+OUTPUT_JSON = DATA_DIR / f"tickets-{CATEGORY_LABELS[0].lower()}-{LOCALE}.json"
+CACHE_DIR = TOOLS_DIR / ".cache" / f"category-{CATEGORY_ID}" / LOCALE
+
+# Признаки того, что страница отдана в нужном языке и нужной категории.
+LOCALE_MARKER = f"locale-{LOCALE}"
+CATEGORY_MARKER = f'data-active="/tickets/{CATEGORY_ID}"'
 
 # В заголовке страницы общее число билетов идёт после грузинского слова "სულ" (всего).
 TOTAL_RE = re.compile(r"სულ\s+(\d+)")
@@ -44,6 +57,35 @@ def parse_page_count(html):
         if option["value"].isdigit()
     ]
     return max(values) if values else 1
+
+
+def is_page_html_valid(html):
+    """Страница непустая, отдана в нужной локали и относится к нужной категории."""
+    if not html or not html.strip():
+        return False
+    return LOCALE_MARKER in html and CATEGORY_MARKER in html
+
+
+def _cache_path(page):
+    return CACHE_DIR / f"page-{page}.html"
+
+
+def read_cached_page(page):
+    """HTML из кэша, либо None, если кэша нет или он негодный."""
+    path = _cache_path(page)
+    if not path.exists():
+        return None
+    html = path.read_text(encoding="utf-8")
+    return html if is_page_html_valid(html) else None
+
+
+def write_cached_page(page, html):
+    """Записать страницу в кэш атомарно — оборванная запись не оставит битый файл."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    path = _cache_path(page)
+    tmp = path.with_suffix(".html.tmp")
+    tmp.write_text(html, encoding="utf-8")
+    os.replace(tmp, path)
 
 
 def _clean_text(element):

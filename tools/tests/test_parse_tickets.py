@@ -212,3 +212,44 @@ def test_validate_catches_lost_image():
 def test_validate_allows_null_image_when_source_has_none():
     tickets = [make_ticket(image_url=None, image=None)]
     assert pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1) == []
+
+
+def test_is_page_html_valid_accepts_ru_page(html_ru):
+    assert pt.is_page_html_valid(html_ru) is True
+
+
+def test_is_page_html_valid_rejects_other_locale(html_ka):
+    assert pt.is_page_html_valid(html_ka) is False
+
+
+def test_is_page_html_valid_rejects_empty():
+    assert pt.is_page_html_valid("") is False
+
+
+def test_is_page_html_valid_rejects_other_category(html_ru):
+    assert pt.is_page_html_valid(html_ru.replace('/tickets/2', '/tickets/5')) is False
+
+
+def test_cache_roundtrip(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    assert pt.read_cached_page(3) is None
+    pt.write_cached_page(3, html_ru)
+    assert pt.read_cached_page(3) == html_ru
+
+
+def test_read_cached_page_rejects_wrong_locale(tmp_path, monkeypatch, html_ka):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    (tmp_path / "page-1.html").write_text(html_ka, encoding="utf-8")
+    assert pt.read_cached_page(1) is None
+
+
+def test_read_cached_page_rejects_empty_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    (tmp_path / "page-1.html").write_text("", encoding="utf-8")
+    assert pt.read_cached_page(1) is None
+
+
+def test_write_cached_page_leaves_no_temp_files(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    pt.write_cached_page(1, html_ru)
+    assert [p.name for p in tmp_path.iterdir()] == ["page-1.html"]
