@@ -92,6 +92,19 @@ def test_parse_tickets_gives_null_source_for_unparsable_id():
     assert ticket["source"] is None
 
 
+def test_parse_tickets_rejects_two_correct_marks():
+    html = '<article class="ticket-container locale-ru"><div class="t-num">#3</div>' \
+           '<div class="t-question"><p class="t-question-inner"><span class="text-wrap">Вопрос</span></p></div>' \
+           '<div class="t-cover">' \
+           '<p class="t-answer t-answer-1" data-is-correct-list="true"><span class="t-a-text"><span class="text-wrap">A</span></span></p>' \
+           '<p class="t-answer t-answer-2" data-is-correct-list="true"><span class="t-a-text"><span class="text-wrap">Б</span></span></p>' \
+           '</div></article>'
+    ticket = pt.parse_tickets(html, PAGE_URL)[0]
+    assert ticket["correct"] is None
+    errors = pt.validate([ticket], total=1, pages_seen={1: 1}, page_count=1)
+    assert errors  # такой билет база принять не должна
+
+
 def make_ticket(**overrides):
     """Заведомо валидный билет; поля переопределяются под конкретный тест."""
     ticket = {
@@ -139,13 +152,13 @@ def test_validate_catches_missing_id():
 def test_validate_catches_single_answer():
     tickets = [make_ticket(answers=["Только один"], correct=0)]
     errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
-    assert any("ответ" in e for e in errors)
+    assert any("меньше" in e for e in errors)
 
 
 def test_validate_catches_empty_answer_text():
     tickets = [make_ticket(answers=["Ответ 1", ""])]
     errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
-    assert any("ответ" in e for e in errors)
+    assert any("пустой ответ" in e for e in errors)
 
 
 def test_validate_catches_missing_correct():
@@ -170,6 +183,12 @@ def test_validate_catches_ticket_count_mismatch():
     tickets = [make_ticket(id=1)]
     errors = pt.validate(tickets, total=921, pages_seen={1: 1}, page_count=1)
     assert any("921" in e for e in errors)
+
+
+def test_validate_catches_page_counts_not_matching_total():
+    tickets = [make_ticket(id=1), make_ticket(id=2)]
+    errors = pt.validate(tickets, total=2, pages_seen={1: 1, 2: 5}, page_count=2)
+    assert any("со страниц собрано" in e for e in errors)
 
 
 def test_validate_catches_missing_page():

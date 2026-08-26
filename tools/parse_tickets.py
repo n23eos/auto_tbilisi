@@ -60,17 +60,21 @@ def _parse_ticket_id(article):
 
 
 def _parse_answers(article):
-    """Список ответов и индекс правильного (или None, если метки нет)."""
+    """Список ответов и индексы всех помеченных правильными.
+
+    Индексов может быть не один: у источника встречается разметка с двумя
+    метками, и такой билет должен быть отбракован, а не молча принят.
+    """
     answers = []
-    correct = None
+    correct_indexes = []
     for paragraph in article.select("p.t-answer"):
         # Пустые слоты (в разметке их всегда 4) помечены классом ans-empty.
         if "ans-empty" in paragraph.get("class", []):
             continue
         if paragraph.get("data-is-correct-list") == "true":
-            correct = len(answers)
+            correct_indexes.append(len(answers))
         answers.append(_clean_text(paragraph.select_one(".t-a-text")))
-    return answers, correct
+    return answers, correct_indexes
 
 
 def parse_tickets(html, page_url):
@@ -83,7 +87,8 @@ def parse_tickets(html, page_url):
     tickets = []
     for article in soup.select("article.ticket-container"):
         ticket_id = _parse_ticket_id(article)
-        answers, correct = _parse_answers(article)
+        answers, correct_indexes = _parse_answers(article)
+        correct = correct_indexes[0] if len(correct_indexes) == 1 else None
         image = article.select_one("figure.t-image img")
         image_src = image.get("src") if image is not None else None
         tickets.append(
@@ -140,6 +145,12 @@ def validate(tickets, total, pages_seen, page_count):
     if len(tickets) != total:
         errors.append(
             f"разобрано {len(tickets)} билетов, источник заявляет {total}"
+        )
+
+    counted_on_pages = sum(pages_seen.values())
+    if counted_on_pages != total:
+        errors.append(
+            f"со страниц собрано {counted_on_pages} билетов, источник заявляет {total}"
         )
 
     missing_pages = [n for n in range(1, page_count + 1) if n not in pages_seen]
