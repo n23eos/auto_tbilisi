@@ -375,7 +375,7 @@ def test_parse_tickets_keeps_ticket_without_correct_marker(html_ru):
 
 В `tools/parse_tickets.py` добавить импорт вверху файла:
 ```python
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 ```
 
 И функции в конец файла:
@@ -1298,7 +1298,11 @@ def write_output(document):
 Добавить в конец `tools/parse_tickets.py`:
 ```python
 def collect(session, refresh=False):
-    """Обойти все страницы, скачать картинки. Возвращает (билеты, total, pages_seen)."""
+    """Обойти все страницы, скачать картинки.
+
+    Возвращает (билеты, total, pages_seen, page_count). page_count возвращаем явно:
+    выводить его из pages_seen нельзя — тогда пропущенная страница сама себя спрячет.
+    """
     first_page = fetch_page(session, 1, refresh=refresh)
     total = parse_total(first_page)
     page_count = parse_page_count(first_page)
@@ -1317,14 +1321,16 @@ def collect(session, refresh=False):
         ticket["image"] = None
         if not ticket["image_url"]:
             continue
-        filename = ticket["image_url"].rsplit("/", 1)[-1]
+        # Имя берём из пути URL, а не из хвоста строки: query-параметр
+        # превратился бы в часть имени файла.
+        filename = Path(urlparse(ticket["image_url"]).path).name
         dest = IMAGES_DIR / filename
         if download_image(session, ticket["image_url"], dest):
             ticket["image"] = str(dest.relative_to(DATA_DIR))
         else:
             print(f"  ! билет {ticket['id']}: картинка не скачалась ({ticket['image_url']})")
 
-    return tickets, total, pages_seen
+    return tickets, total, pages_seen, page_count
 
 
 def main(argv=None):
@@ -1337,9 +1343,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     session = build_session()
-    tickets, total, pages_seen = collect(session, refresh=args.refresh)
+    tickets, total, pages_seen, page_count = collect(session, refresh=args.refresh)
 
-    errors = validate(tickets, total, pages_seen, page_count=max(pages_seen))
+    errors = validate(tickets, total, pages_seen, page_count)
     if errors:
         print(f"\nБаза невалидна, найдено проблем: {len(errors)}", file=sys.stderr)
         for error in errors[:50]:
