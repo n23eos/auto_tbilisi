@@ -80,3 +80,13 @@ def test_parse_tickets_keeps_ticket_without_correct_marker(html_ru):
     ticket = pt.parse_tickets(html_ru, PAGE_URL)[3]
     assert ticket["id"] == 7
     assert ticket["correct"] is None
+
+
+def test_parse_tickets_gives_null_source_for_unparsable_id():
+    html = '<article class="ticket-container locale-ru"><div class="t-num">#абв</div>' \
+           '<div class="t-question"><p class="t-question-inner"><span class="text-wrap">Вопрос</span></p></div>' \
+           '<div class="t-cover"><p class="t-answer t-answer-1" data-is-correct-list="true">' \
+           '<span class="t-a-text"><span class="text-wrap">Ответ</span></span></p></div></article>'
+    ticket = pt.parse_tickets(html, PAGE_URL)[0]
+    assert ticket["id"] is None
+    assert ticket["source"] is None

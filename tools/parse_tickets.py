@@ -8,7 +8,7 @@
 """
 
 import re
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
@@ -93,7 +93,7 @@ def parse_tickets(html, page_url):
                 "answers": answers,
                 "correct": correct,
                 "image_url": urljoin(page_url, image_src) if image_src else None,
-                "source": f"{BASE_URL}/tickets?ticket={ticket_id}",
+                "source": f"{BASE_URL}/tickets?ticket={ticket_id}" if ticket_id else None,
             }
         )
     return tickets
