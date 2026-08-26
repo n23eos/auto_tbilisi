@@ -107,6 +107,19 @@ def test_parse_tickets_rejects_two_correct_marks():
     assert errors  # такой билет база принять не должна
 
 
+def test_parse_tickets_marks_russian_ticket_with_ru(html_ru):
+    ticket = pt.parse_tickets(html_ru, PAGE_URL)[0]
+    assert ticket["lang"] == "ru"
+
+
+def test_parse_tickets_marks_untranslated_ticket_with_ka(html_ka):
+    # У источника есть билеты (например, подкатегория «эко-вождение»), для
+    # которых русского перевода нет ни при какой локали — вопрос приходит
+    # на грузинском. Такой билет не бракуем, а помечаем lang="ka".
+    ticket = pt.parse_tickets(html_ka, PAGE_URL)[0]
+    assert ticket["lang"] == "ka"
+
+
 def make_ticket(**overrides):
     """Заведомо валидный билет; поля переопределяются под конкретный тест."""
     ticket = {

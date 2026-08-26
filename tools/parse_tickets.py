@@ -43,6 +43,11 @@ CATEGORY_MARKER = f'data-active="/tickets/{CATEGORY_ID}"'
 # В заголовке страницы общее число билетов идёт после грузинского слова "სულ" (всего).
 TOTAL_RE = re.compile(r"სულ\s+(\d+)")
 
+# Часть билетов (например, подкатегория «эко-вождение») у источника не переведена
+# на русский ни при какой локали cookie — вопрос приходит на грузинском. Раз символ
+# грузинского алфавита есть в тексте вопроса — перевода нет, помечаем билет как ka.
+GEORGIAN_RE = re.compile(r"[Ⴀ-ჿ]")
+
 REQUEST_TIMEOUT_SEC = 30
 
 PAGE_DELAY_SEC = 0.7
@@ -151,10 +156,12 @@ def parse_tickets(html, page_url):
         correct = correct_indexes[0] if len(correct_indexes) == 1 else None
         image = article.select_one("figure.t-image img")
         image_src = image.get("src") if image is not None else None
+        question = _clean_text(article.select_one(".t-question-inner"))
         tickets.append(
             {
                 "id": ticket_id,
-                "question": _clean_text(article.select_one(".t-question-inner")),
+                "lang": "ka" if GEORGIAN_RE.search(question) else "ru",
+                "question": question,
                 "answers": answers,
                 "correct": correct,
                 "image_url": urljoin(page_url, image_src) if image_src else None,
@@ -347,7 +354,7 @@ def fetch_page(session, page, refresh=False):
     raise RuntimeError(f"страница {page}: не удалось скачать за {HTTP_RETRIES} попыток ({last_error})")
 
 
-TICKET_FIELDS = ("id", "question", "image", "answers", "correct", "source")
+TICKET_FIELDS = ("id", "lang", "question", "image", "answers", "correct", "source")
 
 
 def build_document(tickets, total):
