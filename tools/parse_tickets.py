@@ -97,3 +97,69 @@ def parse_tickets(html, page_url):
             }
         )
     return tickets
+
+
+MIN_ANSWERS = 2
+
+
+def _validate_ticket(ticket):
+    """Ошибки одного билета. Пустой список = билет годный."""
+    errors = []
+    ticket_id = ticket["id"]
+    if not isinstance(ticket_id, int) or isinstance(ticket_id, bool) or ticket_id <= 0:
+        return [f"билет {ticket_id!r}: id должен быть положительным целым"]
+
+    if not ticket["question"]:
+        errors.append(f"билет {ticket_id}: пустой текст вопроса")
+
+    answers = ticket["answers"]
+    if len(answers) < MIN_ANSWERS:
+        errors.append(f"билет {ticket_id}: меньше {MIN_ANSWERS} ответов")
+    if any(not answer for answer in answers):
+        errors.append(f"билет {ticket_id}: есть пустой ответ")
+
+    correct = ticket["correct"]
+    is_int = isinstance(correct, int) and not isinstance(correct, bool)
+    if not is_int or not 0 <= correct < len(answers):
+        errors.append(f"билет {ticket_id}: правильный ответ не определён ({correct!r})")
+
+    # image_url есть, а локального файла нет — картинку потеряли, база неполная.
+    if ticket["image_url"] and not ticket["image"]:
+        errors.append(f"билет {ticket_id}: картинка есть у источника, но не скачана")
+
+    return errors
+
+
+def validate(tickets, total, pages_seen, page_count):
+    """Проверить собранную базу. Возвращает список сообщений об ошибках.
+
+    pages_seen — {номер страницы: сколько билетов с неё разобрано}.
+    """
+    errors = []
+
+    if len(tickets) != total:
+        errors.append(
+            f"разобрано {len(tickets)} билетов, источник заявляет {total}"
+        )
+
+    missing_pages = [n for n in range(1, page_count + 1) if n not in pages_seen]
+    if missing_pages:
+        errors.append(f"не обработаны страниц: {missing_pages}")
+
+    empty_pages = [n for n, count in sorted(pages_seen.items()) if count == 0]
+    if empty_pages:
+        errors.append(f"пустые страницы (ноль билетов): {empty_pages}")
+
+    seen_ids = set()
+    duplicates = set()
+    for ticket in tickets:
+        ticket_id = ticket["id"]
+        if ticket_id in seen_ids:
+            duplicates.add(ticket_id)
+        seen_ids.add(ticket_id)
+        errors.extend(_validate_ticket(ticket))
+
+    if duplicates:
+        errors.append(f"дублирующиеся id: {sorted(duplicates)}")
+
+    return errors

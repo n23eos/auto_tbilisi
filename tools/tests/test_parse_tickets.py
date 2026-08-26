@@ -90,3 +90,106 @@ def test_parse_tickets_gives_null_source_for_unparsable_id():
     ticket = pt.parse_tickets(html, PAGE_URL)[0]
     assert ticket["id"] is None
     assert ticket["source"] is None
+
+
+def make_ticket(**overrides):
+    """Заведомо валидный билет; поля переопределяются под конкретный тест."""
+    ticket = {
+        "id": 1,
+        "question": "Вопрос",
+        "answers": ["Ответ 1", "Ответ 2"],
+        "correct": 0,
+        "image_url": None,
+        "image": None,
+        "source": "https://teoria.on.ge/tickets?ticket=1",
+    }
+    ticket.update(overrides)
+    return ticket
+
+
+def test_validate_accepts_good_database():
+    tickets = [make_ticket(id=1), make_ticket(id=2)]
+    assert pt.validate(tickets, total=2, pages_seen={1: 2}, page_count=1) == []
+
+
+def test_validate_catches_duplicate_ids():
+    tickets = [make_ticket(id=5), make_ticket(id=5)]
+    errors = pt.validate(tickets, total=2, pages_seen={1: 2}, page_count=1)
+    assert any("дубл" in e for e in errors)
+
+
+def test_validate_catches_empty_question():
+    tickets = [make_ticket(question="")]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("вопрос" in e for e in errors)
+
+
+def test_validate_catches_non_positive_id():
+    tickets = [make_ticket(id=0)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("id" in e for e in errors)
+
+
+def test_validate_catches_missing_id():
+    tickets = [make_ticket(id=None)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("id" in e for e in errors)
+
+
+def test_validate_catches_single_answer():
+    tickets = [make_ticket(answers=["Только один"], correct=0)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("ответ" in e for e in errors)
+
+
+def test_validate_catches_empty_answer_text():
+    tickets = [make_ticket(answers=["Ответ 1", ""])]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("ответ" in e for e in errors)
+
+
+def test_validate_catches_missing_correct():
+    tickets = [make_ticket(correct=None)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("правильн" in e for e in errors)
+
+
+def test_validate_catches_correct_out_of_range():
+    tickets = [make_ticket(correct=2)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("правильн" in e for e in errors)
+
+
+def test_validate_catches_correct_not_integer():
+    tickets = [make_ticket(correct=True)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("правильн" in e for e in errors)
+
+
+def test_validate_catches_ticket_count_mismatch():
+    tickets = [make_ticket(id=1)]
+    errors = pt.validate(tickets, total=921, pages_seen={1: 1}, page_count=1)
+    assert any("921" in e for e in errors)
+
+
+def test_validate_catches_missing_page():
+    tickets = [make_ticket(id=1), make_ticket(id=2)]
+    errors = pt.validate(tickets, total=2, pages_seen={1: 2}, page_count=3)
+    assert any("страниц" in e for e in errors)
+
+
+def test_validate_catches_empty_page():
+    tickets = [make_ticket(id=1)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1, 2: 0}, page_count=2)
+    assert any("пуст" in e for e in errors)
+
+
+def test_validate_catches_lost_image():
+    tickets = [make_ticket(image_url="https://teoria.on.ge/a.jpg", image=None)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1)
+    assert any("картинк" in e for e in errors)
+
+
+def test_validate_allows_null_image_when_source_has_none():
+    tickets = [make_ticket(image_url=None, image=None)]
+    assert pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1) == []
