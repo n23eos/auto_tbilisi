@@ -2,3 +2,4 @@
 .DS_Store
 29395-375947009.mp4
 tools/.cache/
+.venv/
