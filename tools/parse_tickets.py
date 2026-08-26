@@ -458,11 +458,13 @@ def collect(session, refresh=False):
         # Имя берём из пути URL, а не из хвоста строки: query-параметр
         # превратился бы в часть имени файла.
         filename = Path(urlparse(ticket["image_url"]).path).name
-        dest = IMAGES_DIR / filename
-        if download_image(session, ticket["image_url"], dest):
-            ticket["image"] = str(dest.relative_to(DATA_DIR))
+        cached_jpeg = CACHE_IMAGES_DIR / filename
+        webp = IMAGES_DIR / f"{cached_jpeg.stem}.webp"
+        downloaded = download_image(session, ticket["image_url"], cached_jpeg)
+        if downloaded and convert_to_webp(cached_jpeg, webp):
+            ticket["image"] = str(webp.relative_to(DATA_DIR))
         else:
-            print(f"  ! билет {ticket['id']}: картинка не скачалась ({ticket['image_url']})")
+            print(f"  ! билет {ticket['id']}: картинка не получена ({ticket['image_url']})")
 
     return tickets, total, pages_seen, page_count
 

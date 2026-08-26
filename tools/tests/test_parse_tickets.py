@@ -652,3 +652,27 @@ def test_convert_to_webp_cleans_up_tmp_on_failure(tmp_path, monkeypatch):
     assert not list(tmp_path.glob("*.tmp"))
 
 
+
+def test_collect_stores_webp_path_and_keeps_jpeg_in_cache(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path / "cache")
+    monkeypatch.setattr(pt, "CACHE_IMAGES_DIR", tmp_path / "cache" / "images")
+    monkeypatch.setattr(pt, "DATA_DIR", tmp_path / "data")
+    monkeypatch.setattr(pt, "IMAGES_DIR", tmp_path / "data" / "tickets" / "images")
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+
+    session = FlakySession(html_ru)
+    monkeypatch.setattr(
+        session, "get", lambda url, **kw: FakeResponse(_write_jpeg_bytes())
+        if url.endswith(".jpg")
+        else FakeResponse(html_ru.encode("utf-8"), content_type="text/html"),
+        raising=False,
+    )
+
+    tickets, _total, _pages_seen, _page_count = pt.collect(session)
+    with_image = [t for t in tickets if t["image"]]
+    assert with_image, "в фикстуре есть билеты с картинками"
+    for ticket in with_image:
+        assert ticket["image"].endswith(".webp")
+        assert (tmp_path / "data" / ticket["image"]).exists()
+    assert not list((tmp_path / "data" / "tickets" / "images").glob("*.jpg"))
+    assert list((tmp_path / "cache" / "images").glob("*.jpg")), "JPEG остаётся в кэше"
