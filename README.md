@@ -15,7 +15,7 @@
 
 ## Форма «Заказать звонок»
 
-Заявки уходят через [FormSubmit.co](https://formsubmit.co) на `revelmaat@yahoo.com`.
+Заявки уходят через [FormSubmit.co](https://formsubmit.co) на `autoshkola.ge@gmail.com`.
 
 **Важно (один раз):** после первой заявки FormSubmit пришлёт на эту почту письмо
 с кнопкой активации — нужно нажать «Activate», иначе заявки не будут доходить.

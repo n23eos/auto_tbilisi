@@ -150,7 +150,7 @@ document.documentElement.classList.add('has-js');
       _captcha: 'false'
     };
 
-    fetch('https://formsubmit.co/ajax/revelmaat@yahoo.com', {
+    fetch('https://formsubmit.co/ajax/autoshkola.ge@gmail.com', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
