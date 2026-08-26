@@ -701,6 +701,23 @@ a:hover {
   gap: var(--space-sm);
 }
 
+/* Контакт для партнёров — тише клиентских, отделён линией */
+.footer__partners {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: var(--rule-hair);
+  color: var(--color-ink-faint);
+  font-size: var(--text-xs);
+}
+
+.footer__partners a {
+  color: var(--color-ink-muted);
+}
+
+.footer__partners a:hover {
+  color: var(--color-accent);
+}
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {

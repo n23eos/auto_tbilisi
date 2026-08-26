@@ -15,13 +15,16 @@
 
 ## Форма «Заказать звонок»
 
-Заявки уходят через [FormSubmit.co](https://formsubmit.co) на `autoshkola.ge@gmail.com`.
+Заявки уходят через [FormSubmit.co](https://formsubmit.co) на `info@avtoshkola.ge` (пересылка ImprovMX на Gmail).
 
 **Важно (один раз):** после первой заявки FormSubmit пришлёт на эту почту письмо
 с кнопкой активации — нужно нажать «Activate», иначе заявки не будут доходить.
 
 Сменить почту: заменить адрес в `js/main.js` (строка с `formsubmit.co/ajax/...`)
 и в `index.html` (атрибут `action` формы).
+
+Адреса домена: `info@` — для клиентов, `partners@` — для партнёров.
+Пересылка настроена через ImprovMX (бесплатный тариф), записи MX ведут на mx1/mx2.improvmx.com.
 
 ## Запуск локально
 
