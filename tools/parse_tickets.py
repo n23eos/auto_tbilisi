@@ -7,11 +7,14 @@
 константы, из них выводятся URL, cookie, имя JSON и путь к картинкам.
 """
 
+import json
 import os
 import re
+import time
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import quote, urljoin
 
+import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 
@@ -38,6 +41,11 @@ CATEGORY_MARKER = f'data-active="/tickets/{CATEGORY_ID}"'
 TOTAL_RE = re.compile(r"სულ\s+(\d+)")
 
 REQUEST_TIMEOUT_SEC = 30
+
+PAGE_DELAY_SEC = 0.7
+HTTP_RETRIES = 3
+RETRY_BACKOFF_SEC = 2
+USER_AGENT = "autoshkola.ge tickets parser (+https://avtoshkola.ge)"
 
 
 def parse_total(html):
@@ -274,3 +282,63 @@ def download_image(session, url, dest):
     finally:
         # os.replace переименовал файл — тогда tmp уже нет; если упали раньше, убираем мусор.
         tmp.unlink(missing_ok=True)
+
+
+def build_session():
+    """HTTP-сессия с cookie нужного языка.
+
+    Источник переключает язык только на полный объект настроек: неполный
+    (без category/skin/user) локаль не меняет — проверено вручную.
+    """
+    settings = {"category": CATEGORY_ID, "locale": LOCALE, "skin": "dark", "user": 0}
+    cookie_value = quote(json.dumps(settings, separators=(",", ":")), safe="")
+    session = requests.Session()
+    session.headers.update(
+        {
+            "User-Agent": USER_AGENT,
+            "Cookie": f"exam-settings={cookie_value}",
+        }
+    )
+    return session
+
+
+class WrongLocaleError(RuntimeError):
+    """Ответ пришёл в чужой локали/категории — не ретраится и не кэшируется."""
+
+
+def fetch_page(session, page, refresh=False):
+    """HTML страницы списка: из кэша, либо из сети с ретраями.
+
+    Ответ в чужой локали/категории — это ошибка, а не повод писать его в кэш.
+    Отдельный класс исключения нужен, чтобы отличать её от сетевых сбоев:
+    оба вида ошибок могут прийти как RuntimeError (в т.ч. от самой сессии),
+    но ретраить можно только сетевые.
+    """
+    if not refresh:
+        cached = read_cached_page(page)
+        if cached is not None:
+            return cached
+
+    last_error = None
+    for attempt in range(1, HTTP_RETRIES + 1):
+        try:
+            response = session.get(
+                LIST_URL, params={"page": page}, timeout=REQUEST_TIMEOUT_SEC
+            )
+            response.raise_for_status()
+            html = response.content.decode("utf-8", errors="replace")
+            if not is_page_html_valid(html):
+                raise WrongLocaleError(
+                    f"страница {page}: ответ не в локали {LOCALE} "
+                    f"или не категория {CATEGORY_ID}"
+                )
+            write_cached_page(page, html)
+            time.sleep(PAGE_DELAY_SEC)
+            return html
+        except WrongLocaleError:
+            raise
+        except Exception as error:
+            last_error = error
+            time.sleep(RETRY_BACKOFF_SEC * attempt)
+
+    raise RuntimeError(f"страница {page}: не удалось скачать за {HTTP_RETRIES} попыток ({last_error})")

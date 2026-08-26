@@ -390,3 +390,76 @@ def test_download_image_cleans_up_tmp_on_replace_failure(tmp_path, monkeypatch):
         pt.download_image(session, "https://example.com/f.jpg", dest)
     assert not list(tmp_path.glob("*.tmp"))
     assert not dest.exists()
+
+
+class FlakySession:
+    """Отдаёт ошибку первые fail_times вызовов, потом — страницу."""
+
+    def __init__(self, html, fail_times=0):
+        self.html = html
+        self.fail_times = fail_times
+        self.calls = 0
+
+    def get(self, url, **kwargs):
+        self.calls += 1
+        if self.calls <= self.fail_times:
+            raise RuntimeError("сеть отвалилась")
+        return FakeResponse(self.html.encode("utf-8"), content_type="text/html")
+
+
+def test_fetch_page_uses_cache_without_network(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    pt.write_cached_page(1, html_ru)
+    session = FlakySession(html_ru)
+    assert pt.fetch_page(session, 1) == html_ru
+    assert session.calls == 0
+
+
+def test_fetch_page_downloads_and_caches(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    session = FlakySession(html_ru)
+    assert pt.fetch_page(session, 2) == html_ru
+    assert session.calls == 1
+    assert pt.read_cached_page(2) == html_ru
+
+
+def test_fetch_page_ignores_cache_with_refresh(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    pt.write_cached_page(1, html_ru)
+    session = FlakySession(html_ru)
+    pt.fetch_page(session, 1, refresh=True)
+    assert session.calls == 1
+
+
+def test_fetch_page_retries_then_succeeds(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    monkeypatch.setattr(pt, "RETRY_BACKOFF_SEC", 0)
+    session = FlakySession(html_ru, fail_times=2)
+    assert pt.fetch_page(session, 1) == html_ru
+    assert session.calls == 3
+
+
+def test_fetch_page_raises_after_all_retries(tmp_path, monkeypatch, html_ru):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    monkeypatch.setattr(pt, "RETRY_BACKOFF_SEC", 0)
+    session = FlakySession(html_ru, fail_times=99)
+    with pytest.raises(RuntimeError, match="страниц"):
+        pt.fetch_page(session, 4)
+
+
+def test_fetch_page_rejects_wrong_locale_response(tmp_path, monkeypatch, html_ka):
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+    session = FlakySession(html_ka)
+    with pytest.raises(RuntimeError, match="локал"):
+        pt.fetch_page(session, 1)
+
+
+def test_build_session_sets_locale_cookie():
+    session = pt.build_session()
+    assert "%22locale%22%3A%22ru%22" in session.headers["Cookie"]
+    assert "autoshkola.ge" in session.headers["User-Agent"]
