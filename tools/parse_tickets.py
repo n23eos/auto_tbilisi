@@ -7,12 +7,15 @@
 константы, из них выводятся URL, cookie, имя JSON и путь к картинкам.
 """
 
+import argparse
 import json
 import os
 import re
+import sys
 import time
+from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -342,3 +345,106 @@ def fetch_page(session, page, refresh=False):
             time.sleep(RETRY_BACKOFF_SEC * attempt)
 
     raise RuntimeError(f"страница {page}: не удалось скачать за {HTTP_RETRIES} попыток ({last_error})")
+
+
+TICKET_FIELDS = ("id", "question", "image", "answers", "correct", "source")
+
+
+def build_document(tickets, total):
+    """Итоговый JSON-документ: meta + билеты, отсортированные по id.
+
+    Порядок стабильный, чтобы diff в git был читаемым. Побайтово файл между
+    прогонами не совпадёт — parsed_at меняется.
+    """
+    return {
+        "meta": {
+            "category_id": CATEGORY_ID,
+            "categories": CATEGORY_LABELS,
+            "lang": LOCALE,
+            "source": LIST_URL,
+            "parsed_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "total": total,
+        },
+        "tickets": [
+            {field: ticket.get(field) for field in TICKET_FIELDS}
+            for ticket in sorted(tickets, key=lambda t: t["id"])
+        ],
+    }
+
+
+def write_output(document):
+    """Атомарно записать JSON: провалившаяся запись не портит прошлый результат."""
+    OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    tmp = OUTPUT_JSON.with_suffix(".json.tmp")
+    tmp.write_text(
+        json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    os.replace(tmp, OUTPUT_JSON)
+
+
+def collect(session, refresh=False):
+    """Обойти все страницы, скачать картинки.
+
+    Возвращает (билеты, total, pages_seen, page_count). page_count возвращаем явно:
+    выводить его из pages_seen нельзя — тогда пропущенная страница сама себя спрячет.
+    """
+    first_page = fetch_page(session, 1, refresh=refresh)
+    total = parse_total(first_page)
+    page_count = parse_page_count(first_page)
+    print(f"Источник заявляет: {total} билетов, {page_count} страниц")
+
+    tickets = []
+    pages_seen = {}
+    for page in range(1, page_count + 1):
+        html = first_page if page == 1 else fetch_page(session, page, refresh=refresh)
+        page_tickets = parse_tickets(html, f"{LIST_URL}?page={page}")
+        pages_seen[page] = len(page_tickets)
+        tickets.extend(page_tickets)
+        print(f"  страница {page}/{page_count}: {len(page_tickets)} билетов")
+
+    for ticket in tickets:
+        ticket["image"] = None
+        if not ticket["image_url"]:
+            continue
+        # Имя берём из пути URL, а не из хвоста строки: query-параметр
+        # превратился бы в часть имени файла.
+        filename = Path(urlparse(ticket["image_url"]).path).name
+        dest = IMAGES_DIR / filename
+        if download_image(session, ticket["image_url"], dest):
+            ticket["image"] = str(dest.relative_to(DATA_DIR))
+        else:
+            print(f"  ! билет {ticket['id']}: картинка не скачалась ({ticket['image_url']})")
+
+    return tickets, total, pages_seen, page_count
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Парсер билетов ПДД Грузии (категория B/B1, русский)"
+    )
+    parser.add_argument(
+        "--refresh", action="store_true", help="игнорировать кэш и перекачать страницы"
+    )
+    args = parser.parse_args(argv)
+
+    session = build_session()
+    tickets, total, pages_seen, page_count = collect(session, refresh=args.refresh)
+
+    errors = validate(tickets, total, pages_seen, page_count)
+    if errors:
+        print(f"\nБаза невалидна, найдено проблем: {len(errors)}", file=sys.stderr)
+        for error in errors[:50]:
+            print(f"  - {error}", file=sys.stderr)
+        if len(errors) > 50:
+            print(f"  ... и ещё {len(errors) - 50}", file=sys.stderr)
+        print(f"\n{OUTPUT_JSON} НЕ перезаписан.", file=sys.stderr)
+        return 1
+
+    write_output(build_document(tickets, total))
+    with_images = sum(1 for t in tickets if t["image"])
+    print(f"\nГотово: {len(tickets)} билетов ({with_images} с картинками) → {OUTPUT_JSON}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -463,3 +463,40 @@ def test_build_session_sets_locale_cookie():
     session = pt.build_session()
     assert "%22locale%22%3A%22ru%22" in session.headers["Cookie"]
     assert "autoshkola.ge" in session.headers["User-Agent"]
+
+
+def test_build_document_sorts_by_id_and_fills_meta():
+    tickets = [make_ticket(id=9), make_ticket(id=2)]
+    document = pt.build_document(tickets, total=2)
+    assert [t["id"] for t in document["tickets"]] == [2, 9]
+    assert document["meta"]["category_id"] == 2
+    assert document["meta"]["categories"] == ["B", "B1"]
+    assert document["meta"]["lang"] == "ru"
+    assert document["meta"]["total"] == 2
+    assert document["meta"]["parsed_at"].startswith("20")
+
+
+def test_build_document_drops_internal_image_url_field():
+    tickets = [make_ticket(image_url="https://example.com/a.jpg", image="tickets/images/a.jpg")]
+    document = pt.build_document(tickets, total=1)
+    assert "image_url" not in document["tickets"][0]
+    assert document["tickets"][0]["image"] == "tickets/images/a.jpg"
+
+
+def test_write_output_creates_file(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    pt.write_output({"meta": {"total": 1}, "tickets": [make_ticket()]})
+    import json as json_module
+
+    written = json_module.loads(target.read_text(encoding="utf-8"))
+    assert written["tickets"][0]["question"] == "Вопрос"
+
+
+def test_write_output_replaces_atomically_without_temp_leftovers(tmp_path, monkeypatch):
+    target = tmp_path / "tickets-b-ru.json"
+    monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    target.write_text('{"старое": true}', encoding="utf-8")
+    pt.write_output({"meta": {}, "tickets": []})
+    assert [p.name for p in tmp_path.iterdir()] == ["tickets-b-ru.json"]
+    assert "старое" not in target.read_text(encoding="utf-8")
