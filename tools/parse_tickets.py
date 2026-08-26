@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
+from PIL import Image
 
 # --- Что парсим (менять здесь, а не по всему файлу) ---
 CATEGORY_ID = 2
@@ -35,6 +36,8 @@ CATEGORY_MARKER = f'data-active="/tickets/{CATEGORY_ID}"'
 
 # В заголовке страницы общее число билетов идёт после грузинского слова "სულ" (всего).
 TOTAL_RE = re.compile(r"სულ\s+(\d+)")
+
+REQUEST_TIMEOUT_SEC = 30
 
 
 def parse_total(html):
@@ -216,3 +219,52 @@ def validate(tickets, total, pages_seen, page_count):
         errors.append(f"дублирующиеся id: {sorted(duplicates)}")
 
     return errors
+
+
+def verify_image(path):
+    """Файл действительно декодируется как изображение.
+
+    verify() ловит битую структуру, но не всегда — обрыв файла, поэтому следом
+    открываем заново и делаем load(): у недокачанного JPEG заголовок цел,
+    а данные — нет.
+    """
+    try:
+        with Image.open(path) as image:
+            image.verify()
+        with Image.open(path) as image:
+            image.load()
+        return True
+    except Exception:
+        return False
+
+
+def download_image(session, url, dest):
+    """Скачать картинку в dest. True — на диске лежит проверенное изображение.
+
+    Уже лежащий файл повторно не качаем, но проверяем: Content-Type для него
+    взять неоткуда, поэтому единственная проверка — декодирование.
+    """
+    if dest.exists():
+        if verify_image(dest):
+            return True
+        dest.unlink()  # мусор с прошлого запуска — качаем заново
+
+    try:
+        response = session.get(url, timeout=REQUEST_TIMEOUT_SEC)
+        response.raise_for_status()
+    except Exception:
+        return False
+
+    content_type = response.headers.get("Content-Type", "")
+    if not content_type.startswith("image/"):
+        return False
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".tmp")
+    tmp.write_bytes(response.content)
+    if not verify_image(tmp):
+        tmp.unlink()
+        return False
+
+    os.replace(tmp, dest)
+    return True

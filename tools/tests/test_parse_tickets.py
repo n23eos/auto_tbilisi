@@ -1,6 +1,8 @@
+import io
 from pathlib import Path
 
 import pytest
+from PIL import Image
 
 from tools import parse_tickets as pt
 
@@ -253,3 +255,103 @@ def test_write_cached_page_leaves_no_temp_files(tmp_path, monkeypatch, html_ru):
     monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
     pt.write_cached_page(1, html_ru)
     assert [p.name for p in tmp_path.iterdir()] == ["page-1.html"]
+
+
+def _write_png(path, size=(8, 8)):
+    from PIL import Image
+
+    Image.new("RGB", size, (10, 120, 200)).save(path, format="PNG")
+
+
+def _write_jpeg_bytes(size=(64, 64)):
+    import io
+
+    from PIL import Image
+
+    buffer = io.BytesIO()
+    Image.new("RGB", size, (200, 60, 10)).save(buffer, format="JPEG")
+    return buffer.getvalue()
+
+
+def test_verify_image_accepts_real_png(tmp_path):
+    path = tmp_path / "good.png"
+    _write_png(path)
+    assert pt.verify_image(path) is True
+
+
+def test_verify_image_rejects_html_with_jpg_extension(tmp_path):
+    path = tmp_path / "cloudflare.jpg"
+    path.write_text("<html><body>Attention Required! | Cloudflare</body></html>", encoding="utf-8")
+    assert pt.verify_image(path) is False
+
+
+def test_verify_image_rejects_truncated_jpeg(tmp_path):
+    data = _write_jpeg_bytes()
+    path = tmp_path / "truncated.jpg"
+    path.write_bytes(data[: len(data) // 2])
+    # Магические байты у обрезанного файла верные — поймать может только декодирование.
+    assert path.read_bytes()[:2] == b"\xff\xd8"
+    assert pt.verify_image(path) is False
+
+
+def test_verify_image_rejects_missing_file(tmp_path):
+    assert pt.verify_image(tmp_path / "нет-такого.jpg") is False
+
+
+class FakeResponse:
+    def __init__(self, content, content_type="image/jpeg", status=200):
+        self.content = content
+        self.headers = {"Content-Type": content_type}
+        self.status_code = status
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
+
+class FakeSession:
+    def __init__(self, response):
+        self.response = response
+        self.calls = 0
+
+    def get(self, url, **kwargs):
+        self.calls += 1
+        return self.response
+
+
+def test_download_image_saves_valid_image(tmp_path):
+    session = FakeSession(FakeResponse(_write_jpeg_bytes()))
+    dest = tmp_path / "a.jpg"
+    assert pt.download_image(session, "https://example.com/a.jpg", dest) is True
+    assert dest.exists()
+
+
+def test_download_image_rejects_non_image_content_type(tmp_path):
+    session = FakeSession(FakeResponse(b"<html>error</html>", content_type="text/html"))
+    dest = tmp_path / "b.jpg"
+    assert pt.download_image(session, "https://example.com/b.jpg", dest) is False
+    assert not dest.exists()
+
+
+def test_download_image_rejects_corrupt_body_and_removes_file(tmp_path):
+    session = FakeSession(FakeResponse(b"not an image at all", content_type="image/jpeg"))
+    dest = tmp_path / "c.jpg"
+    assert pt.download_image(session, "https://example.com/c.jpg", dest) is False
+    assert not dest.exists()
+
+
+def test_download_image_skips_existing_valid_file(tmp_path):
+    dest = tmp_path / "d.png"
+    _write_png(dest)
+    session = FakeSession(FakeResponse(b"", content_type="image/jpeg"))
+    assert pt.download_image(session, "https://example.com/d.png", dest) is True
+    assert session.calls == 0
+
+
+def test_download_image_redownloads_existing_broken_file(tmp_path):
+    dest = tmp_path / "e.jpg"
+    dest.write_text("<html>мусор с прошлого запуска</html>", encoding="utf-8")
+    session = FakeSession(FakeResponse(_write_jpeg_bytes()))
+    assert pt.download_image(session, "https://example.com/e.jpg", dest) is True
+    assert session.calls == 1
+    assert pt.verify_image(dest) is True
