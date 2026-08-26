@@ -3,7 +3,7 @@
 // ЧТОБЫ ВКЛЮЧИТЬ: впишите ниже свой идентификатор вида G-XXXXXXXXXX
 // (берётся в аккаунте Google Analytics: Администратор → Потоки данных → ваш сайт).
 // Пока здесь пусто, счётчик не грузится и на скорость сайта не влияет.
-const GA_MEASUREMENT_ID = '';
+const GA_MEASUREMENT_ID = 'G-ZC7378W9KE';
 
 (function () {
   const isValidId = /^G-[A-Z0-9]{6,}$/.test(GA_MEASUREMENT_ID);
