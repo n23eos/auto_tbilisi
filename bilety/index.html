@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Билеты ПДД Грузии онлайн на русском — экзамен 2026 | Автошкола Тбилиси</title>
+  <meta name="description" content="Экзамен по билетам ПДД Грузии на русском языке: 30 вопросов, 30 минут, до 3 ошибок — как на настоящем экзамене. Бесплатно, без регистрации.">
+  <link rel="canonical" href="https://avtoshkola.ge/bilety/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#faf9f6">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://avtoshkola.ge/bilety/">
+  <meta property="og:site_name" content="Автошкола на русском языке — Тбилиси">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Билеты ПДД Грузии онлайн на русском — экзамен">
+  <meta property="og:description" content="30 вопросов, 30 минут, до 3 ошибок — как на настоящем экзамене в Грузии. Бесплатно.">
+  <meta property="og:image" content="https://avtoshkola.ge/media/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/tokens.css?v=13">
+  <link rel="stylesheet" href="../css/style.css?v=13">
+  <link rel="stylesheet" href="../css/exam.css?v=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    "name": "Экзамен по билетам ПДД Грузии на русском языке",
+    "about": "Правила дорожного движения Грузии, категория B",
+    "educationalLevel": "Подготовка к теоретическому экзамену на права категории B",
+    "inLanguage": "ru",
+    "url": "https://avtoshkola.ge/bilety/"
+  }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="nav__brand" href="../">Автошкола<span class="nav__brand-dot">·</span>Тбилиси</a>
+    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+  </header>
+
+  <main class="exam" id="exam">
+    <!-- Экран 1: старт -->
+    <section class="exam__screen exam__intro" id="screen-intro">
+      <h1 class="exam__title">Билеты ПДД Грузии на русском</h1>
+      <p class="exam__lead">
+        Экзамен идёт по правилам настоящего: 30 вопросов, 30 минут,
+        допустимо не больше трёх ошибок. Регистрация не нужна.
+      </p>
+      <dl class="exam__rules">
+        <div class="exam__rule"><dt>Вопросов</dt><dd>30</dd></div>
+        <div class="exam__rule"><dt>Времени</dt><dd>30 минут</dd></div>
+        <div class="exam__rule"><dt>Ошибок можно</dt><dd>не больше 3</dd></div>
+      </dl>
+      <button class="exam__btn exam__btn--primary" id="btn-start" type="button">Начать экзамен</button>
+      <p class="exam__status" id="intro-status" role="status">Загружаем билеты…</p>
+    </section>
+
+    <!-- Экран 2: вопрос -->
+    <section class="exam__screen exam__quiz" id="screen-quiz" hidden>
+      <div class="exam__bar">
+        <span class="exam__counter">Вопрос <b id="q-index">1</b> из <b id="q-total">30</b></span>
+        <span class="exam__timer" id="q-timer">30:00</span>
+        <span class="exam__mistakes">Ошибок: <b id="q-mistakes">0</b> из 3</span>
+      </div>
+      <div class="exam__progress"><div class="exam__progress-fill" id="q-progress"></div></div>
+
+      <h2 class="exam__question" id="q-text" tabindex="-1"></h2>
+      <figure class="exam__figure" id="q-figure" hidden>
+        <img class="exam__image" id="q-image" src="" alt="Изображение к вопросу билета">
+      </figure>
+
+      <ul class="exam__answers" id="q-answers"></ul>
+
+      <p class="exam__feedback" id="q-feedback" role="status" aria-live="polite"></p>
+      <button class="exam__btn exam__btn--primary" id="btn-next" type="button" hidden>Дальше</button>
+      <p class="exam__hint">Ответ — клавиши 1–4, дальше — Enter</p>
+    </section>
+
+    <!-- Экран 3: результат -->
+    <section class="exam__screen exam__result" id="screen-result" hidden>
+      <h2 class="exam__verdict" id="r-verdict"></h2>
+      <p class="exam__summary" id="r-summary"></p>
+      <div class="exam__actions">
+        <button class="exam__btn exam__btn--primary" id="btn-restart" type="button">Пройти ещё раз</button>
+        <a class="exam__btn exam__btn--ghost" href="../#callback-form">Записаться на курс</a>
+      </div>
+      <h3 class="exam__mistakes-title" id="r-mistakes-title" hidden>Разбор ошибок</h3>
+      <ol class="exam__review" id="r-review"></ol>
+    </section>
+
+    <p class="exam__source">
+      Вопросы и изображения — официальные экзаменационные билеты Грузии,
+      источник: <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>.
+      Тема «эко-вождение» (51 билет) на реальном экзамене существует только на грузинском,
+      поэтому в тренажёр она не включена.
+    </p>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__mark">Автошкола на русском языке</p>
+    <p class="footer__tagline">Полный курс ПДД и вождение — Тбилиси, Грузия</p>
+    <p class="footer__meta">
+      <a href="https://www.facebook.com/avtoshkolatbilisi" rel="noopener">Facebook</a>
+      <span aria-hidden="true">·</span>
+      <a href="tel:+995599987707">+995 599 98 77 07</a>
+      <span aria-hidden="true">·</span>
+      <span>Пр-т Важа Пшавела 9, Тбилиси</span>
+    </p>
+  </footer>
+
+  <script type="module" src="../js/exam.js?v=1"></script>
+</body>
+</html>
