@@ -3,3 +3,5 @@
 29395-375947009.mp4
 tools/.cache/
 .venv/
+__pycache__/
+*.pyc

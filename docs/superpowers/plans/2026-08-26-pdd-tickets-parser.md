@@ -375,7 +375,7 @@ def test_parse_tickets_keeps_ticket_without_correct_marker(html_ru):
 
 В `tools/parse_tickets.py` добавить импорт вверху файла:
 ```python
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 ```
 
 И функции в конец файла:
@@ -438,7 +438,7 @@ def parse_tickets(html, page_url):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 12 passed
+Ожидаемо: 13 passed
 
 - [ ] **Step 5: Commit**
 
@@ -646,7 +646,7 @@ def validate(tickets, total, pages_seen, page_count):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 27 passed
+Ожидаемо: 28 passed
 
 - [ ] **Step 5: Commit**
 
@@ -775,7 +775,7 @@ def write_cached_page(page, html):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 35 passed
+Ожидаемо: 36 passed
 
 - [ ] **Step 5: Commit**
 
@@ -995,7 +995,7 @@ def download_image(session, url, dest):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 44 passed
+Ожидаемо: 45 passed
 
 - [ ] **Step 9: Commit**
 
@@ -1173,7 +1173,7 @@ def fetch_page(session, page, refresh=False):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 51 passed
+Ожидаемо: 52 passed
 
 - [ ] **Step 5: Commit**
 
@@ -1247,7 +1247,9 @@ def test_write_output_replaces_atomically_without_temp_leftovers(tmp_path, monke
 import argparse
 import sys
 from datetime import datetime
+from urllib.parse import urlparse
 ```
+(`urlparse` нужен в `collect()` ниже — для имени файла картинки.)
 
 И функции:
 ```python
@@ -1291,7 +1293,7 @@ def write_output(document):
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 55 passed
+Ожидаемо: 56 passed
 
 - [ ] **Step 5: Написать main()**
 
@@ -1377,7 +1379,7 @@ if __name__ == "__main__":
 ```bash
 .venv/bin/python -m pytest tools/tests/test_parse_tickets.py -v
 ```
-Ожидаемо: 55 passed
+Ожидаемо: 56 passed
 
 - [ ] **Step 8: Commit**
 
@@ -1483,7 +1485,7 @@ git commit -m "docs: README — как собрать базу билетов"
 После Task 10 в ветке `dev`:
 - `data/tickets-b-ru.json` — 921 билет, отсортированы по id
 - `data/tickets/images/` — картинки, проверенные декодированием
-- `tools/parse_tickets.py` + 55 тестов, сеть в тестах не нужна
+- `tools/parse_tickets.py` + 56 тестов, сеть в тестах не нужна
 - `index.html`, css, js не изменены, `main` не тронут
 
 Следующий этап (отдельный спек): раздел-тренажёр на сайте.
