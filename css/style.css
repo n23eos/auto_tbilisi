@@ -106,6 +106,10 @@ a:hover {
   color: var(--color-accent);
 }
 
+.nav.is-solid .nav__link {
+  color: var(--color-ink);
+}
+
 .nav.is-solid .nav__cta {
   border-color: var(--color-accent);
   color: var(--color-accent);
@@ -137,6 +141,22 @@ a:hover {
 .nav__brand-dot {
   color: var(--color-accent-bright);
   margin-inline: 0.35em;
+}
+
+/* Ссылка на билеты: цвет как у бренда — светлый поверх видео, тёмный на сплошной подложке */
+.nav__link {
+  font-family: var(--font-body);
+  color: var(--color-ink-invert);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: auto;
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+.nav__link:hover {
+  text-decoration: underline;
 }
 
 .nav__cta {
@@ -398,6 +418,22 @@ a:hover {
 .steps__item p {
   color: var(--color-ink-muted);
   max-width: 52ch;
+}
+
+.steps__cta {
+  margin-top: var(--space-lg);
+}
+
+.exam-link {
+  font-weight: 600;
+  color: var(--color-accent-deep);
+  text-decoration: none;
+  border-bottom: 2px solid var(--color-accent);
+  padding-bottom: 2px;
+}
+
+.exam-link:hover {
+  color: var(--color-ink);
 }
 
 /* ---------- Форматы ---------- */
