@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Тренировка по билетам ПДД Грузии на русском — все 870 вопросов</title>
+  <meta name="description" content="Свободная тренировка по всем билетам ПДД Грузии на русском: без таймера и лимита ошибок, с фильтрами и работой над ошибками. Браузер запоминает прогресс.">
+  <link rel="canonical" href="https://avtoshkola.ge/bilety/trenirovka/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#faf9f6">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://avtoshkola.ge/bilety/trenirovka/">
+  <meta property="og:site_name" content="Автошкола на русском языке — Тбилиси">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Тренировка по билетам ПДД Грузии на русском">
+  <meta property="og:description" content="Все билеты по порядку, без таймера и лимита ошибок. Прогресс и работа над ошибками сохраняются в браузере.">
+  <meta property="og:image" content="https://avtoshkola.ge/media/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/tokens.css?v=13">
+  <link rel="stylesheet" href="../../css/style.css?v=13">
+  <link rel="stylesheet" href="../../css/exam.css?v=1">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
+</head>
+<body>
+  <header class="nav is-solid">
+    <a class="nav__brand" href="../../">Автошкола<span class="nav__brand-dot">·</span>Тбилиси</a>
+    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+  </header>
+
+  <main class="exam" id="training">
+    <h1 class="exam__title">Тренировка по билетам ПДД</h1>
+    <p class="exam__lead">
+      Все билеты по порядку, без таймера и лимита ошибок. Браузер запомнит,
+      где вы остановились и что уже решено.
+    </p>
+
+    <div class="exam__filters" role="group" aria-label="Что показывать">
+      <button class="exam__filter is-active" id="filter-all" type="button" data-filter="all">Все билеты</button>
+      <button class="exam__filter" id="filter-unsolved" type="button" data-filter="unsolved">Нерешённые</button>
+      <button class="exam__filter" id="filter-mistakes" type="button" data-filter="mistakes">Мои ошибки</button>
+    </div>
+
+    <div class="exam__bar">
+      <span class="exam__counter">Билет <b id="t-index">1</b> из <b id="t-total">0</b></span>
+      <span class="exam__counter">Решено верно: <b id="t-solved">0</b> из <b id="t-pool">0</b></span>
+    </div>
+    <div class="exam__progress"><div class="exam__progress-fill" id="t-progress"></div></div>
+
+    <p class="exam__status" id="t-status" role="status">Загружаем билеты…</p>
+
+    <section class="exam__screen" id="t-card" hidden>
+      <h2 class="exam__question" id="t-text" tabindex="-1"></h2>
+      <figure class="exam__figure" id="t-figure" hidden>
+        <img class="exam__image" id="t-image" src="" alt="Изображение к вопросу билета">
+      </figure>
+      <ul class="exam__answers" id="t-answers"></ul>
+      <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
+      <div class="exam__actions">
+        <button class="exam__btn exam__btn--ghost" id="t-prev" type="button">← Назад</button>
+        <button class="exam__btn exam__btn--primary" id="t-next" type="button">Дальше →</button>
+      </div>
+      <p class="exam__hint">Ответ — клавиши 1–4, переход — стрелки влево и вправо</p>
+    </section>
+
+    <p class="exam__empty" id="t-empty" hidden></p>
+
+    <div class="exam__reset">
+      <button class="exam__btn exam__btn--ghost" id="t-reset" type="button">Сбросить прогресс</button>
+      <p class="exam__note">
+        Прогресс хранится только в этом браузере: на другом устройстве его не будет,
+        а в приватном окне он не сохранится. Кнопка сброса стирает его безвозвратно.
+      </p>
+    </div>
+
+    <p class="exam__source">
+      Вопросы и изображения — официальные экзаменационные билеты Грузии, источник:
+      <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>.
+      Тема «эко-вождение» (51 билет) есть только на грузинском и в тренировку не включена.
+    </p>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__mark">Автошкола на русском языке</p>
+    <p class="footer__tagline">Полный курс ПДД и вождение — Тбилиси, Грузия</p>
+    <p class="footer__meta">
+      <a href="https://www.facebook.com/avtoshkolatbilisi" rel="noopener">Facebook</a>
+      <span aria-hidden="true">·</span>
+      <a href="tel:+995599987707">+995 599 98 77 07</a>
+      <span aria-hidden="true">·</span>
+      <span>Пр-т Важа Пшавела 9, Тбилиси</span>
+    </p>
+  </footer>
+
+  <script type="module" src="../../js/training.js?v=1"></script>
+</body>
+</html>

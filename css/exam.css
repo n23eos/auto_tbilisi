@@ -215,3 +215,32 @@
   .exam__bar { font-size: var(--text-xs); }
   .exam__btn { width: 100%; text-align: center; }
 }
+
+/* --- Тренировка --- */
+
+.exam__filters { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+
+.exam__filter {
+  border: var(--rule-hair);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-2);
+  color: var(--color-ink-muted);
+  padding: var(--space-2xs) var(--space-md);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.exam__filter:hover { border-color: var(--color-line-strong); }
+.exam__filter:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+
+.exam__filter.is-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.exam__empty { font-size: var(--text-lg); color: var(--color-ink-muted); margin: var(--space-2xl) 0; }
+.exam__reset { margin-top: var(--space-3xl); }
+.exam__note { font-size: var(--text-xs); color: var(--color-ink-faint); max-width: 34rem; margin-top: var(--space-xs); }
