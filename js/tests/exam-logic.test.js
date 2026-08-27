@@ -42,6 +42,15 @@ test("при нехватке русских билетов выборка па�
   assert.throws(() => selectExamTickets(pool), /русских билетов 5/);
 });
 
+test("изъятые билеты в экзамен не попадают", () => {
+  const pool = [
+    ...makeTickets(40, "ru"),
+    ...makeTickets(40, "ru").map((t) => ({ ...t, id: t.id + 100, withdrawn: true })),
+  ];
+  const picked = selectExamTickets(pool);
+  assert.ok(picked.every((t) => !t.withdrawn));
+});
+
 test("проверка ответа сравнивает индекс с полем correct", () => {
   const ticket = { correct: 2 };
   assert.equal(isCorrect(ticket, 2), true);

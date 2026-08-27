@@ -117,6 +117,17 @@ test("грузинские билеты не попадают ни в один �
   }
 });
 
+test("изъятые билеты не попадают ни в один фильтр", () => {
+  const pool = [
+    { id: 1, lang: "ru" },
+    { id: 2, lang: "ru", withdrawn: true },
+  ];
+  for (const filter of Object.values(FILTERS)) {
+    const list = filterTickets(pool, { solved: [2], mistakes: [2], position: 0 }, filter);
+    assert.ok(list.every((t) => !t.withdrawn));
+  }
+});
+
 test("позиция не уходит за границы списка", () => {
   assert.equal(clampPosition(99, 3), 2);
   assert.equal(clampPosition(-4, 3), 0);

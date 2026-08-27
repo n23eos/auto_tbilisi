@@ -15,7 +15,8 @@ export const TIME_LIMIT_SEC = 30 * 60;
  * который не может прочитать.
  */
 export function selectExamTickets(tickets, random = Math.random) {
-  const pool = tickets.filter((ticket) => ticket.lang === "ru");
+  // Изъятые из официального банка вопросы ученику показывать незачем.
+  const pool = tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn);
   if (pool.length < QUESTION_COUNT) {
     throw new Error(`русских билетов ${pool.length}, нужно минимум ${QUESTION_COUNT}`);
   }

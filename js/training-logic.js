@@ -63,7 +63,8 @@ export function markAnswer(progress, ticketId, wasCorrect) {
 }
 
 export function filterTickets(tickets, progress, filter) {
-  const ru = tickets.filter((ticket) => ticket.lang === "ru");
+  // Изъятые из официального банка вопросы ученику показывать незачем.
+  const ru = tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn);
   if (filter === FILTERS.UNSOLVED) {
     const solved = new Set(progress.solved);
     return ru.filter((ticket) => !solved.has(ticket.id));
