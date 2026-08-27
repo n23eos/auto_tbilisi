@@ -10,6 +10,7 @@ import {
   isCorrect,
   selectExamTickets,
 } from "./exam-logic.js";
+import { markAnswer, readProgress, writeProgress } from "./training-logic.js";
 
 const DATA_URL = "../data/tickets-b-ru.json";
 const IMAGES_BASE = "../data/";
@@ -123,6 +124,15 @@ function answer(answerIndex) {
     if (index === ticket.correct) button.classList.add("exam__answer--correct");
     if (index === answerIndex && !correct) button.classList.add("exam__answer--wrong");
   });
+
+  // Ошибки экзамена попадают в общий прогресс, чтобы их можно было
+  // отработать в разделе тренировки.
+  try {
+    const storage = window.localStorage;
+    writeProgress(storage, markAnswer(readProgress(storage), ticket.id, correct));
+  } catch {
+    // Хранилище недоступно — экзамену это не мешает.
+  }
 
   const feedback = el("q-feedback");
   if (correct) {
