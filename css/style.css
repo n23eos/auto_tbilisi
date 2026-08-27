@@ -650,6 +650,143 @@ a:hover {
   }
 }
 
+/* ---------- Страница «Вопросы и ответы» ---------- */
+
+.qa {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: calc(var(--space-3xl) + 2rem) clamp(1rem, 4vw, 3rem) var(--space-2xl);
+}
+
+.qa__crumbs {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.qa__title {
+  margin-top: var(--space-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-display-s);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.qa__lede {
+  max-width: 40rem;
+  margin-top: var(--space-md);
+  font-size: var(--text-lg);
+  color: var(--color-ink-muted);
+}
+
+/* Оглавление — ссылки на разделы, переносятся по ширине */
+.qa__toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xl);
+  padding-block: var(--space-md);
+  border-block: var(--rule-hair);
+}
+
+.qa__toc a {
+  padding: var(--space-2xs) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.qa__toc a:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.qa__section {
+  margin-top: var(--space-2xl);
+  /* Якорь не должен уезжать под липкую шапку */
+  scroll-margin-top: 6rem;
+}
+
+.qa__section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  padding-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--color-ink);
+}
+
+/* Второй абзац в ответе не должен слипаться с первым */
+.qa .faq__item p + p {
+  margin-top: var(--space-sm);
+}
+
+.qa__cta {
+  margin-top: var(--space-2xl);
+  padding: var(--space-xl);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+}
+
+.qa__cta h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.qa__cta p {
+  margin-top: var(--space-sm);
+  color: var(--color-ink-muted);
+}
+
+.qa__cta-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.qa__cta-call,
+.qa__cta-form {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-lg);
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.qa__cta-call {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.qa__cta-call:hover {
+  background: var(--color-accent-deep);
+  color: var(--color-on-accent);
+}
+
+.qa__cta-form {
+  border: 1px solid var(--color-line-strong);
+}
+
+.qa__cta-form:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Ссылка из блока вопросов на главной — на полную страницу */
+.faq__more {
+  margin-top: var(--space-lg);
+  font-weight: 600;
+}
+
 /* ---------- Контакты + форма ---------- */
 
 .contact {
