@@ -233,6 +233,11 @@ function finish(timeUp) {
 }
 
 function start() {
+  // Порог берём из логики, а не из разметки: иначе при его изменении
+  // текст на странице и поведение экзамена разъедутся.
+  el("q-max").textContent = String(MAX_MISTAKES);
+  el("rule-max").textContent = String(MAX_MISTAKES);
+
   state.questions = selectExamTickets(state.pool);
   state.index = 0;
   state.mistakes = 0;

@@ -48,12 +48,12 @@ test("проверка ответа сравнивает индекс с пол�
   assert.equal(isCorrect(ticket, 0), false);
 });
 
-test("три ошибки — сдал", () => {
+test("ошибок ровно по порогу — сдал", () => {
   const verdict = examVerdict({ answered: QUESTION_COUNT, mistakes: MAX_MISTAKES, timeUp: false });
   assert.equal(verdict.passed, true);
 });
 
-test("четыре ошибки — не сдал", () => {
+test("на одну ошибку больше порога — не сдал", () => {
   const verdict = examVerdict({ answered: 12, mistakes: MAX_MISTAKES + 1, timeUp: false });
   assert.equal(verdict.passed, false);
   assert.equal(verdict.reason, "mistakes");

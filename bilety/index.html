@@ -51,12 +51,12 @@
       <h1 class="exam__title">Билеты ПДД Грузии на русском</h1>
       <p class="exam__lead">
         Экзамен идёт по правилам настоящего: 30 вопросов, 30 минут,
-        допустимо не больше трёх ошибок. Регистрация не нужна.
+        допустимо не больше пяти ошибок. Регистрация не нужна.
       </p>
       <dl class="exam__rules">
         <div class="exam__rule"><dt>Вопросов</dt><dd>30</dd></div>
         <div class="exam__rule"><dt>Времени</dt><dd>30 минут</dd></div>
-        <div class="exam__rule"><dt>Ошибок можно</dt><dd>не больше 3</dd></div>
+        <div class="exam__rule"><dt>Ошибок можно</dt><dd>не больше <span id="rule-max">5</span></dd></div>
       </dl>
       <button class="exam__btn exam__btn--primary" id="btn-start" type="button">Начать экзамен</button>
       <p class="exam__status" id="intro-status" role="status">Загружаем билеты…</p>
@@ -67,7 +67,7 @@
       <div class="exam__bar">
         <span class="exam__counter">Вопрос <b id="q-index">1</b> из <b id="q-total">30</b></span>
         <span class="exam__timer" id="q-timer">30:00</span>
-        <span class="exam__mistakes">Ошибок: <b id="q-mistakes">0</b> из 3</span>
+        <span class="exam__mistakes">Ошибок: <b id="q-mistakes">0</b> из <b id="q-max">5</b></span>
       </div>
       <div class="exam__progress"><div class="exam__progress-fill" id="q-progress"></div></div>
 

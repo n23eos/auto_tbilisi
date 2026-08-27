@@ -3,7 +3,10 @@
 // в node --test без браузера.
 
 export const QUESTION_COUNT = 30;
-export const MAX_MISTAKES = 3;
+// Порог по данным самой автошколы, которая возит учеников на экзамен.
+// В коде teoria.on.ge зашито другое правило (провал при >10% ошибок, то есть
+// 3 ошибки из 30), но их сайт мог отстать от текущего регламента.
+export const MAX_MISTAKES = 5;
 export const TIME_LIMIT_SEC = 30 * 60;
 
 /**
