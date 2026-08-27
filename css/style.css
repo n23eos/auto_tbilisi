@@ -163,6 +163,14 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Пункт текущей страницы */
+.nav__link.is-current {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
 .nav__cta {
   margin-left: auto;
   font-family: var(--font-body);
@@ -717,10 +725,9 @@ a:hover {
   scroll-margin-top: 6rem;
 }
 
-.qa__section-title {
-  font-family: var(--font-display);
+/* Заголовок секции меньшего размера — как section-title, но для плотных страниц */
+.section-title--compact {
   font-size: var(--text-2xl);
-  font-weight: 700;
   padding-bottom: var(--space-xs);
   margin-bottom: var(--space-sm);
   border-bottom: 2px solid var(--color-ink);
