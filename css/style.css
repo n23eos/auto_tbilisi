@@ -480,6 +480,112 @@ a:hover {
   max-width: 58ch;
 }
 
+/* ---------- Цены ---------- */
+
+.prices {
+  padding: var(--space-3xl) clamp(1rem, 4vw, 3rem) var(--space-2xl);
+  background: var(--color-paper-2);
+}
+
+.prices__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.prices__group-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid var(--color-ink);
+}
+
+.prices__list {
+  margin: 0;
+}
+
+/* Строка прайса: название слева, цена справа, на узком экране — друг под другом */
+.prices__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-xs);
+  padding-block: var(--space-md);
+  border-bottom: var(--rule-hair);
+}
+
+.prices__row dt {
+  flex: 1 1 12rem;
+  font-weight: 600;
+}
+
+.prices__row dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-accent-deep);
+}
+
+.prices__row .prices__free {
+  color: var(--color-success);
+}
+
+.prices__note {
+  display: block;
+  margin-top: var(--space-2xs);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-ink-muted);
+}
+
+.prices__unit {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-align: right;
+  color: var(--color-ink-faint);
+}
+
+.prices__fees {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  border: var(--rule-hair);
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+}
+
+.prices__fees-lede {
+  margin-top: var(--space-xs);
+  color: var(--color-ink-muted);
+}
+
+.prices__fees-list {
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: var(--space-xs) var(--space-lg);
+}
+
+.prices__fees-list b {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+}
+
+.prices__disclaimer {
+  max-width: 46rem;
+  margin-top: var(--space-xl);
+  color: var(--color-ink-muted);
+}
+
 /* ---------- FAQ ---------- */
 
 .faq {
@@ -1001,6 +1107,38 @@ a:hover {
   .nav__brand {
     font-size: var(--text-xs);
     letter-spacing: 0.03em;
+  }
+
+  /* На узком экране в шапке четыре элемента в строку не помещаются:
+     город в названии убираем, ссылки переносим на вторую строку */
+  .nav__brand-city,
+  .nav__brand-dot {
+    display: none;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
+  }
+
+  .nav__brand {
+    order: 1;
+  }
+
+  .nav__link {
+    order: 2;
+  }
+
+  /* Телефон уходит на всю ширину второй строкой — заодно в него легче попасть пальцем */
+  .nav__cta {
+    order: 3;
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  /* Шапка стала выше — якорным ссылкам нужен больший запас сверху */
+  html {
+    scroll-padding-top: 7rem;
   }
 
   .nav__cta {

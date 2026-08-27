@@ -27,8 +27,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
-  <link rel="stylesheet" href="css/tokens.css?v=13">
-  <link rel="stylesheet" href="css/style.css?v=14">
+  <link rel="stylesheet" href="css/tokens.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=15">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
@@ -47,6 +47,8 @@
         "telephone": "+995599987707",
         "email": "info@avtoshkola.ge",
         "image": "https://avtoshkola.ge/media/og-image.jpg",
+        "priceRange": "28–280 ₾",
+        "currenciesAccepted": "GEL",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Проспект Важа Пшавела, 9",
@@ -175,7 +177,39 @@
             "name": "Сколько стоит обучение?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Цена зависит от выбранной программы и количества занятий. Позвоните нам или закажите звонок — рассчитаем под вас."
+              "text": "Теория в группе — 150 лари за полный курс, индивидуально онлайн — 280 лари за курс или 28 лари за занятие. Вождение: площадка 40 лари за занятие, город 50 лари. Тестирование и консультация бесплатны, медицинская справка — 45 лари. Государственные пошлины за экзамены оплачиваются отдельно."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Где сдают экзамен на права в Грузии?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "В Тбилиси экзамены не принимают. Сдавать можно в одном из 12 городов Грузии — от Рустави до Батуми. Запись идёт на сайте госуслуг my.sa.gov.ge, открывать его нужно с компьютера или в режиме ПК. Если сайт сбоит, зарегистрироваться бесплатно помогут в отделении Банка Грузии или TBC."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Учиться на механике или на автомате?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "На стоимость это не влияет. Права выдают по тому, на чём сдавали экзамен: после автомата в правах будет отметка, что водить можно только автомат. Категория B/B1 разрешает легковые автомобили, квадроциклы и скутеры с двигателем до 50 кубических сантиметров."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Сколько занятий нужно на площадке?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "С нуля обычно от 5 до 10 занятий. На площадке отрабатывают шесть-семь элементов: змейку, параллельную парковку, въезд в гараж, эстакаду. При имеющемся опыте вождения хватает одного-двух занятий."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Что спрашивают на экзамене по теории?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "В базе 921 вопрос. На экзамене за 30 минут нужно ответить на 30 вопросов, допускается не более 5 ошибок."
             }
           }
         ]
@@ -188,7 +222,8 @@
 
   <!-- Nav · N9 edge-aligned minimal -->
   <header class="nav">
-    <a class="nav__brand" href="#top">Автошкола<span class="nav__brand-dot">·</span>Тбилиси</a>
+    <a class="nav__brand" href="#top">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <a class="nav__link" href="#prices">Цены</a>
     <a class="nav__link" href="bilety/">Билеты ПДД</a>
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
@@ -225,8 +260,8 @@
       <span class="stats__label">рекомендаций по отзывам на странице</span>
     </div>
     <div class="stats__item" data-reveal>
-      <span class="stats__num">ПДД + руль</span>
-      <span class="stats__label">полный курс: теория и практика вождения</span>
+      <span class="stats__num">Бесплатно</span>
+      <span class="stats__label">тестирование и консультация — до начала обучения</span>
     </div>
   </section>
 
@@ -273,6 +308,13 @@
       <li class="steps__item" data-reveal>
         <span class="steps__num">04</span>
         <div>
+          <h3>Медицинское обследование</h3>
+          <p>Без справки к экзамену не допустят. Подскажем, куда идти и что взять с собой — обследование занимает один визит.</p>
+        </div>
+      </li>
+      <li class="steps__item" data-reveal>
+        <span class="steps__num">05</span>
+        <div>
           <h3>Экзамен</h3>
           <p>Доводим до уверенного уровня и подсказываем, как записаться и что взять с собой. Дальше — руль ваш.</p>
         </div>
@@ -289,14 +331,118 @@
     <div class="formats__grid" data-reveal-group>
       <article class="formats__card" data-reveal>
         <h3>Очно в Тбилиси</h3>
-        <p>Теория в классе на пр-те Важа Пшавела 9 и практика вождения по городу с инструктором.</p>
+        <p>Теория в классе на пр-те Важа Пшавела 9 у метро Медицинский университет, площадка — у метро Церетели, затем вождение по городу с инструктором.</p>
       </article>
       <article class="formats__card formats__card--wide" data-reveal>
         <h3>Теория онлайн</h3>
         <p>Живые занятия по теории из дома — удобно, если вы ещё в пути в Грузию или совмещаете с работой. Вождение затем проходит очно.</p>
       </article>
     </div>
-    <p class="formats__note">Стоимость и расписание зависят от программы — оставьте заявку, и мы всё расскажем по телефону.</p>
+    <p class="formats__note">Цены на все форматы — <a href="#prices">в таблице ниже</a>. Расписание подбираем под вас.</p>
+  </section>
+
+  <!-- Цены -->
+  <section class="prices" id="prices">
+    <h2 class="section-title" data-reveal>Цены</h2>
+
+    <div class="prices__grid" data-reveal-group>
+      <article class="prices__group" data-reveal>
+        <h3 class="prices__group-title">Теория</h3>
+        <dl class="prices__list">
+          <div class="prices__row">
+            <dt>
+              Группа в аудитории
+              <span class="prices__note">9 занятий по 90 минут, две недели, будни в 19:00. Группы до 12 человек</span>
+            </dt>
+            <dd>150 ₾<span class="prices__unit">за курс</span></dd>
+          </div>
+          <div class="prices__row">
+            <dt>
+              Индивидуально онлайн
+              <span class="prices__note">10 занятий по 90 минут, график подбираем под вас</span>
+            </dt>
+            <dd>280 ₾<span class="prices__unit">за курс</span></dd>
+          </div>
+          <div class="prices__row">
+            <dt>
+              Одно занятие онлайн
+              <span class="prices__note">если полный курс не нужен — после бесплатного тестирования</span>
+            </dt>
+            <dd>28 ₾<span class="prices__unit">за занятие</span></dd>
+          </div>
+          <div class="prices__row">
+            <dt>
+              Онлайн своей компанией
+              <span class="prices__note">вдвоём, втроём или вчетвером — цена за курс с каждого</span>
+            </dt>
+            <dd>210 / 180 / 150 ₾<span class="prices__unit">с человека</span></dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="prices__group" data-reveal>
+        <h3 class="prices__group-title">Вождение</h3>
+        <dl class="prices__list">
+          <div class="prices__row">
+            <dt>
+              Площадка (автодром)
+              <span class="prices__note">занятие 45 минут, площадка у метро Церетели. Механика или автомат — цена одна</span>
+            </dt>
+            <dd>40 ₾<span class="prices__unit">за занятие</span></dd>
+          </div>
+          <div class="prices__row">
+            <dt>
+              Город
+              <span class="prices__note">реальные маршруты Тбилиси с инструктором</span>
+            </dt>
+            <dd>50 ₾<span class="prices__unit">за занятие</span></dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="prices__group" data-reveal>
+        <h3 class="prices__group-title">Дополнительно</h3>
+        <dl class="prices__list">
+          <div class="prices__row">
+            <dt>
+              Тестирование
+              <span class="prices__note">10–15 минут, покажет, сколько занятий вам действительно нужно</span>
+            </dt>
+            <dd class="prices__free">бесплатно</dd>
+          </div>
+          <div class="prices__row">
+            <dt>
+              Консультация
+              <span class="prices__note">по телефону в удобное время: этапы, документы, пошлины, сроки</span>
+            </dt>
+            <dd class="prices__free">бесплатно</dd>
+          </div>
+          <div class="prices__row">
+            <dt>Медицинская справка</dt>
+            <dd>45 ₾</dd>
+          </div>
+        </dl>
+      </article>
+    </div>
+
+    <!-- Пошлины идут государству, а не школе — держим их отдельно,
+         иначе прайс читается дороже, чем он есть -->
+    <div class="prices__fees" data-reveal>
+      <h3 class="prices__group-title">Государственные пошлины</h3>
+      <p class="prices__fees-lede">Платятся государству при записи на экзамен, не автошколе.</p>
+      <ul class="prices__fees-list">
+        <li><b>57 ₾</b> — экзамен по теории</li>
+        <li><b>90 ₾</b> — экзамен по вождению в городе</li>
+        <li><b>40 ₾</b> — пересдача площадки, начиная со второй попытки</li>
+        <li><b>250 ₾</b> — если не хотите ждать очереди и нужна ближайшая дата</li>
+      </ul>
+    </div>
+
+    <p class="prices__disclaimer" data-reveal>
+      Сколько занятий понадобится и во сколько выйдет обучение целиком — зависит от вашего
+      текущего уровня, формата занятий и того, как быстро идёт вождение.
+      Позвоните или закажите звонок: посчитаем под вас, это бесплатно.
+    </p>
   </section>
 
   <!-- FAQ -->
@@ -320,7 +466,23 @@
     </details>
     <details class="faq__item">
       <summary>Сколько стоит обучение?</summary>
-      <p>Цена зависит от выбранной программы и количества занятий. Позвоните нам или закажите звонок — посчитаем под вас.</p>
+      <p>Теория — от 150 ₾ за полный курс в группе, вождение — 40 ₾ за занятие на площадке и 50 ₾ по городу. <a href="#prices">Все цены собраны в таблице</a> вместе с государственными пошлинами.</p>
+    </details>
+    <details class="faq__item">
+      <summary>Где сдают экзамен? Можно ли в Тбилиси?</summary>
+      <p>В Тбилиси экзамены не принимают. Сдавать можно в одном из 12 городов Грузии — от Рустави до Батуми. Запись идёт на <a href="https://my.sa.gov.ge/drivinglicenses/theoreticalexam" rel="noopener">сайте госуслуг</a>: выбираете город, свободную дату и время, платите пошлину грузинской картой. Сайт нужно открывать с компьютера или включить режим ПК в мобильном браузере. Если сайт сбоит, вас бесплатно зарегистрируют в отделении Банка Грузии или TBC.</p>
+    </details>
+    <details class="faq__item">
+      <summary>Учиться на механике или на автомате?</summary>
+      <p>На стоимость это не влияет — у нас есть обе машины. Но права выдают по тому, на чём вы сдавали: сдали на автомате — в правах будет отметка, что водить можно только автомат. Категория B/B1 разрешает легковые автомобили, а также квадроциклы и скутеры с двигателем до 50 см³.</p>
+    </details>
+    <details class="faq__item">
+      <summary>Сколько занятий нужно на площадке?</summary>
+      <p>С нуля обычно 5–10 занятий. На площадке отрабатывают шесть-семь элементов: змейка, параллельная парковка, въезд в гараж, эстакада и другие. Если опыт вождения уже есть, хватает одного-двух занятий, чтобы понять готовность к экзамену.</p>
+    </details>
+    <details class="faq__item">
+      <summary>Что именно спрашивают на экзамене по теории?</summary>
+      <p>Всего в базе 921 вопрос. На экзамене за 30 минут нужно ответить на 30 вопросов, допустимо не более 5 ошибок. Прогнать себя по билетам можно прямо здесь — <a href="bilety/">тренажёр экзамена</a>.</p>
     </details>
   </section>
 
@@ -333,7 +495,8 @@
         <li><a href="tel:+995599987707">+995 599 98 77 07</a><span> — позвонить</span></li>
         <li><a href="https://m.me/avtoshkolatbilisi" rel="noopener">Messenger</a><span> — написать в Facebook</span></li>
         <li><a href="mailto:info@avtoshkola.ge">info@avtoshkola.ge</a><span> — почта</span></li>
-        <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span> — как добраться</span></li>
+        <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span> — аудитория, метро Медицинский университет</span></li>
+        <li><a href="https://maps.app.goo.gl/KDqDEXzkr9bN4wDfA" rel="noopener">Площадка для вождения</a><span> — автодром у метро Церетели</span></li>
       </ul>
     </div>
 
@@ -425,7 +588,7 @@
     </button>
   </div>
 
-  <script src="js/analytics.js?v=13" defer></script>
-  <script src="js/main.js?v=13" defer></script>
+  <script src="js/analytics.js?v=15" defer></script>
+  <script src="js/main.js?v=15" defer></script>
 </body>
 </html>
