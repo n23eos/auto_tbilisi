@@ -22,8 +22,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/tokens.css?v=18">
-  <link rel="stylesheet" href="../css/style.css?v=18">
+  <link rel="stylesheet" href="../css/tokens.css?v=20">
+  <link rel="stylesheet" href="../css/style.css?v=20">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
   <script type="application/ld+json">
   {
@@ -314,7 +314,7 @@
         "name": "Когда вам можно звонить?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Звонить удобно с 10:00 до 20:00. Написать в мессенджер можно в любое время суток — в нерабочие часы никого не разбудите, ответим утром. Если выбираете формат и не понимаете, что вам подходит, — договоритесь о звонке. За несколько минут разговора обычно становится понятнее, чем за час переписки, и это бесплатно."
+          "text": "Звонить удобно с 10:00 до 20:00. Написать в WhatsApp можно в любое время суток — в нерабочие часы никого не разбудите, ответим утром. Если выбираете формат и не понимаете, что вам подходит, — договоритесь о звонке. За несколько минут разговора обычно становится понятнее, чем за час переписки, и это бесплатно."
         }
       }
     ]
@@ -325,9 +325,11 @@
 
   <header class="nav is-solid">
     <a class="nav__brand" href="../">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
-    <a class="nav__link" href="../#prices">Цены</a>
-    <a class="nav__link" href="../bilety/">Билеты ПДД</a>
-    <a class="nav__link" href="../#contact">Контакты</a>
+    <nav class="nav__links" aria-label="Разделы сайта">
+      <a class="nav__link" href="../#prices">Цены</a>
+      <a class="nav__link" href="../bilety/">Билеты ПДД</a>
+      <a class="nav__link" href="../#contact">Контакты</a>
+    </nav>
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
 
@@ -550,7 +552,7 @@
 
       <details class="faq__item">
         <summary>Когда вам можно звонить?</summary>
-        <p>Звонить удобно с 10:00 до 20:00. Написать в мессенджер можно в любое время суток — в нерабочие часы никого не разбудите, ответим утром.</p>
+        <p>Звонить удобно с 10:00 до 20:00. Написать в <a href="https://wa.me/995599987707" rel="noopener">WhatsApp</a> можно в любое время суток — в нерабочие часы никого не разбудите, ответим утром.</p>
         <p>Если выбираете формат и не понимаете, что вам подходит, — договоритесь о звонке. За несколько минут разговора обычно становится понятнее, чем за час переписки, и это бесплатно.</p>
       </details>
     </section>
@@ -577,6 +579,6 @@
     </p>
   </footer>
 
-  <script src="../js/analytics.js?v=18" defer></script>
+  <script src="../js/analytics.js?v=20" defer></script>
 </body>
 </html>

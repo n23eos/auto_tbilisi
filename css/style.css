@@ -143,6 +143,12 @@ a:hover {
 }
 
 /* Ссылка на билеты: цвет как у бренда — светлый поверх видео, тёмный на сплошной подложке */
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
 .nav__link {
   font-family: var(--font-body);
   color: var(--color-ink-invert);
@@ -1122,6 +1128,7 @@ a:hover {
 .fab__menu li:nth-last-child(2) .fab__item { animation-delay: 40ms; }
 .fab__menu li:nth-last-child(3) .fab__item { animation-delay: 80ms; }
 .fab__menu li:nth-last-child(4) .fab__item { animation-delay: 120ms; }
+.fab__menu li:nth-last-child(5) .fab__item { animation-delay: 160ms; }
 
 @keyframes fab-in {
   from {
@@ -1269,12 +1276,13 @@ a:hover {
     order: 2;
   }
 
-  /* Три ссылки не помещаются в строку с названием и телефоном —
-     уходят на вторую строку и делят её поровну */
-  .nav__link {
+  /* Ссылки не помещаются в строку с названием и телефоном —
+     уходят на вторую строку целой группой */
+  .nav__links {
     order: 3;
-    flex: 1 1 30%;
-    text-align: center;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: var(--space-xs);
   }
 
   /* Шапка стала выше — якорным ссылкам нужен больший запас сверху */

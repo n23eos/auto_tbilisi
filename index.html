@@ -27,8 +27,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
-  <link rel="stylesheet" href="css/tokens.css?v=18">
-  <link rel="stylesheet" href="css/style.css?v=18">
+  <link rel="stylesheet" href="css/tokens.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=20">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
@@ -211,10 +211,12 @@
   <!-- Nav · N9 edge-aligned minimal -->
   <header class="nav">
     <a class="nav__brand" href="#top">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
-    <a class="nav__link" href="#prices">Цены</a>
-    <a class="nav__link" href="bilety/">Билеты ПДД</a>
-    <a class="nav__link" href="#faq">Вопросы</a>
-    <a class="nav__link" href="#contact">Контакты</a>
+    <nav class="nav__links" aria-label="Разделы сайта">
+      <a class="nav__link" href="#prices">Цены</a>
+      <a class="nav__link" href="bilety/">Билеты ПДД</a>
+      <a class="nav__link" href="#faq">Вопросы</a>
+      <a class="nav__link" href="#contact">Контакты</a>
+    </nav>
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
 
@@ -481,6 +483,7 @@
       <p class="contact__lede">Оставьте имя и номер — перезвоним, ответим на вопросы и подберём программу. Или свяжитесь напрямую:</p>
       <ul class="contact__links">
         <li><a href="tel:+995599987707">+995 599 98 77 07</a><span> — позвонить</span></li>
+        <li><a href="https://wa.me/995599987707" rel="noopener">WhatsApp</a><span> — написать можно в любое время суток</span></li>
         <li><a href="https://m.me/avtoshkolatbilisi" rel="noopener">Messenger</a><span> — написать в Facebook</span></li>
         <li><a href="mailto:info@avtoshkola.ge">info@avtoshkola.ge</a><span> — почта</span></li>
         <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span> — аудитория, метро Медицинский университет</span></li>
@@ -550,6 +553,12 @@
         </a>
       </li>
       <li>
+        <a class="fab__item" href="https://wa.me/995599987707" rel="noopener" target="_blank" data-channel="whatsapp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l1.7-4.4A8.3 8.3 0 1 1 8 20l-5 1Z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.2 1.7.7v1.4c-3.8.6-8-3.4-8.6-7.2h1.5l.7 1.7L9 9.5Z"/></svg>
+          WhatsApp
+        </a>
+      </li>
+      <li>
         <a class="fab__item" href="https://m.me/avtoshkolatbilisi" rel="noopener" target="_blank" data-channel="messenger">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3-.5L4 21l1.3-3.4A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="m7.5 13.5 3-3.2 2 2 3.5-2.8-3 3.2-2-2Z"/></svg>
           Messenger
@@ -576,7 +585,7 @@
     </button>
   </div>
 
-  <script src="js/analytics.js?v=18" defer></script>
-  <script src="js/main.js?v=18" defer></script>
+  <script src="js/analytics.js?v=20" defer></script>
+  <script src="js/main.js?v=20" defer></script>
 </body>
 </html>
