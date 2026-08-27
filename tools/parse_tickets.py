@@ -34,6 +34,7 @@ ROOT_DIR = TOOLS_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
 IMAGES_DIR = DATA_DIR / "tickets" / "images"
 OUTPUT_JSON = DATA_DIR / f"tickets-{CATEGORY_LABELS[0].lower()}-{LOCALE}.json"
+WITHDRAWN_JSON = DATA_DIR / "withdrawn-tickets.json"
 CACHE_DIR = TOOLS_DIR / ".cache" / f"category-{CATEGORY_ID}" / LOCALE
 # Скачанные JPEG живут в кэше и в git не попадают: в репозитории лежит только WebP.
 CACHE_IMAGES_DIR = TOOLS_DIR / ".cache" / f"category-{CATEGORY_ID}" / "images"
@@ -206,7 +207,24 @@ def _validate_ticket(ticket):
     return errors
 
 
-def validate(tickets, total, pages_seen, page_count):
+def load_withdrawn_ids():
+    """id билетов, изъятых из официального банка вопросов.
+
+    Список ведётся руками в data/withdrawn-tickets.json: у источника пометки нет,
+    он держит изъятые билеты в общем списке.
+    """
+    if not WITHDRAWN_JSON.exists():
+        return set()
+    document = json.loads(WITHDRAWN_JSON.read_text(encoding="utf-8"))
+    return {int(item["id"]) for item in document.get("tickets", [])}
+
+
+def mark_withdrawn(tickets, withdrawn_ids):
+    """Проставить признак изъятия, не меняя исходные словари."""
+    return [{**ticket, "withdrawn": ticket["id"] in withdrawn_ids} for ticket in tickets]
+
+
+def validate(tickets, total, pages_seen, page_count, withdrawn_ids=frozenset()):
     """Проверить собранную базу. Возвращает список сообщений об ошибках.
 
     pages_seen — {номер страницы: сколько билетов с неё разобрано}.
@@ -243,6 +261,13 @@ def validate(tickets, total, pages_seen, page_count):
 
     if duplicates:
         errors.append(f"дублирующиеся id: {sorted(duplicates)}")
+
+    # Список изъятых ведётся руками отдельно от парсера: если источник переименует
+    # или уберёт билет, список протухнет молча — а так прогон честно упадёт.
+    known_ids = {ticket["id"] for ticket in tickets}
+    unknown = sorted(set(withdrawn_ids) - known_ids)
+    if unknown:
+        errors.append(f"в списке изъятых есть id, которых нет в базе: {unknown}")
 
     return errors
 
@@ -392,7 +417,7 @@ def fetch_page(session, page, refresh=False):
     raise RuntimeError(f"страница {page}: не удалось скачать за {HTTP_RETRIES} попыток ({last_error})")
 
 
-TICKET_FIELDS = ("id", "lang", "question", "image", "answers", "correct", "source")
+TICKET_FIELDS = ("id", "lang", "withdrawn", "question", "image", "answers", "correct", "source")
 
 
 def build_document(tickets, total):
@@ -451,6 +476,8 @@ def collect(session, refresh=False):
         tickets.extend(page_tickets)
         print(f"  страница {page}/{page_count}: {len(page_tickets)} билетов")
 
+    tickets = mark_withdrawn(tickets, load_withdrawn_ids())
+
     for ticket in tickets:
         ticket["image"] = None
         if not ticket["image_url"]:
@@ -481,7 +508,7 @@ def main(argv=None):
     session = build_session()
     tickets, total, pages_seen, page_count = collect(session, refresh=args.refresh)
 
-    errors = validate(tickets, total, pages_seen, page_count)
+    errors = validate(tickets, total, pages_seen, page_count, withdrawn_ids=load_withdrawn_ids())
     if errors:
         print(f"\nБаза невалидна, найдено проблем: {len(errors)}", file=sys.stderr)
         for error in errors[:50]:

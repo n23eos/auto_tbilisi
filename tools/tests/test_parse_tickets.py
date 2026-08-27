@@ -230,6 +230,37 @@ def test_validate_allows_null_image_when_source_has_none():
     assert pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1) == []
 
 
+def test_load_withdrawn_ids_reads_file(tmp_path, monkeypatch):
+    path = tmp_path / "withdrawn.json"
+    path.write_text('{"meta": {}, "tickets": [{"id": 5}, {"id": 9}]}', encoding="utf-8")
+    monkeypatch.setattr(pt, "WITHDRAWN_JSON", path)
+    assert pt.load_withdrawn_ids() == {5, 9}
+
+
+def test_load_withdrawn_ids_without_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(pt, "WITHDRAWN_JSON", tmp_path / "нет.json")
+    assert pt.load_withdrawn_ids() == set()
+
+
+def test_mark_withdrawn_sets_flag():
+    tickets = [make_ticket(id=1), make_ticket(id=5)]
+    marked = pt.mark_withdrawn(tickets, {5})
+    assert marked[0]["withdrawn"] is False
+    assert marked[1]["withdrawn"] is True
+
+
+def test_mark_withdrawn_does_not_mutate_input():
+    tickets = [make_ticket(id=5)]
+    pt.mark_withdrawn(tickets, {5})
+    assert "withdrawn" not in tickets[0]
+
+
+def test_validate_catches_unknown_withdrawn_id():
+    tickets = [make_ticket(id=1, withdrawn=False)]
+    errors = pt.validate(tickets, total=1, pages_seen={1: 1}, page_count=1, withdrawn_ids={42})
+    assert any("42" in e for e in errors)
+
+
 def test_is_page_html_valid_accepts_ru_page(html_ru):
     assert pt.is_page_html_valid(html_ru) is True
 
@@ -575,6 +606,9 @@ def test_main_keeps_old_database_when_validation_fails(tmp_path, monkeypatch):
 def test_main_writes_new_database_when_validation_passes(tmp_path, monkeypatch):
     target = tmp_path / "tickets-b-ru.json"
     monkeypatch.setattr(pt, "OUTPUT_JSON", target)
+    # Реальный data/withdrawn-tickets.json тут ни при чём: тест собирает
+    # свою крошечную базу, в которую эти id заведомо не входят.
+    monkeypatch.setattr(pt, "WITHDRAWN_JSON", tmp_path / "нет.json")
     monkeypatch.setattr(pt, "build_session", lambda: object())
     good = [make_ticket(id=1), make_ticket(id=2)]
     monkeypatch.setattr(
