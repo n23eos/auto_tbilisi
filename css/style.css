@@ -157,6 +157,9 @@ a:hover {
   font-weight: 600;
   white-space: nowrap;
   transition: color var(--dur-med) var(--ease-out);
+  /* Невидимый запас вокруг текста: область нажатия ~44px, вёрстка не сдвигается */
+  padding: 0.75rem 0.25rem;
+  margin: -0.75rem -0.25rem;
 }
 
 .nav__link:hover {
@@ -1354,4 +1357,51 @@ a:hover {
     width: 3.25rem;
     height: 3.25rem;
   }
+}
+
+/* ============ Страница 404 ============ */
+
+.not-found {
+  min-height: 60vh;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.not-found__code {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(4rem, 12vw, 7rem);
+  line-height: 1;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-sm);
+}
+
+.not-found__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  margin: 0 0 var(--space-md);
+}
+
+.not-found__text {
+  color: var(--color-ink);
+  margin: 0 0 var(--space-md);
+}
+
+.not-found__links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.not-found__links a,
+.not-found__text a {
+  color: var(--color-accent);
+  font-weight: 600;
 }
