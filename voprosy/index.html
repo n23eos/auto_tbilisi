@@ -22,8 +22,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/tokens.css?v=21">
-  <link rel="stylesheet" href="../css/style.css?v=21">
+  <link rel="stylesheet" href="../css/tokens.css?v=22">
+  <link rel="stylesheet" href="../css/style.css?v=22">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
   <script type="application/ld+json">
   {
@@ -584,6 +584,48 @@
     </p>
   </footer>
 
-  <script src="../js/analytics.js?v=21" defer></script>
+  <!-- Плавающая кнопка контактов — как на главной; «Оставить заявку» ведёт к форме на главной -->
+  <div class="fab" data-fab>
+    <ul class="fab__menu" id="fab-menu" hidden>
+      <li>
+        <a class="fab__item" href="tel:+995599987707" data-channel="phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 3h-2A1.6 1.6 0 0 0 3 4.6C3 13.1 10.9 21 19.4 21a1.6 1.6 0 0 0 1.6-1.6v-2a1.6 1.6 0 0 0-1.3-1.6l-2.6-.5a1.6 1.6 0 0 0-1.6.7l-.8 1.2a13 13 0 0 1-5.4-5.4l1.2-.8a1.6 1.6 0 0 0 .7-1.6l-.5-2.6A1.6 1.6 0 0 0 6.6 3Z"/></svg>
+          Позвонить
+        </a>
+      </li>
+      <li>
+        <a class="fab__item" href="https://wa.me/995599987707" rel="noopener" target="_blank" data-channel="whatsapp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l1.7-4.4A8.3 8.3 0 1 1 8 20l-5 1Z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.2 1.7.7v1.4c-3.8.6-8-3.4-8.6-7.2h1.5l.7 1.7L9 9.5Z"/></svg>
+          WhatsApp
+        </a>
+      </li>
+      <li>
+        <a class="fab__item" href="https://m.me/avtoshkolatbilisi" rel="noopener" target="_blank" data-channel="messenger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3-.5L4 21l1.3-3.4A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="m7.5 13.5 3-3.2 2 2 3.5-2.8-3 3.2-2-2Z"/></svg>
+          Messenger
+        </a>
+      </li>
+      <li>
+        <a class="fab__item" href="mailto:info@avtoshkola.ge?subject=%D0%92%D0%BE%D0%BF%D1%80%D0%BE%D1%81%20%D0%BF%D0%BE%20%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8E" data-channel="email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>
+          Написать на почту
+        </a>
+      </li>
+      <li>
+        <a class="fab__item" href="../#contact" data-channel="form">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5 19 8l-9.5 9.5-4.2.7.7-4.2Z"/><path d="M4 21h16"/></svg>
+          Оставить заявку
+        </a>
+      </li>
+    </ul>
+
+    <button class="fab__toggle" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="Связаться с нами" data-fab-toggle>
+      <svg class="fab__icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>
+      <svg class="fab__icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <script src="../js/analytics.js?v=22" defer></script>
+  <script src="../js/main.js?v=22" defer></script>
 </body>
 </html>

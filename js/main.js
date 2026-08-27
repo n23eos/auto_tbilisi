@@ -229,8 +229,9 @@ document.documentElement.classList.add('has-js');
     toggle.focus();
   });
 
-  // «Оставить заявку» — прокрутка к форме и фокус в первое поле
-  formBtn.addEventListener('click', function () {
+  // «Оставить заявку» — прокрутка к форме и фокус в первое поле.
+  // На страницах без формы этой кнопки нет — там вместо неё обычная ссылка.
+  if (formBtn) formBtn.addEventListener('click', function () {
     // Целимся в саму форму, а не в секцию: на телефоне выше неё идёт блок контактов
     const form = document.getElementById('callback-form');
     const nameInput = document.getElementById('cb-name');

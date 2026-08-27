@@ -27,8 +27,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
-  <link rel="stylesheet" href="css/tokens.css?v=21">
-  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/tokens.css?v=22">
+  <link rel="stylesheet" href="css/style.css?v=22">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23161a24'/><rect x='14' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='46' y='46' width='24' height='8' rx='2' fill='%23f2b23e'/><rect x='78' y='46' width='10' height='8' rx='2' fill='%23f2b23e'/></svg>">
@@ -94,6 +94,20 @@
               }
             }
           ]
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "10:00",
+          "closes": "20:00"
         }
       },
       {
@@ -233,6 +247,7 @@
         <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
         <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
       </h1>
+      <a class="marquee__cta" href="#contact">Записаться на обучение</a>
       <p class="marquee__geo">Автошкола в Тбилиси · пр-т Важа Пшавела 9</p>
     </div>
   </section>
@@ -269,6 +284,8 @@
       <li>Занятия очно и онлайн</li>
       <li>Обучение с нуля — опыт не нужен</li>
       <li>Инструкторы говорят по-русски</li>
+      <li>Оплата после первого урока — без предоплаты</li>
+      <li>Школа работает больше семи лет</li>
     </ul>
   </section>
 
@@ -301,7 +318,7 @@
         <span class="steps__num">04</span>
         <div>
           <h3>Медицинское обследование</h3>
-          <p>Без справки к экзамену не допустят. Подскажем, куда идти и что взять с собой — обследование занимает один визит.</p>
+          <p>Без справки формы 100 к экзамену не допустят. Её выдаёт наш врач после осмотра — один визит, без очередей и поиска клиники.</p>
         </div>
       </li>
       <li class="steps__item" data-reveal>
@@ -484,6 +501,7 @@
       <ul class="contact__links">
         <li><a href="tel:+995599987707">+995 599 98 77 07</a><span> — позвонить</span></li>
         <li><a href="https://wa.me/995599987707" rel="noopener">WhatsApp</a><span> — написать можно в любое время суток</span></li>
+        <li><span class="contact__hours">Звонки — ежедневно с 10:00 до 20:00</span><span> — в WhatsApp пишите круглосуточно</span></li>
         <li><a href="https://m.me/avtoshkolatbilisi" rel="noopener">Messenger</a><span> — написать в Facebook</span></li>
         <li><a href="mailto:info@avtoshkola.ge">info@avtoshkola.ge</a><span> — почта</span></li>
         <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span> — аудитория, метро Медицинский университет</span></li>
@@ -585,7 +603,7 @@
     </button>
   </div>
 
-  <script src="js/analytics.js?v=21" defer></script>
-  <script src="js/main.js?v=21" defer></script>
+  <script src="js/analytics.js?v=22" defer></script>
+  <script src="js/main.js?v=22" defer></script>
 </body>
 </html>

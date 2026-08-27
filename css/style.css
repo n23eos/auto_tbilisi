@@ -277,6 +277,31 @@ a:hover {
   to { transform: translateY(0); }
 }
 
+/* Кнопка записи на первом экране */
+.marquee__cta {
+  display: inline-block;
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-xl);
+  min-height: 44px;
+  background: var(--color-accent-bright);
+  color: var(--color-ink);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: var(--text-md);
+  text-decoration: none;
+  transition: transform var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out);
+}
+
+.marquee__cta:hover {
+  background: var(--color-on-accent);
+  color: var(--color-ink);
+  transform: translateY(-2px);
+}
+
+.marquee__cta:active {
+  transform: translateY(0);
+}
+
 .marquee__geo {
   margin-top: var(--space-lg);
   font-size: var(--text-sm);
@@ -736,6 +761,10 @@ a:hover {
 /* Второй абзац в ответе не должен слипаться с первым */
 .qa .faq__item p + p {
   margin-top: var(--space-sm);
+}
+
+.contact__hours {
+  font-weight: 600;
 }
 
 .qa__cta {
