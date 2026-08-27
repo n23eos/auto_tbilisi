@@ -57,6 +57,20 @@ document.documentElement.classList.add('has-js');
   items.forEach(function (item) {
     observer.observe(item);
   });
+
+  // Страховка для поисковых роботов: они не прокручивают страницу, поэтому
+  // наблюдатель у нижних блоков может не сработать и текст останется
+  // прозрачным. Через 3 секунды после загрузки показываем всё, что осталось.
+  const REVEAL_FALLBACK_MS = 3000;
+  window.addEventListener('load', function () {
+    window.setTimeout(function () {
+      items.forEach(function (item) {
+        if (item.classList.contains('is-visible')) return;
+        item.classList.add('is-visible');
+        observer.unobserve(item);
+      });
+    }, REVEAL_FALLBACK_MS);
+  });
 })();
 
 // Шапка становится светлой, когда видео уходит вверх
