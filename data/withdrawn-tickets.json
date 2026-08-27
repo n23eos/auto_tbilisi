@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "purpose": "Билеты, изъятые Сервисным агентством МВД Грузии из официального банка вопросов B/B1. Парсер помечает их в базе, тренажёр их не показывает.",
+    "official_bank_size": 898,
+    "source": "https://drv.ge/question-bank-updates/en — журнал изменений банка вопросов стороннего тренажёра",
+    "caveat": "Официальный реестр доступен только после входа на my.sa.gov.ge, поэтому список сверен косвенно: 921 у teoria.on.ge минус 898 официальных = 23, и ровно 23 вопроса помечены в журнале как изъятые для B/B1. Сопоставление с нашими билетами сделано по английской локали teoria.on.ge.",
+    "ambiguity": "Два изъятых вопроса имеют в базе по несколько билетов с одинаковым текстом и разными картинками (330/337/345 и 1068/1069). Изъяты ровно два из этих пяти, какие именно — по журналу не определить. Убраны все пять: показать ученику изъятый вопрос хуже, чем не показать действующий.",
+    "checked_at": "2026-08-27",
+    "total": 26
+  },
+  "tickets": [
+    {
+      "id": 181,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Реверсивный светофор, с сигналом красного цвета знака Х и внизу направленной зеленной стрелкой употребляется:",
+      "withdrawn_en": "Reversible traffic lights, with red X mark signal and green arrow pointing down is used:"
+    },
+    {
+      "id": 182,
+      "certainty": "точно",
+      "match": "похоже",
+      "question_ru": "Контурная стрелка (стрелки) нанесенная на основной зеленый световой сигнал светофора:",
+      "withdrawn_en": "The contour arrow/arrows depicted on the main green signal of the traffic light:"
+    },
+    {
+      "id": 184,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "При регулировании движении T- образным светофором, движение маршрутных транспортных средств разрешено:",
+      "withdrawn_en": "During the regulation of the movement by ‘T’-form traffic lights route vehicles are permitted to drive:"
+    },
+    {
+      "id": 185,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "При регулировании движения T- образным светофором, движение маршрутных транспортных средств запрещается:",
+      "withdrawn_en": "During traffic regulation by ‘T’-form traffic lights route vehicles are not permitted to drive:"
+    },
+    {
+      "id": 270,
+      "certainty": "точно",
+      "match": "по смыслу",
+      "question_ru": "Имеет ли право водитель зеленного легкового автомобиля сделать обгон по направлению стрелки?",
+      "withdrawn_en": "Is the driver of the green passenger car allowed to overtake in the direction of the arrow?"
+    },
+    {
+      "id": 271,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Имеет ли право водитель серого легкового автомобиля сделать обгон по направлению стрелки?",
+      "withdrawn_en": "Is grey motor car driver allowed to overtake to the arrow direction?"
+    },
+    {
+      "id": 330,
+      "certainty": "спорно",
+      "match": "неоднозначно",
+      "question_ru": "Какой автомобиль стоит с нарушением правил о стоянке?",
+      "withdrawn_en": "Which of the vehicles is parked in breach of the parking rules?"
+    },
+    {
+      "id": 337,
+      "certainty": "спорно",
+      "match": "неоднозначно",
+      "question_ru": "Какое транспортное средство стоит с нарушением правил о стоянке?",
+      "withdrawn_en": "Which of the vehicles is parked in breach of the parking rules?"
+    },
+    {
+      "id": 345,
+      "certainty": "спорно",
+      "match": "неоднозначно",
+      "question_ru": "Какое транспортное средство стоит с нарушением правил стоянки?",
+      "withdrawn_en": "Which of the vehicles is parked in breach of the parking rules?"
+    },
+    {
+      "id": 526,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "При отсутствии полосы движения для велосипедов или велосипедной дорожки или обочины, в случае осложненного движения на проезжей части дороги, если не задержится движение пешеходов, право движения по тротуару имеет:",
+      "withdrawn_en": "In the absence of bike lanes or bike tracks or road shoulders and in case of complicated traffic in the carriageway and if the pedestrian movement shall not be hampered the movement in the pavements is permitted for:"
+    },
+    {
+      "id": 827,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Во время, какого нижеперечисленного неполадка запрещается водителю движение транспортным средством?",
+      "withdrawn_en": "In case of which failure given below is a driver prohibited from proceeding the vehicle?"
+    },
+    {
+      "id": 828,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Во время тумана, дождя или снега управление механическим транспортным средством запрещается:",
+      "withdrawn_en": "During fog, rain or snow, driving of a mechanical vehicle is prohibibited:"
+    },
+    {
+      "id": 842,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Движение транспортного средства долгое время на высокой скорости вызывает:",
+      "withdrawn_en": "Driving of the vehicle at high speed for long period of time shall cause:"
+    },
+    {
+      "id": 949,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "На той дороге с двухсторонним движением, у которой есть разделительная полоса, стороной встречного движения считается:",
+      "withdrawn_en": "On two-way road with lane line, reverse traffic side shall be:"
+    },
+    {
+      "id": 956,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Если в соответствии требования правил дорожного движения водитель обязан уступить дорогу другому участнику дорожного движения, о намерении уступки дороги должен выразить ясно:",
+      "withdrawn_en": "If according to the orders of the Highway Code, a driver is obliged to yield to other traffic participants, he/she must express his/her intention of yielding clearly:"
+    },
+    {
+      "id": 981,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Включение фонарей заднего хода разрешено:",
+      "withdrawn_en": "Switching the reverse lights on is allowed:"
+    },
+    {
+      "id": 1066,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Дальнейшее движение транспортного средства запрещено:",
+      "withdrawn_en": "Further motion of the vehicle is prohibitied:"
+    },
+    {
+      "id": 1068,
+      "certainty": "спорно",
+      "match": "неоднозначно",
+      "question_ru": "Дальнейшее движение транспортного средства запрещено, если:",
+      "withdrawn_en": "Subsequent driving of a vehicle is prohibited, if:"
+    },
+    {
+      "id": 1069,
+      "certainty": "спорно",
+      "match": "неоднозначно",
+      "question_ru": "Водителю дальнейшее движение транспортного средства запрещается, если:",
+      "withdrawn_en": "Subsequent driving of a vehicle is prohibited, if:"
+    },
+    {
+      "id": 1076,
+      "certainty": "точно",
+      "match": "по смыслу",
+      "question_ru": "При существовании, каких нижеперечисленных обстоятельствах может водитель, участвующий в дорожно-транспортном происшествии, оставить место происшествие и не подождать прихода уполномоченного лица?",
+      "withdrawn_en": "Under which of the following circumstances may a driver involved in a road traffic accident leave the scene and not wait for an authorized person to arrive?"
+    },
+    {
+      "id": 1079,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Из нижеперечисленных, в каком случае, не возникнет обязательство у водителя участвующего дорожно-транспортном происшествии перевезти пострадавшего в результате аварии в лечебное учреждение?",
+      "withdrawn_en": "In which of the below cases is not a traffic accident participant driver obliged to take an injured after an accident to the medical institution?"
+    },
+    {
+      "id": 1085,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Остановка транспортного средства резким торможением допустимо:",
+      "withdrawn_en": "Stopping of a vehicle with hard braking is allowed:"
+    },
+    {
+      "id": 1428,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "При движении по крутому спуску, длительное торможение транспортного средства с механической коробкой передач с отключенным сцеплением может вызвать:",
+      "withdrawn_en": "While driving on a steep slope, prolonged braking of a vehicle with mechanical gearbox by switched-off clutch may cause:"
+    },
+    {
+      "id": 1572,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "В темное время суток или при условиях недостаточной видимости, во время подбора скорости водитель решающее значение должен присвоить:",
+      "withdrawn_en": "During dark hours or in poor visibility conditions, while selecting the vehicle speed, the driver should give a decisive meaning to:"
+    },
+    {
+      "id": 1635,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Из перечисленных обстоятельств, которое указывает о неисправности системы питания мотора или на резкое увеличение растраты горючего в результате неправильного регулирования мотора?",
+      "withdrawn_en": "Which of the circumstances given below indicates the engine supply system malfunctions or abrupt increase of fuel consumption due to incorrect regulation of the engine?"
+    },
+    {
+      "id": 1650,
+      "certainty": "точно",
+      "match": "точно",
+      "question_ru": "Как должен поступить водитель автомобиля с задними ведущими, чтобы избежать при движении по обледеневшей дороге боковое скольжение заднего моста?",
+      "withdrawn_en": "How the driver of the rear-driving wheel vehicle has to act, in order to avoid side sliping of rear bridge during motion on the frozen road?"
+    }
+  ]
+}
