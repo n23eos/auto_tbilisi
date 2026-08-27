@@ -280,10 +280,17 @@ a:hover {
   to { transform: translateY(0); }
 }
 
-/* Кнопка записи на первом экране */
+/* Кнопки на первом экране: запись + WhatsApp */
+.marquee__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
 .marquee__cta {
   display: inline-block;
-  margin-top: var(--space-lg);
   padding: var(--space-sm) var(--space-xl);
   min-height: 44px;
   background: var(--color-accent-bright);
@@ -303,6 +310,19 @@ a:hover {
 
 .marquee__cta:active {
   transform: translateY(0);
+}
+
+/* Вторичная кнопка: прозрачная с обводкой, читается поверх видео */
+.marquee__cta--ghost {
+  background: var(--color-scrim-solid);
+  color: var(--color-ink-invert);
+  border: 1px solid var(--color-accent-bright);
+  backdrop-filter: blur(6px);
+}
+
+.marquee__cta--ghost:hover {
+  background: var(--color-accent-bright);
+  color: var(--color-ink);
 }
 
 .marquee__geo {
@@ -1267,7 +1287,11 @@ a:hover {
 }
 
 @media (max-width: 40rem) {
+  /* Две кнопки встают в столбик и не влезают в фиксированную высоту —
+     разрешаем блоку расти, чтобы заголовок не прятался под кнопками */
   .marquee {
+    height: auto;
+    min-height: clamp(30rem, 50vw, 88svh);
     padding-bottom: var(--space-lg);
   }
 

@@ -165,6 +165,10 @@ document.documentElement.classList.add('has-js');
       .then(function () {
         successMsg.hidden = false;
         form.reset();
+        // Заявка дошла — фиксируем конверсию в GA4
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'generate_lead', { method: 'callback_form' });
+        }
       })
       .catch(function () {
         failMsg.hidden = false;
@@ -200,21 +204,15 @@ document.documentElement.classList.add('has-js');
     menu.hidden = !isOpen;
   }
 
-  // Отправляем событие в Google Analytics. Счётчика может не быть — тогда молча пропускаем.
-  function trackContactClick(channel) {
-    if (typeof window.gtag !== 'function') return;
-    window.gtag('event', 'contact_click', { channel: channel });
-  }
-
   toggle.addEventListener('click', function () {
     setOpen(menu.hidden);
   });
 
-  // Клик по любому пункту: считаем канал и закрываем список
+  // Клик по любому пункту — закрываем список.
+  // Событие в GA отправляет общий обработчик в analytics.js.
   menu.addEventListener('click', function (event) {
     const item = event.target.closest('.fab__item');
     if (!item) return;
-    trackContactClick(item.dataset.channel);
     setOpen(false);
   });
 
