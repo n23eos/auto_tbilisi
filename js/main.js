@@ -179,9 +179,9 @@ document.documentElement.classList.add('has-js');
       .then(function () {
         successMsg.hidden = false;
         form.reset();
-        // Заявка дошла — фиксируем конверсию в GA4
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'generate_lead', { method: 'callback_form' });
+        // Заявка дошла — фиксируем конверсию в GA4 и в пикселе Facebook
+        if (typeof window.track === 'function') {
+          window.track('generate_lead', { method: 'callback_form' });
         }
       })
       .catch(function () {

@@ -261,6 +261,9 @@ function start() {
 
   show("quiz");
   renderQuestion();
+
+  // Запустил экзамен — значит готовится сдавать: самая тёплая аудитория
+  if (typeof window.track === "function") window.track("exam_start", { source: "bilety" });
 }
 
 document.addEventListener("keydown", (event) => {
