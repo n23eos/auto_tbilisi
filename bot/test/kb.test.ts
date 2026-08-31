@@ -1,11 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { searchKb, menuAnswer, CONTACTS } from "../src/kb";
+import { KB_SECTIONS } from "../src/generated/kb";
 
 describe("kb", () => {
   it("кнопки меню отдают непустые тексты нужных разделов", () => {
     expect(menuAnswer("ceny")).toContain("₾");
     expect(menuAnswer("dokumenty").length).toBeGreaterThan(100);
     expect(menuAnswer("ekzameny").length).toBeGreaterThan(100);
+  });
+
+  // Разделы уходят ученику с parse_mode: "HTML". Один «&» или «<» в исходном
+  // txt («теория & практика», «< 18 лет», «<info@…>») заставит Telegram
+  // ответить 400 — и ученик по этой кнопке меню не получит НИЧЕГО, молча и
+  // навсегда, потому что апдейт уже помечен обработанным.
+  it("сгенерированная база знаний экранирована для HTML", () => {
+    for (const section of KB_SECTIONS) {
+      expect(section.text, `раздел ${section.id}: сырой < или >`).not.toMatch(/[<>]/);
+      // «&» допустим только как начало уже готовой сущности.
+      expect(section.text, `раздел ${section.id}: сырой &`).not.toMatch(/&(?!amp;|lt;|gt;)/);
+    }
   });
 
   it("CONTACTS содержит телефон школы", () => {
