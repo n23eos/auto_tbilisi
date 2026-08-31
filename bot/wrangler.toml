@@ -11,6 +11,14 @@ binding = "DB"
 database_name = "avtoshkola-bot"
 database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
 
-[vars]
-ADMIN_CHAT_ID = "0"
-ADMIN_IDS = ""
+# Блока [vars] здесь СОЗНАТЕЛЬНО нет.
+#
+# При deploy содержимое [vars] затирает значения, выставленные в дашборде
+# Cloudflare. Placeholder'ы ADMIN_CHAT_ID = "0" и ADMIN_IDS = "" молча
+# возвращались бы после каждого `npm run deploy`: кнопки админов отвечали бы
+# «Только для администраторов», карточки уходили бы в чат 0 и не доходили,
+# заявки копились бы в pending — и ничто не показало бы причину.
+#
+# Поэтому ADMIN_CHAT_ID и ADMIN_IDS задаются через `wrangler secret put`
+# (секретными они не являются, но так у них один источник истины и deploy их
+# не трогает). Как их выставить — см. README.md.
