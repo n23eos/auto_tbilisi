@@ -2,6 +2,7 @@ import { env } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
 import { routeUpdate } from "../src/router";
 import { getConversation } from "../src/conversation";
+import { getFact } from "../src/facts";
 import type { Env } from "../src/types";
 
 const ADMIN_CHAT = -100500;
@@ -90,6 +91,25 @@ describe("router: админы", () => {
       makeEnv(sent),
     );
     expect(sent[0].body.text).toContain("15 сентября");
+  });
+
+  it("/set@botname работает так же, как голая команда", async () => {
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 71, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID, first_name: "Нина" }, text: "/set@some_bot дата_группы 15 сентября" } },
+      makeEnv(sent),
+    );
+    expect(sent[0].body.text).toContain("15 сентября");
+    expect(await getFact((env as any).DB, "next_group_date")).toBe("15 сентября");
+  });
+
+  it("/zayavki@botname тоже распознаётся", async () => {
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 72, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID, first_name: "Нина" }, text: "/zayavki@some_bot" } },
+      makeEnv(sent),
+    );
+    expect(sent[0].body.text).toContain("Заяв");
   });
 
   it("/set от чужого игнорируется", async () => {

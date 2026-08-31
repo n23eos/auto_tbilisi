@@ -247,8 +247,24 @@ async function handleLeadCallback(cb: any, env: Env, tg: TelegramClient): Promis
   }
 }
 
-async function handleAdminCommand(text: string, fromId: number, env: Env, tg: TelegramClient): Promise<void> {
+/**
+ * В группах клиенты Telegram дописывают к команде имя бота: «/set@avtoshkola_bot дата_группы 15 сентября».
+ * Срезаем «@имя» с первого токена, чтобы команды работали одинаково с упоминанием и без него.
+ */
+function stripBotMention(text: string): string {
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("/")) return trimmed;
+  const spaceIdx = trimmed.search(/\s/);
+  const command = spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx);
+  const atIdx = command.indexOf("@");
+  if (atIdx === -1) return trimmed;
+  const rest = spaceIdx === -1 ? "" : trimmed.slice(spaceIdx);
+  return command.slice(0, atIdx) + rest;
+}
+
+async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: TelegramClient): Promise<void> {
   const adminChat = Number(env.ADMIN_CHAT_ID);
+  const text = stripBotMention(raw);
 
   if (text.startsWith("/set ")) {
     const rest = text.slice("/set ".length).trim();
