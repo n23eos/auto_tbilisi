@@ -1,0 +1,16 @@
+name = "avtoshkola-bot"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["0 3 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "avtoshkola-bot"
+database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
+
+[vars]
+ADMIN_CHAT_ID = "0"
+ADMIN_IDS = ""
