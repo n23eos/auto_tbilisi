@@ -3,12 +3,13 @@ import { CONTACTS, menuAnswer, searchKb } from "./kb";
 import { getFact, setFact } from "./facts";
 import {
   startConversation, getConversation, updateConversation, deleteConversation, validatePhone,
+  truncate, NAME_LIMIT, QUESTION_LIMIT,
   type Conversation,
 } from "./conversation";
 import {
   createLead, getLead, takeLead, markCalled, closeLead, releaseLead, renderLeadCard,
 } from "./leads";
-import { escapeHtml } from "./escape";
+import { escapeHtml, escapeClamped } from "./escape";
 import { formatTbilisi } from "./time";
 import type { Env } from "./types";
 
@@ -37,6 +38,10 @@ const FALLBACK_MENU = {
 const FACT_ALIASES: Record<string, string> = {
   дата_группы: "next_group_date",
 };
+
+// Потолок на имя и на имя админа в строке списка /zayavki: 10 заявок × 2 поля
+// × 150 с запасом влезают в одно сообщение Telegram.
+const LIST_FIELD_LIMIT = 150;
 
 function makeClient(env: Env): TelegramClient {
   // __fetch — шов для тестов: они вызывают routeUpdate напрямую и подменяют fetch.
@@ -90,7 +95,11 @@ async function handleFormInput(conv: Conversation, msg: any, env: Env, tg: Teleg
 
   if (conv.step === "name") {
     if (!text) { await tg.sendMessage(chatId, "Напишите, пожалуйста, ваше имя текстом."); return; }
-    await updateConversation(env.DB, chatId, "phone", { ...conv.data, name: text });
+    const name = truncate(text, NAME_LIMIT);
+    await updateConversation(env.DB, chatId, "phone", { ...conv.data, name });
+    if (name !== text) {
+      await tg.sendMessage(chatId, `Имя длинновато — сократил до ${NAME_LIMIT} символов. Если что, администратор уточнит.`);
+    }
     await tg.sendMessage(chatId, "Ваш телефон? Можно нажать кнопку ниже или ввести вручную.", {
       keyboard: [[{ text: "📱 Поделиться контактом", request_contact: true }]],
       resize_keyboard: true, one_time_keyboard: true,
@@ -111,7 +120,11 @@ async function handleFormInput(conv: Conversation, msg: any, env: Env, tg: Teleg
   }
 
   if (conv.step === "question") {
-    await updateConversation(env.DB, chatId, "consent", { ...conv.data, question: text || "—" });
+    const question = truncate(text, QUESTION_LIMIT);
+    await updateConversation(env.DB, chatId, "consent", { ...conv.data, question: question || "—" });
+    if (question !== text) {
+      await tg.sendMessage(chatId, `Вопрос длинный — сократил до ${QUESTION_LIMIT} символов. Подробности расскажете администратору голосом.`);
+    }
     await tg.sendMessage(
       chatId,
       "Почти готово! Нажимая «Согласен», вы разрешаете школе использовать ваш номер, чтобы связаться с вами по вопросу записи.",
@@ -294,10 +307,13 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
   if (text.startsWith("/zayavki")) {
     const { results } = await env.DB.prepare("SELECT * FROM leads ORDER BY id DESC LIMIT 10").all();
     if (results.length === 0) { await tg.sendMessage(adminChat, "Заявок пока нет."); return; }
+    // Десять заявок склеиваются в ОДНО сообщение, поэтому длину режем в каждой
+    // строке: одно длинное имя в базе иначе роняет всю команду, и она остаётся
+    // сломанной, пока заявка не вывалится из последней десятки.
     const lines = (results as any[]).map((l) => {
       const undelivered = l.delivery_status === "pending" ? " ⚠️ карточка не доставлена" : "";
-      const who = l.assigned_to_name ? ` · ведёт ${escapeHtml(l.assigned_to_name)}` : "";
-      return `#${l.id} ${escapeHtml(l.name)} · ${l.status}${who} · ${formatTbilisi(l.created_at)}${undelivered}`;
+      const who = l.assigned_to_name ? ` · ведёт ${escapeClamped(l.assigned_to_name, LIST_FIELD_LIMIT)}` : "";
+      return `#${l.id} ${escapeClamped(l.name, LIST_FIELD_LIMIT)} · ${l.status}${who} · ${formatTbilisi(l.created_at)}${undelivered}`;
     });
     await tg.sendMessage(adminChat, "<b>Последние заявки</b>\n" + lines.join("\n"));
     return;

@@ -1,4 +1,4 @@
-import { escapeHtml } from "./escape";
+import { escapeHtml, escapeClamped } from "./escape";
 import { formatTbilisi } from "./time";
 import type { InlineKeyboard } from "./telegram";
 import type { Lead } from "./types";
@@ -96,15 +96,24 @@ const STATUS_LABEL: Record<string, string> = {
   closed: "✅ Закрыта",
 };
 
+// Потолки на длину полей уже В КАРТОЧКЕ, считая экранирование. Ввод ученика
+// режется ещё в анкете, но строка могла попасть в базу раньше этой проверки
+// или из другого места — а недоставленная карточка означает потерянную заявку,
+// поэтому рендер обязан влезать в лимит Telegram при любых данных.
+// Сумма потолков (200 + 2000 + 300) с запасом меньше 4096.
+const CARD_NAME_LIMIT = 200;
+const CARD_QUESTION_LIMIT = 2000;
+const CARD_ADMIN_NAME_LIMIT = 300;
+
 export function renderLeadCard(lead: Lead): { text: string; keyboard: InlineKeyboard } {
   const lines = [
     `<b>Заявка #${lead.id}</b> · ${STATUS_LABEL[lead.status]}`,
-    `Имя: ${escapeHtml(lead.name)}`,
+    `Имя: ${escapeClamped(lead.name, CARD_NAME_LIMIT)}`,
   ];
   // Телефон показываем только после взятия — чтобы не звонили двое сразу
   if (lead.status !== "new") lines.push(`Телефон: ${escapeHtml(lead.phone)}`);
-  if (lead.question) lines.push(`Вопрос: ${escapeHtml(lead.question)}`);
-  if (lead.assigned_to_name) lines.push(`Ведёт: ${escapeHtml(lead.assigned_to_name)}`);
+  if (lead.question) lines.push(`Вопрос: ${escapeClamped(lead.question, CARD_QUESTION_LIMIT)}`);
+  if (lead.assigned_to_name) lines.push(`Ведёт: ${escapeClamped(lead.assigned_to_name, CARD_ADMIN_NAME_LIMIT)}`);
   lines.push(`Создана: ${formatTbilisi(lead.created_at)} (Тбилиси)`);
 
   const rows: InlineKeyboard["inline_keyboard"] = [];

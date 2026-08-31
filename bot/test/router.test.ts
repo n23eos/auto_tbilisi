@@ -8,9 +8,21 @@ import type { Env } from "../src/types";
 const ADMIN_CHAT = -100500;
 const ADMIN_ID = 777;
 
+// Настоящий лимит Telegram на текст сообщения.
+const TELEGRAM_TEXT_LIMIT = 4096;
+
 function makeEnv(sent: any[]): Env {
   const fetchFn = vi.fn(async (url: any, init: any) => {
-    sent.push({ url: String(url), body: JSON.parse(init.body) });
+    const body = JSON.parse(init.body);
+    sent.push({ url: String(url), body });
+    // Telegram отвечает 400, а не молча режет текст. Без этого фейк принимал
+    // любую длину, и тесты не замечали бы недоставленных карточек.
+    if (typeof body.text === "string" && body.text.length > TELEGRAM_TEXT_LIMIT) {
+      return new Response(
+        JSON.stringify({ ok: false, description: "Bad Request: message is too long" }),
+        { status: 400 },
+      );
+    }
     return new Response(JSON.stringify({ ok: true, result: { message_id: 42 } }), { status: 200 });
   }) as unknown as typeof fetch;
   return {
@@ -73,6 +85,45 @@ describe("router: ученик", () => {
     expect(lead).toBeNull();
   });
 
+  it("вопрос на 5000 символов: карточка влезает в лимит и доставляется", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 20, callback_query: { id: "c20", from: { id: 20, first_name: "Д" }, message: { chat: { id: 20, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(20, "Длинный"), e);
+    await routeUpdate(privateMessage(20, "+995599112240"), e);
+    await routeUpdate(privateMessage(20, "я".repeat(5000)), e);
+    await routeUpdate({ update_id: 21, callback_query: { id: "c21", from: { id: 20, first_name: "Д" }, message: { chat: { id: 20, type: "private" } }, data: "form:consent_yes" } }, e);
+
+    const lead = await (env as any).DB.prepare("SELECT * FROM leads WHERE student_chat_id = 20").first();
+    expect(lead.delivery_status).toBe("delivered");
+    const card = sent.find((s) => s.body.chat_id === ADMIN_CHAT);
+    expect(card.body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
+  });
+
+  it("имя из «<» не раздувает карточку экранированием сверх лимита", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 22, callback_query: { id: "c22", from: { id: 22, first_name: "Д" }, message: { chat: { id: 22, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(22, "<".repeat(1100)), e);
+    await routeUpdate(privateMessage(22, "+995599112242"), e);
+    await routeUpdate(privateMessage(22, "вопрос"), e);
+    await routeUpdate({ update_id: 23, callback_query: { id: "c23", from: { id: 22, first_name: "Д" }, message: { chat: { id: 22, type: "private" } }, data: "form:consent_yes" } }, e);
+
+    const lead = await (env as any).DB.prepare("SELECT * FROM leads WHERE student_chat_id = 22").first();
+    expect(lead.delivery_status).toBe("delivered");
+    const card = sent.find((s) => s.body.chat_id === ADMIN_CHAT);
+    expect(card.body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
+  });
+
+  it("ученику говорят, что текст сокращён, а не режут молча", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 24, callback_query: { id: "c24", from: { id: 24, first_name: "Д" }, message: { chat: { id: 24, type: "private" } }, data: "menu:zapis" } }, e);
+    sent.length = 0;
+    await routeUpdate(privateMessage(24, "И".repeat(500)), e);
+    expect(sent.map((s) => s.body.text).join(" ")).toContain("сократил");
+  });
+
   it("невалидный телефон переспрашивает и не двигает шаг", async () => {
     const sent: any[] = [];
     const e = makeEnv(sent);
@@ -110,6 +161,23 @@ describe("router: админы", () => {
       makeEnv(sent),
     );
     expect(sent[0].body.text).toContain("Заяв");
+  });
+
+  it("/zayavki переживает имя на 2000 символов, уже лежащее в базе", async () => {
+    await (env as any).DB.prepare(
+      `INSERT INTO leads (submission_id, name, phone, student_chat_id)
+       VALUES ('long-name', ?, '+995599112299', 99)`,
+      // Именно «<»: escapeHtml раздувает его вчетверо («&lt;»), и 2000 символов
+      // превращаются в 8000 — вдвое больше лимита Telegram.
+    ).bind("<".repeat(2000)).run();
+
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 73, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID, first_name: "Нина" }, text: "/zayavki" } },
+      makeEnv(sent),
+    );
+    expect(sent.length).toBe(1);
+    expect(sent[0].body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
   });
 
   it("/set от чужого игнорируется", async () => {

@@ -56,6 +56,18 @@ export async function deleteConversation(db: D1Database, chatId: number): Promis
   await db.prepare("DELETE FROM conversations WHERE chat_id = ?").bind(chatId).run();
 }
 
+// Границы длины того, что ученик вводит в анкету. Без них одно длинное
+// сообщение навсегда ломает заявку: карточка перестаёт влезать в лимит
+// Telegram, sendMessage отвечает 400, заявка остаётся pending — а ученику уже
+// сказали «Заявка отправлена».
+export const NAME_LIMIT = 100;
+export const QUESTION_LIMIT = 1000;
+
+/** Обрезка с многоточием: сокращение должно быть видно, а не происходить молча. */
+export function truncate(text: string, limit: number): string {
+  return text.length <= limit ? text : text.slice(0, limit - 1) + "…";
+}
+
 /** Возвращает нормализованный номер (только цифры и ведущий +) или null. */
 export function validatePhone(raw: string): string | null {
   const cleaned = raw.replace(/[\s()-]/g, "");
