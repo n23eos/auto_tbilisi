@@ -1,5 +1,11 @@
 const UPDATES_KEEP_DAYS = 7;
 const PHONE_RETENTION_DAYS = 90;
+// Потолок хранения независимо от статуса. Заявку могут не закрыть никогда
+// (спам-запись, ученик не отвечает, админ забыл нажать «Закрыть») — и тогда
+// правило «90 дней после закрытия» не срабатывает вообще, а телефон лежит
+// вечно. Отсчёт от создания заявки, а не от updated_at: иначе любое действие
+// админа сдвигало бы срок.
+const PHONE_MAX_AGE_DAYS = 180;
 
 /**
  * Метка «телефона больше нет». Колонка phone — NOT NULL, поэтому вместо NULL
@@ -12,14 +18,18 @@ export const PHONE_ERASED = "удалён";
 export async function runCleanup(db: D1Database): Promise<void> {
   await db.prepare(`DELETE FROM processed_updates WHERE seen_at < datetime('now', '-${UPDATES_KEEP_DAYS} days')`).run();
   await db.prepare("DELETE FROM conversations WHERE expires_at <= datetime('now')").run();
-  // Телефон нужен только для связи: после закрытия храним 90 дней, потом затираем.
+  // Телефон нужен только для связи: после закрытия храним 90 дней, а в любом
+  // случае — не дольше 180 дней с создания заявки, даже если её не закрыли.
   // Условие phone != метка делает прогон идемпотентным — второй раз строки не трогаются
   // и updated_at (по нему же считается срок) не сдвигается.
   await db
     .prepare(
       `UPDATE leads SET phone = '${PHONE_ERASED}'
-       WHERE status = 'closed' AND phone != '${PHONE_ERASED}'
-         AND updated_at < datetime('now', '-${PHONE_RETENTION_DAYS} days')`,
+       WHERE phone != '${PHONE_ERASED}'
+         AND (
+           (status = 'closed' AND updated_at < datetime('now', '-${PHONE_RETENTION_DAYS} days'))
+           OR created_at < datetime('now', '-${PHONE_MAX_AGE_DAYS} days')
+         )`,
     )
     .run();
 }
