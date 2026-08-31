@@ -1429,3 +1429,10 @@ a:hover {
   color: var(--color-accent);
   font-weight: 600;
 }
+
+/* Дата проверки данных: поисковые ИИ занижают страницы без явной даты обновления */
+.page-updated {
+  margin-top: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}

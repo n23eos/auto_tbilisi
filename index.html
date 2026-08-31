@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Автошкола на русском языке в Тбилиси — права в Грузии</title>
+  <title>Автошкола на русском языке в Тбилиси — права в Грузии | Avtoshkola.ge</title>
   <meta name="description" content="Автошкола на русском языке в Тбилиси: теория ПДД Грузии и практика вождения с инструктором, очно и онлайн, обучение с нуля. Пр-т Важа Пшавела 9.">
   <link rel="canonical" href="https://avtoshkola.ge/">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -15,7 +15,7 @@
   <meta property="og:url" content="https://avtoshkola.ge/">
   <meta property="og:site_name" content="Автошкола на русском языке — Тбилиси">
   <meta property="og:locale" content="ru_RU">
-  <meta property="og:title" content="Автошкола на русском языке в Тбилиси">
+  <meta property="og:title" content="Автошкола на русском языке в Тбилиси — Avtoshkola.ge">
   <meta property="og:description" content="Полный курс ПДД и вождение на русском языке. Обучение с нуля, очно и онлайн. Пр-т Важа Пшавела 9, Тбилиси.">
   <meta property="og:image" content="https://avtoshkola.ge/media/og-image.jpg">
   <meta property="og:image:width" content="1200">
@@ -28,7 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
-  <link rel="stylesheet" href="css/style.css?v=25">
+  <link rel="stylesheet" href="css/style.css?v=26">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -44,10 +44,16 @@
       {
         "@type": [
           "DrivingSchool",
-          "LocalBusiness"
+          "LocalBusiness",
+          "EducationalOrganization"
         ],
         "@id": "https://avtoshkola.ge/#school",
         "name": "Автошкола на русском языке — Тбилиси",
+        "alternateName": [
+          "Avtoshkola.ge",
+          "Русская автошкола в Тбилиси",
+          "Автошкола на русском языке на Важа Пшавела"
+        ],
         "description": "Русскоязычное отделение автошколы в Грузии: полный курс ПДД и практика вождения на русском языке, очно и онлайн.",
         "url": "https://avtoshkola.ge/",
         "telephone": "+995599987707",
@@ -82,18 +88,67 @@
           "itemListElement": [
             {
               "@type": "Offer",
+              "name": "Теория ПДД в группе — полный курс",
+              "price": "150",
+              "priceCurrency": "GEL",
+              "url": "https://avtoshkola.ge/#prices",
+              "availability": "https://schema.org/InStock",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Теория ПДД на русском языке",
-                "description": "Правила дорожного движения Грузии на русском языке, очно или онлайн."
+                "name": "Теория ПДД на русском языке в аудитории",
+                "description": "Правила дорожного движения Грузии на русском языке: 9 занятий по 90 минут в группе."
               }
             },
             {
               "@type": "Offer",
+              "name": "Теория ПДД индивидуально онлайн — полный курс",
+              "price": "280",
+              "priceCurrency": "GEL",
+              "url": "https://avtoshkola.ge/#prices",
+              "availability": "https://schema.org/InStock",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Практика вождения",
-                "description": "Занятия на площадке и в городе с инструктором, говорящим по-русски."
+                "name": "Теория ПДД на русском языке онлайн",
+                "description": "Курс из 10 индивидуальных занятий в Zoom или Google Meet, 28 ₾ за отдельное занятие."
+              }
+            },
+            {
+              "@type": "Offer",
+              "name": "Вождение на площадке — одно занятие",
+              "price": "40",
+              "priceCurrency": "GEL",
+              "url": "https://avtoshkola.ge/#prices",
+              "availability": "https://schema.org/InStock",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Практика вождения на площадке",
+                "description": "Занятие 45 минут на автодроме с инструктором, говорящим по-русски."
+              }
+            },
+            {
+              "@type": "Offer",
+              "name": "Вождение по городу — одно занятие",
+              "price": "50",
+              "priceCurrency": "GEL",
+              "url": "https://avtoshkola.ge/#prices",
+              "availability": "https://schema.org/InStock",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Практика вождения в городе",
+                "description": "Занятие в реальном трафике Тбилиси с инструктором, говорящим по-русски."
+              }
+            },
+            {
+              "@type": "Offer",
+              "name": "Тестирование и консультация",
+              "price": "0",
+              "priceCurrency": "GEL",
+              "url": "https://avtoshkola.ge/#prices",
+              "availability": "https://schema.org/InStock",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Бесплатное тестирование перед началом обучения",
+                "description": "Пробное занятие 15–20 минут: знакомство с преподавателем и выбор формата."
               }
             }
           ]
@@ -123,6 +178,14 @@
           "@id": "https://avtoshkola.ge/#school"
         },
         "educationalLevel": "Начальный — обучение с нуля, опыт вождения не требуется",
+        "offers": {
+          "@type": "Offer",
+          "category": "Полный курс теории ПДД",
+          "price": "150",
+          "priceCurrency": "GEL",
+          "url": "https://avtoshkola.ge/#prices",
+          "availability": "https://schema.org/InStock"
+        },
         "teaches": [
           "Правила дорожного движения Грузии",
           "Управление автомобилем на площадке",
@@ -159,14 +222,35 @@
         "@id": "https://avtoshkola.ge/#website",
         "url": "https://avtoshkola.ge/",
         "name": "Автошкола на русском языке — Тбилиси",
+        "alternateName": "Avtoshkola.ge",
         "inLanguage": "ru-RU",
         "publisher": {
           "@id": "https://avtoshkola.ge/#school"
         }
       },
       {
+        "@type": "WebPage",
+        "@id": "https://avtoshkola.ge/#webpage",
+        "url": "https://avtoshkola.ge/",
+        "name": "Автошкола на русском языке в Тбилиси — Avtoshkola.ge",
+        "description": "Автошкола на русском языке в Тбилиси: теория ПДД Грузии и практика вождения с инструктором, очно и онлайн, обучение с нуля.",
+        "isPartOf": {
+          "@id": "https://avtoshkola.ge/#website"
+        },
+        "about": {
+          "@id": "https://avtoshkola.ge/#school"
+        },
+        "inLanguage": "ru-RU",
+        "datePublished": "2026-08-26",
+        "dateModified": "2026-08-31"
+      },
+      {
         "@type": "FAQPage",
         "@id": "https://avtoshkola.ge/#faq",
+        "isPartOf": {
+          "@id": "https://avtoshkola.ge/#webpage"
+        },
+        "dateModified": "2026-08-31",
         "mainEntity": [
           {
             "@type": "Question",
@@ -227,7 +311,7 @@
 
   <!-- Nav · N9 edge-aligned minimal -->
   <header class="nav">
-    <a class="nav__brand" href="#top">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <a class="nav__brand" href="#top" aria-label="Avtoshkola.ge — автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
     <nav class="nav__links" aria-label="Разделы сайта">
       <a class="nav__link" href="#prices">Цены</a>
       <a class="nav__link" href="bilety/">Билеты ПДД</a>
@@ -254,7 +338,7 @@
         <a class="marquee__cta" href="#contact">Записаться на обучение</a>
         <a class="marquee__cta marquee__cta--ghost" href="https://wa.me/995599987707" rel="noopener" target="_blank">Написать в WhatsApp</a>
       </div>
-      <p class="marquee__geo">Автошкола в Тбилиси · пр-т Важа Пшавела 9</p>
+      <p class="marquee__geo">Avtoshkola.ge — автошкола на русском языке в Тбилиси, пр-т Важа Пшавела 9</p>
     </div>
   </section>
 
@@ -282,7 +366,7 @@
   <section class="about" id="about">
     <div class="about__text" data-reveal>
       <h2 class="section-title">Русскоязычное отделение автошколы в Грузии</h2>
-      <p>Переехали в Тбилиси и хотите получить права — но грузинского пока не знаете? Мы ведём весь курс на русском языке: разбираем теорию ПДД Грузии, отрабатываем вождение на площадке и в городе, готовим к экзамену.</p>
+      <p><strong>Avtoshkola.ge — автошкола на русском языке в Тбилиси</strong>, проспект Важа Пшавела 9. Переехали в Тбилиси и хотите получить права — но грузинского пока не знаете? Мы ведём весь курс на русском языке: разбираем теорию ПДД Грузии, отрабатываем вождение на площадке и в городе, готовим к экзамену.</p>
       <p>Теорию можно проходить онлайн из любой точки, практика — очно в Тбилиси. Инструкторы объясняют спокойно и по делу: без криков, без спешки, с первого занятия за рулём.</p>
     </div>
     <ul class="about__list" data-reveal>
@@ -467,6 +551,7 @@
       текущего уровня, формата занятий и того, как быстро идёт вождение.
       Позвоните или закажите звонок: посчитаем под вас, это бесплатно.
     </p>
+    <p class="page-updated">Цены и пошлины проверены <time datetime="2026-08-31">31 августа 2026 года</time>.</p>
   </section>
 
   <!-- FAQ · на главной только основное, полный список — на /voprosy/ -->
@@ -552,8 +637,8 @@
 
   <!-- Footer · Ft1 mast-headed -->
   <footer class="footer">
-    <p class="footer__mark">Автошкола на русском языке</p>
-    <p class="footer__tagline">Полный курс ПДД и вождение — Тбилиси, Грузия</p>
+    <p class="footer__mark">Автошкола на русском языке — Тбилиси</p>
+    <p class="footer__tagline">Avtoshkola.ge · полный курс ПДД и вождение — Тбилиси, Грузия</p>
     <p class="footer__meta">
       <a href="https://www.facebook.com/avtoshkolatbilisi" rel="noopener">Facebook</a>
       <span aria-hidden="true">·</span>

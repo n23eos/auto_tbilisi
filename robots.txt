@@ -25,3 +25,7 @@ User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: https://avtoshkola.ge/sitemap.xml
+
+# Плоский текст сайта для языковых моделей
+# https://avtoshkola.ge/llms.txt
+# https://avtoshkola.ge/llms-full.txt
