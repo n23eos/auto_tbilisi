@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { routeUpdate } from "../src/router";
 import { getConversation } from "../src/conversation";
 import { getFact } from "../src/facts";
+import { createLead, getLead, takeLead, closeLead } from "../src/leads";
 import type { Env } from "../src/types";
 
 const ADMIN_CHAT = -100500;
@@ -11,10 +12,18 @@ const ADMIN_ID = 777;
 // Настоящий лимит Telegram на текст сообщения.
 const TELEGRAM_TEXT_LIMIT = 4096;
 
-function makeEnv(sent: any[]): Env {
+// failMethod — имитация «сообщение в группе удалили»: Telegram отвечает
+// ошибкой на editMessageText, хотя message_id в базе ещё лежит.
+function makeEnv(sent: any[], failMethod?: string): Env {
   const fetchFn = vi.fn(async (url: any, init: any) => {
     const body = JSON.parse(init.body);
     sent.push({ url: String(url), body });
+    if (failMethod && String(url).endsWith(`/${failMethod}`)) {
+      return new Response(
+        JSON.stringify({ ok: false, description: "Bad Request: message to edit not found" }),
+        { status: 400 },
+      );
+    }
     // Telegram отвечает 400, а не молча режет текст. Без этого фейк принимал
     // любую длину, и тесты не замечали бы недоставленных карточек.
     if (typeof body.text === "string" && body.text.length > TELEGRAM_TEXT_LIMIT) {
@@ -259,5 +268,157 @@ describe("router: админы", () => {
     );
     expect(sent.length).toBe(1);
     expect(sent[0].url).toContain("answerCallbackQuery");
+  });
+});
+
+const db = () => (env as any).DB as D1Database;
+
+function adminMessage(text: string, fromId: number = ADMIN_ID) {
+  return {
+    update_id: Math.floor(Math.random() * 1e9),
+    message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: fromId, first_name: "Нина" }, text },
+  };
+}
+
+async function seedLead(submissionId: string): Promise<number> {
+  const { leadId } = await createLead(db(), {
+    submissionId,
+    name: "Ученик",
+    phone: "+995599000777",
+    question: null,
+    studentChatId: 900,
+  });
+  return leadId;
+}
+
+/** Тексты, ушедшие в админ-группу, одной строкой — по ним и проверяем ответы команд. */
+function adminTexts(sent: any[]): string {
+  return sent.filter((s) => s.body.chat_id === ADMIN_CHAT).map((s) => s.body.text).join("\n");
+}
+
+describe("router: /release", () => {
+  it("снимает исполнителя с чужой заявки, и её берёт другой админ", async () => {
+    const id = await seedLead("r-release-1");
+    await takeLead(db(), id, 111, "Уволенный");
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`), makeEnv(sent));
+
+    const lead = (await getLead(db(), id))!;
+    expect(lead.status).toBe("new");
+    expect(lead.assigned_to_id).toBeNull();
+    expect(adminTexts(sent)).toContain("освобождена");
+    // Сценарий (а) целиком: заявку снова можно взять.
+    expect(await takeLead(db(), id, 222, "Олег")).toBe(true);
+  });
+
+  it("отказывает на свободной заявке и называет текущий статус", async () => {
+    const id = await seedLead("r-release-new");
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`), makeEnv(sent));
+
+    expect(adminTexts(sent)).toContain("Новая");
+    expect((await getLead(db(), id))!.status).toBe("new");
+  });
+
+  it("отказывает на закрытой заявке и не переоткрывает её", async () => {
+    const id = await seedLead("r-release-closed");
+    await takeLead(db(), id, 111, "Нина");
+    await closeLead(db(), id, 111);
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`), makeEnv(sent));
+
+    expect(adminTexts(sent)).toContain("Закрыта");
+    expect((await getLead(db(), id))!.status).toBe("closed");
+  });
+
+  it("повторный вызов ничего не портит", async () => {
+    const id = await seedLead("r-release-twice");
+    await takeLead(db(), id, 111, "Уволенный");
+
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate(adminMessage(`/release ${id}`), e);
+    await routeUpdate(adminMessage(`/release ${id}`), e);
+
+    const lead = (await getLead(db(), id))!;
+    expect(lead.status).toBe("new");
+    expect(lead.assigned_to_id).toBeNull();
+    const { results } = await db()
+      .prepare("SELECT event FROM lead_events WHERE lead_id = ? AND event = 'force_released'")
+      .bind(id)
+      .all();
+    expect(results.length).toBe(1);
+  });
+
+  it("перерисовывает карточку в группе, если её message_id известен", async () => {
+    const id = await seedLead("r-release-edit");
+    await takeLead(db(), id, 111, "Уволенный");
+    await db().prepare("UPDATE leads SET telegram_message_id = 7 WHERE id = ?").bind(id).run();
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`), makeEnv(sent));
+
+    const edit = sent.find((s) => s.url.includes("editMessageText"));
+    expect(edit.body.message_id).toBe(7);
+    expect(edit.body.text).toContain("Новая");
+  });
+
+  it("если карточку удалили, команда всё равно успешна и подсказывает /card", async () => {
+    const id = await seedLead("r-release-edit-fail");
+    await takeLead(db(), id, 111, "Уволенный");
+    await db().prepare("UPDATE leads SET telegram_message_id = 7 WHERE id = ?").bind(id).run();
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`), makeEnv(sent, "editMessageText"));
+
+    expect((await getLead(db(), id))!.status).toBe("new");
+    expect(adminTexts(sent)).toContain(`/card ${id}`);
+  });
+
+  it("нечисловой и неизвестный номер — понятный ответ, а не падение", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate(adminMessage("/release абв"), e);
+    await routeUpdate(adminMessage("/release"), e);
+    await routeUpdate(adminMessage("/release 999999"), e);
+
+    const texts = sent.filter((s) => s.body.chat_id === ADMIN_CHAT).map((s) => s.body.text);
+    expect(texts.length).toBe(3);
+    expect(texts[0]).toContain("/release 12");
+    expect(texts[1]).toContain("/release 12");
+    expect(texts[2]).toContain("999999");
+  });
+
+  it("/release@botname работает так же", async () => {
+    const id = await seedLead("r-release-mention");
+    await takeLead(db(), id, 111, "Уволенный");
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release@some_bot ${id}`), makeEnv(sent));
+    expect((await getLead(db(), id))!.status).toBe("new");
+  });
+
+  it("не-админ в группе не может освободить заявку", async () => {
+    const id = await seedLead("r-release-stranger");
+    await takeLead(db(), id, 111, "Нина");
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/release ${id}`, 999), makeEnv(sent));
+
+    expect(sent.length).toBe(0);
+    expect((await getLead(db(), id))!.assigned_to_id).toBe(111);
+  });
+
+  it("админ из лички не может освободить заявку", async () => {
+    const id = await seedLead("r-release-private");
+    await takeLead(db(), id, 111, "Нина");
+
+    const sent: any[] = [];
+    await routeUpdate(privateMessage(ADMIN_ID, `/release ${id}`), makeEnv(sent));
+
+    expect((await getLead(db(), id))!.assigned_to_id).toBe(111);
+    expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(0);
   });
 });

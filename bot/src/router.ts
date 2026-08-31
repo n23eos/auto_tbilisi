@@ -7,7 +7,8 @@ import {
   type Conversation,
 } from "./conversation";
 import {
-  createLead, getLead, takeLead, markCalled, closeLead, releaseLead, renderLeadCard,
+  createLead, getLead, takeLead, markCalled, closeLead, releaseLead, forceReleaseLead,
+  renderLeadCard, statusLabel,
 } from "./leads";
 import { escapeHtml, escapeClamped } from "./escape";
 import { formatTbilisi } from "./time";
@@ -301,6 +302,78 @@ function stripBotMention(text: string): string {
   return command.slice(0, atIdx) + rest;
 }
 
+/** Номер заявки из команды: только цифры. null — админ получит подсказку про формат. */
+function parseLeadId(rest: string): number | null {
+  const trimmed = rest.trim();
+  if (!/^\d+$/.test(trimmed)) return null;
+  const id = Number(trimmed);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
+/**
+ * /release <id> — снять исполнителя с заявки, не спрашивая, кто её взял.
+ * Нужна ровно тогда, когда самообслуживание не работает: админа, взявшего
+ * заявку, убрали из ADMIN_IDS, и его «Освободить» больше некому нажать.
+ */
+async function handleRelease(rest: string, fromId: number, env: Env, tg: TelegramClient): Promise<void> {
+  const adminChat = Number(env.ADMIN_CHAT_ID);
+  const leadId = parseLeadId(rest);
+  if (leadId === null) {
+    await tg.sendMessage(adminChat, "Формат: /release 12 — номер заявки цифрами. Номера видно в /zayavki.");
+    return;
+  }
+  const before = await getLead(env.DB, leadId);
+  if (!before) {
+    await tg.sendMessage(adminChat, `Заявки #${leadId} в базе нет. Список последних: /zayavki`);
+    return;
+  }
+
+  if (!(await forceReleaseLead(env.DB, leadId, fromId))) {
+    // Не ошибка команды: снимать нечего. Статус перечитываем, чтобы в отказе
+    // стоял настоящий — за время попытки его могли поменять кнопками.
+    const now = await getLead(env.DB, leadId);
+    await tg.sendMessage(
+      adminChat,
+      `Заявку #${leadId} освобождать не от кого — статус «${statusLabel(now?.status ?? "")}». ` +
+      "Снять исполнителя можно только с заявки в работе. Закрытую заявку не переоткрываем.",
+    );
+    return;
+  }
+
+  const who = before.assigned_to_name
+    ? `Снят исполнитель: ${escapeClamped(before.assigned_to_name, LIST_FIELD_LIMIT)}.`
+    : "Исполнитель снят.";
+  await tg.sendMessage(
+    adminChat,
+    `Заявка #${leadId} освобождена. ${who} Взять её теперь может любой администратор.` +
+    (await refreshCard(leadId, before.telegram_message_id, env, tg)),
+  );
+}
+
+/**
+ * Перерисовать карточку заявки на прежнем месте. Возвращает ХВОСТ к ответу админу:
+ * пустой при успехе, подсказку — если карточки нет. Неудачная перерисовка не
+ * отменяет саму команду: сообщение в группе могли удалить, а заявка уже свободна.
+ */
+async function refreshCard(
+  leadId: number,
+  messageId: number | null,
+  env: Env,
+  tg: TelegramClient,
+): Promise<string> {
+  if (!messageId) return ` Карточки в группе нет — выслать: /card ${leadId}`;
+  const lead = await getLead(env.DB, leadId);
+  if (!lead) return "";
+  try {
+    const card = renderLeadCard(lead);
+    await tg.editMessageText(Number(env.ADMIN_CHAT_ID), messageId, card.text, card.keyboard);
+    return "";
+  } catch (err) {
+    console.error(`Карточка заявки #${leadId} не перерисована:`, err);
+    return ` Старую карточку обновить не удалось — похоже, её удалили. Выслать заново: /card ${leadId}`;
+  }
+}
+
 async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: TelegramClient): Promise<void> {
   const adminChat = Number(env.ADMIN_CHAT_ID);
   const text = stripBotMention(raw);
@@ -343,6 +416,12 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
     });
     await tg.sendMessage(adminChat, "<b>Последние заявки</b>\n" + lines.join("\n"));
     return;
+  }
+
+  // Пробел обязателен только когда номер есть: голая «/release» тоже должна
+  // отвечать подсказкой про формат, а не молчать.
+  if (text === "/release" || text.startsWith("/release ")) {
+    return handleRelease(text.slice("/release".length), fromId, env, tg);
   }
 
   if (text.startsWith("/resend")) {

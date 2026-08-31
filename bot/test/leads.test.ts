@@ -7,6 +7,7 @@ import {
   markCalled,
   closeLead,
   releaseLead,
+  forceReleaseLead,
   renderLeadCard,
 } from "../src/leads";
 
@@ -62,6 +63,43 @@ describe("статусы", () => {
     expect(lead.status).toBe("new");
     expect(lead.assigned_to_id).toBeNull();
     expect(await takeLead(db, id, 20, "Олег")).toBe(true);
+  });
+
+  it("forceReleaseLead снимает ЧУЖОГО исполнителя, и заявку берёт другой", async () => {
+    const id = await makeLead("s9");
+    await takeLead(db, id, 10, "Нина");
+    // 20 — не тот, кто взял: обычный releaseLead тут бы отказал.
+    expect(await releaseLead(db, id, 20)).toBe(false);
+    expect(await forceReleaseLead(db, id, 20)).toBe(true);
+    const lead = (await getLead(db, id))!;
+    expect(lead.status).toBe("new");
+    expect(lead.assigned_to_id).toBeNull();
+    expect(lead.assigned_to_name).toBeNull();
+    expect(await takeLead(db, id, 30, "Олег")).toBe(true);
+  });
+
+  it("forceReleaseLead отказывает на new и на closed", async () => {
+    const fresh = await makeLead("s10");
+    expect(await forceReleaseLead(db, fresh, 20)).toBe(false); // и так свободна
+
+    const done = await makeLead("s11");
+    await takeLead(db, done, 10, "Нина");
+    await closeLead(db, done, 10);
+    expect(await forceReleaseLead(db, done, 20)).toBe(false); // закрытая — терминальная
+    expect((await getLead(db, done))!.status).toBe("closed");
+  });
+
+  it("принудительное снятие пишется в lead_events отдельным событием", async () => {
+    const id = await makeLead("s12");
+    await takeLead(db, id, 10, "Нина");
+    await forceReleaseLead(db, id, 20);
+    const { results } = await db
+      .prepare("SELECT event, actor_id FROM lead_events WHERE lead_id = ? ORDER BY id")
+      .bind(id)
+      .all();
+    expect(results.map((r: any) => r.event)).toEqual(["created", "taken", "force_released"]);
+    // В логе видно, КТО снял чужую заявку, а не только с кого.
+    expect((results.at(-1) as any).actor_id).toBe(20);
   });
 
   it("переходы пишутся в lead_events", async () => {

@@ -89,12 +89,36 @@ export function releaseLead(db: D1Database, leadId: number, adminId: number): Pr
   );
 }
 
+/**
+ * Снятие исполнителя администратором — БЕЗ проверки, что он и есть исполнитель.
+ * Отдельная функция, а не послабление в releaseLead: тот остаётся
+ * самообслуживанием («освобождаю свою заявку») и обязан требовать совпадения
+ * assigned_to_id, иначе кнопка «Освободить» начнёт снимать чужие заявки.
+ * Здесь же весь смысл в обратном: админа, взявшего заявку, могло уже не быть
+ * в школе. Условие по статусу остаётся: закрытую заявку не переоткрываем,
+ * а на свободной снимать нечего — оба случая вернут false.
+ */
+export function forceReleaseLead(db: D1Database, leadId: number, adminId: number): Promise<boolean> {
+  return transition(
+    db,
+    `UPDATE leads SET status = 'new', assigned_to_id = NULL, assigned_to_name = NULL, updated_at = datetime('now')
+     WHERE id = ? AND status IN ('in_progress', 'contacted')`,
+    [leadId],
+    leadId, "force_released", adminId,
+  );
+}
+
 const STATUS_LABEL: Record<string, string> = {
   new: "🆕 Новая",
   in_progress: "✋ В работе",
   contacted: "📞 Созвонились",
   closed: "✅ Закрыта",
 };
+
+/** Человеческое название статуса для сообщений админу; неизвестный — как есть, а не «undefined». */
+export function statusLabel(status: string): string {
+  return STATUS_LABEL[status] ?? status;
+}
 
 // Потолки на длину полей уже В КАРТОЧКЕ, считая экранирование. Ввод ученика
 // режется ещё в анкете, но строка могла попасть в базу раньше этой проверки
