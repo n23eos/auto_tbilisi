@@ -159,7 +159,7 @@ async function submitForm(chatId: number, env: Env, tg: TelegramClient): Promise
     await tg.sendMessage(chatId, "Анкета устарела. Начнём заново? Нажмите «Записаться» в меню.", MAIN_MENU);
     return;
   }
-  const { leadId } = await createLead(env.DB, {
+  const { created, leadId } = await createLead(env.DB, {
     submissionId: conv.submissionId,
     name: conv.data.name,
     phone: conv.data.phone,
@@ -167,6 +167,15 @@ async function submitForm(chatId: number, env: Env, tg: TelegramClient): Promise
     studentChatId: chatId,
   });
   await deleteConversation(env.DB, chatId);
+  // createLead идемпотентен по submission_id, но карточка и подтверждение —
+  // нет. Два нажатия «Согласен» приходят разными update_id (дедуп вебхука их
+  // не ловит) и обрабатываются параллельно: оба успевают прочитать анкету до
+  // её удаления. Без этой проверки в группу уходят две карточки на одну заявку,
+  // обе с живыми кнопками, и два подтверждения ученику.
+  if (!created) {
+    await tg.sendMessage(chatId, "Заявка уже отправлена — администратор свяжется с вами. 🚗", MAIN_MENU);
+    return;
+  }
   await deliverCard(leadId, env, tg);
   await tg.sendMessage(chatId, "Заявка отправлена! Администратор свяжется с вами в рабочее время (10:00–20:00). Спасибо! 🚗", MAIN_MENU);
 }

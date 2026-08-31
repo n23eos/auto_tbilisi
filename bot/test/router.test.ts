@@ -73,6 +73,28 @@ describe("router: ученик", () => {
     expect(cardMsg.body.text).toContain("Вася Пупкин");
   });
 
+  it("повторное «Согласен» не создаёт вторую карточку", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    const consent = (updateId: number, cbId: string) => ({
+      update_id: updateId,
+      callback_query: { id: cbId, from: { id: 40, first_name: "Дважды" }, message: { chat: { id: 40, type: "private" } }, data: "form:consent_yes" },
+    });
+    await routeUpdate({ update_id: 40, callback_query: { id: "c40", from: { id: 40, first_name: "Дважды" }, message: { chat: { id: 40, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(40, "Дважды Нажал"), e);
+    await routeUpdate(privateMessage(40, "+995599112240"), e);
+    await routeUpdate(privateMessage(40, "вопрос"), e);
+
+    // Два разных update_id — дедуп вебхука по update_id тут не спасает.
+    // Обработчики идут ПАРАЛЛЕЛЬНО: оба успевают прочитать анкету до того, как
+    // первый её удалит, поэтому проверки «анкета устарела» недостаточно.
+    await Promise.all([routeUpdate(consent(41, "c41"), e), routeUpdate(consent(42, "c42"), e)]);
+
+    expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(1);
+    const { results } = await (env as any).DB.prepare("SELECT id FROM leads WHERE student_chat_id = 40").all();
+    expect(results.length).toBe(1);
+  });
+
   it("без согласия заявка не создаётся", async () => {
     const sent: any[] = [];
     const e = makeEnv(sent);
