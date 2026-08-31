@@ -335,7 +335,7 @@ async function handleRelease(rest: string, fromId: number, env: Env, tg: Telegra
     const now = await getLead(env.DB, leadId);
     await tg.sendMessage(
       adminChat,
-      `Заявку #${leadId} освобождать не от кого — статус «${statusLabel(now?.status ?? "")}». ` +
+      `Заявку #${leadId} освобождать не от кого — статус «${statusLabel(now?.status ?? before.status)}». ` +
       "Снять исполнителя можно только с заявки в работе. Закрытую заявку не переоткрываем.",
     );
     return;
