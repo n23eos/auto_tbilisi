@@ -422,3 +422,91 @@ describe("router: /release", () => {
     expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(0);
   });
 });
+
+describe("router: /card", () => {
+  it("высылает карточку уже доставленной заявки и запоминает новое сообщение", async () => {
+    const id = await seedLead("r-card-delivered");
+    await db()
+      .prepare("UPDATE leads SET delivery_status = 'delivered', telegram_message_id = 7 WHERE id = ?")
+      .bind(id)
+      .run();
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card ${id}`), makeEnv(sent));
+
+    const card = sent.find((s) => s.url.includes("sendMessage") && s.body.chat_id === ADMIN_CHAT);
+    expect(card.body.text).toContain(`Заявка #${id}`);
+    expect(card.body.reply_markup.inline_keyboard.flat().length).toBeGreaterThan(0);
+    // Дальнейшие перерисовки должны идти в новую карточку, а не в устаревшую.
+    expect((await getLead(db(), id))!.telegram_message_id).toBe(42);
+  });
+
+  it("новая карточка помечена как замена старой, если старая была", async () => {
+    const id = await seedLead("r-card-marker");
+    await db().prepare("UPDATE leads SET telegram_message_id = 7 WHERE id = ?").bind(id).run();
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card ${id}`), makeEnv(sent));
+    expect(sent[0].body.text).toContain("устарела");
+  });
+
+  it("первая карточка (недоставленная) идёт без пометки о замене", async () => {
+    const id = await seedLead("r-card-pending");
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card ${id}`), makeEnv(sent));
+
+    expect(sent[0].body.text).not.toContain("устарела");
+    expect((await getLead(db(), id))!.delivery_status).toBe("delivered");
+  });
+
+  it("заявка с затёртым телефоном рисуется без ошибок", async () => {
+    const id = await seedLead("r-card-erased");
+    await takeLead(db(), id, ADMIN_ID, "Нина");
+    // Так делает ежедневная уборка: колонка NOT NULL, поэтому вместо NULL — метка.
+    await db().prepare("UPDATE leads SET phone = 'удалён' WHERE id = ?").bind(id).run();
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card ${id}`), makeEnv(sent));
+    expect(sent[0].body.text).toContain("Телефон: удалён");
+  });
+
+  it("нечисловой и неизвестный номер — понятный ответ, а не падение", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate(adminMessage("/card абв"), e);
+    await routeUpdate(adminMessage("/card"), e);
+    await routeUpdate(adminMessage("/card 999999"), e);
+
+    const texts = sent.map((s) => s.body.text);
+    expect(texts.length).toBe(3);
+    expect(texts[0]).toContain("/card 12");
+    expect(texts[1]).toContain("/card 12");
+    expect(texts[2]).toContain("999999");
+  });
+
+  it("/card@botname работает так же", async () => {
+    const id = await seedLead("r-card-mention");
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card@some_bot ${id}`), makeEnv(sent));
+    expect(sent[0].body.text).toContain(`Заявка #${id}`);
+  });
+
+  it("не-админ в группе карточку не получит", async () => {
+    const id = await seedLead("r-card-stranger");
+    const sent: any[] = [];
+    await routeUpdate(adminMessage(`/card ${id}`, 999), makeEnv(sent));
+    expect(sent.length).toBe(0);
+  });
+
+  it("админ из лички карточку не вытянет", async () => {
+    const id = await seedLead("r-card-private");
+    await takeLead(db(), id, ADMIN_ID, "Нина");
+
+    const sent: any[] = [];
+    await routeUpdate(privateMessage(ADMIN_ID, `/card ${id}`), makeEnv(sent));
+
+    // Ни в группу, ни в личку телефон ученика уйти не должен.
+    expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(0);
+    expect(sent.map((s) => s.body.text).join("\n")).not.toContain("+995599000777");
+  });
+});

@@ -186,12 +186,13 @@ async function submitForm(chatId: number, env: Env, tg: TelegramClient): Promise
  * Ученик в любом случае получает подтверждение: его данные уже сохранены, и молчать
  * в ответ хуже, чем не доставить карточку.
  */
-async function deliverCard(leadId: number, env: Env, tg: TelegramClient): Promise<boolean> {
+async function deliverCard(leadId: number, env: Env, tg: TelegramClient, notice?: string): Promise<boolean> {
   const lead = await getLead(env.DB, leadId);
   if (!lead) return false;
   try {
     const card = renderLeadCard(lead);
-    const sent = await tg.sendMessage(Number(env.ADMIN_CHAT_ID), card.text, card.keyboard);
+    const text = notice ? `${notice}\n${card.text}` : card.text;
+    const sent = await tg.sendMessage(Number(env.ADMIN_CHAT_ID), text, card.keyboard);
     await env.DB
       .prepare("UPDATE leads SET delivery_status = 'delivered', telegram_message_id = ? WHERE id = ?")
       .bind(sent.message_id, leadId)
@@ -374,6 +375,39 @@ async function refreshCard(
   }
 }
 
+/**
+ * /card <id> — выслать карточку заявки заново, независимо от delivery_status.
+ * Нужна, когда карточку удалили из группы или группу перевели в супергруппу:
+ * кнопок нет, а /resend берёт только недоставленные заявки.
+ *
+ * Старую карточку НЕ удаляем: у бота может не быть на это прав, а история
+ * группы — это ещё и то, что админы читают глазами. Вместо удаления помечаем
+ * новую карточку как замену и переписываем telegram_message_id, чтобы будущие
+ * перерисовки шли в неё. Нажатие на старую карточку остаётся безопасным:
+ * условные UPDATE не дадут сделать переход дважды, а handleLeadCallback
+ * правит то сообщение, в котором нажали.
+ */
+async function handleCardResend(rest: string, env: Env, tg: TelegramClient): Promise<void> {
+  const adminChat = Number(env.ADMIN_CHAT_ID);
+  const leadId = parseLeadId(rest);
+  if (leadId === null) {
+    await tg.sendMessage(adminChat, "Формат: /card 12 — номер заявки цифрами. Номера видно в /zayavki.");
+    return;
+  }
+  const lead = await getLead(env.DB, leadId);
+  if (!lead) {
+    await tg.sendMessage(adminChat, `Заявки #${leadId} в базе нет. Список последних: /zayavki`);
+    return;
+  }
+
+  const notice = lead.telegram_message_id
+    ? `↻ Карточка выслана заново. Прежняя карточка заявки #${leadId} выше устарела — нажимайте кнопки в этой.`
+    : undefined;
+  if (!(await deliverCard(leadId, env, tg, notice))) {
+    await tg.sendMessage(adminChat, `Карточку заявки #${leadId} отправить не удалось. Попробуйте ещё раз: /card ${leadId}`);
+  }
+}
+
 async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: TelegramClient): Promise<void> {
   const adminChat = Number(env.ADMIN_CHAT_ID);
   const text = stripBotMention(raw);
@@ -422,6 +456,10 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
   // отвечать подсказкой про формат, а не молчать.
   if (text === "/release" || text.startsWith("/release ")) {
     return handleRelease(text.slice("/release".length), fromId, env, tg);
+  }
+
+  if (text === "/card" || text.startsWith("/card ")) {
+    return handleCardResend(text.slice("/card".length), env, tg);
   }
 
   if (text.startsWith("/resend")) {
