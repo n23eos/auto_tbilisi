@@ -108,6 +108,23 @@ async function handleFormInput(conv: Conversation, msg: any, env: Env, tg: Teleg
   }
 
   if (conv.step === "phone") {
+    // Кнопка «Поделиться контактом» присылает contact с user_id самого
+    // отправителя. Но через меню «прикрепить» можно переслать карточку ЛЮБОГО
+    // человека — там user_id чужой или отсутствует. Принять такой номер значит
+    // записать в заявку телефон постороннего, который ни на что не соглашался,
+    // и школа позвонит ему. Ровно от этого защищает шаг с согласием.
+    if (msg.contact && msg.contact.user_id !== msg.from?.id) {
+      await tg.sendMessage(
+        chatId,
+        "Это контакт другого человека — записать могу только свой номер. " +
+        "Нажмите кнопку ниже или введите номер вручную.",
+        {
+          keyboard: [[{ text: "📱 Поделиться контактом", request_contact: true }]],
+          resize_keyboard: true, one_time_keyboard: true,
+        },
+      );
+      return;
+    }
     const raw = msg.contact?.phone_number ?? text;
     const phone = validatePhone(raw ?? "");
     if (!phone) {

@@ -124,6 +124,40 @@ describe("router: ученик", () => {
     expect(sent.map((s) => s.body.text).join(" ")).toContain("сократил");
   });
 
+  it("свой контакт по кнопке принимается", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 30, callback_query: { id: "c30", from: { id: 30, first_name: "С" }, message: { chat: { id: 30, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(30, "Своя"), e);
+    // user_id в контакте совпадает с отправителем — это действительно его номер.
+    await routeUpdate(privateMessage(30, "", { contact: { phone_number: "+995599112230", user_id: 30 } }), e);
+    expect((await getConversation((env as any).DB, 30))!.step).toBe("question");
+  });
+
+  it("чужая карточка контакта не принимается и шаг не двигается", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 31, callback_query: { id: "c31", from: { id: 31, first_name: "Ч" }, message: { chat: { id: 31, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(31, "Чужая"), e);
+    sent.length = 0;
+    // Через меню «прикрепить» можно переслать контакт любого человека:
+    // user_id тогда чужой или отсутствует вовсе.
+    await routeUpdate(privateMessage(31, "", { contact: { phone_number: "+995599112231", user_id: 999 } }), e);
+
+    expect((await getConversation((env as any).DB, 31))!.step).toBe("phone");
+    expect((await getConversation((env as any).DB, 31))!.data.phone).toBeUndefined();
+    expect(sent[0].body.text).toContain("свой");
+  });
+
+  it("контакт без user_id тоже не принимается", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    await routeUpdate({ update_id: 32, callback_query: { id: "c32", from: { id: 32, first_name: "Б" }, message: { chat: { id: 32, type: "private" } }, data: "menu:zapis" } }, e);
+    await routeUpdate(privateMessage(32, "Без id"), e);
+    await routeUpdate(privateMessage(32, "", { contact: { phone_number: "+995599112232" } }), e);
+    expect((await getConversation((env as any).DB, 32))!.step).toBe("phone");
+  });
+
   it("невалидный телефон переспрашивает и не двигает шаг", async () => {
     const sent: any[] = [];
     const e = makeEnv(sent);
