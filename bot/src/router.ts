@@ -1,5 +1,5 @@
 import { TelegramClient } from "./telegram";
-import { CONTACTS, menuAnswer, searchKb } from "./kb";
+import { CONTACTS, PHONE, menuAnswer, searchKb } from "./kb";
 import { getFact, setFact } from "./facts";
 import {
   startConversation, getConversation, updateConversation, deleteConversation, validatePhone,
@@ -51,6 +51,29 @@ const LIST_FIELD_LIMIT = 150;
 // 400 — админ не видит ни подтверждения, ни причины, а кнопка у учеников молча
 // перестаёт отвечать. 200 символов на дату группы — с большим запасом.
 const FACT_FIELD_LIMIT = 200;
+
+/**
+ * Сколько заявок один и тот же чат может подать за сутки.
+ *
+ * Анкету может пройти любой пользователь Telegram, и без потолка её несложно
+ * прокрутить в цикле: каждая заявка — карточка в группу админов. За лимитом
+ * Telegram (около 20 сообщений в минуту в группу) отправка начинает падать,
+ * карточки копятся в pending, и настоящие заявки тонут среди спама.
+ *
+ * Три — с запасом для живого человека: заявка, потом «ой, не тот телефон»,
+ * потом ещё одна на всякий случай. Четвёртая за сутки уже похожа на скрипт,
+ * и такому отвечаем телефоном школы, а не молчанием.
+ */
+export const DAILY_LEAD_LIMIT = 3;
+
+/**
+ * Размер пачки /resend. Без потолка команда перебирала ВСЮ очередь pending
+ * в одном запросе: на каждую заявку чтение из D1, вызов Telegram и запись.
+ * При сотне накопившихся карточек это упирается в лимит подзапросов воркера,
+ * и /resend начинает падать раз за разом — то есть ломается ровно тот
+ * инструмент, которым эту очередь и разгребают.
+ */
+export const RESEND_BATCH = 25;
 
 function makeClient(env: Env): TelegramClient {
   // __fetch — шов для тестов: они вызывают routeUpdate напрямую и подменяют fetch.
@@ -168,6 +191,23 @@ async function submitForm(chatId: number, env: Env, tg: TelegramClient): Promise
     await tg.sendMessage(chatId, "Анкета устарела. Начнём заново? Нажмите «Записаться» в меню.", MAIN_MENU);
     return;
   }
+  // Потолок заявок с одного чата за сутки. Считаем ДО createLead: иначе строка
+  // уже вставлена, и «отказ» означал бы мусор в базе при каждой попытке.
+  const recent = await env.DB
+    .prepare("SELECT count(*) AS n FROM leads WHERE student_chat_id = ? AND created_at > datetime('now', '-1 day')")
+    .bind(chatId)
+    .first<{ n: number }>();
+  if ((recent?.n ?? 0) >= DAILY_LEAD_LIMIT) {
+    await deleteConversation(env.DB, chatId);
+    await tg.sendMessage(
+      chatId,
+      `Заявка от вас уже принята — администратор свяжется с вами. ` +
+        `Если дело срочное, позвоните напрямую: ${PHONE}`,
+      MAIN_MENU,
+    );
+    return;
+  }
+
   const { created, leadId } = await createLead(env.DB, {
     submissionId: conv.submissionId,
     name: conv.data.name,
@@ -274,7 +314,14 @@ async function handleLeadCallback(cb: any, env: Env, tg: TelegramClient): Promis
     return;
   }
   const [, action, idStr] = cb.data.split(":");
-  const leadId = Number(idStr);
+  // Тем же parseLeadId, что и команды: callback_data приходит от клиента, и
+  // «lead:take:abc» дал бы NaN в bind — D1 бросает, answerCallbackQuery уже не
+  // вызывается, и кнопка у админа крутится до таймаута вместо внятного отказа.
+  const leadId = parseLeadId(idStr ?? "");
+  if (leadId === null) {
+    await tg.answerCallbackQuery(cb.id, "Битая кнопка — обновите карточку командой /card <номер>");
+    return;
+  }
   const adminName: string = cb.from.first_name ?? "админ";
 
   let ok = false;
@@ -428,7 +475,11 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
       return;
     }
     const alias = rest.slice(0, spaceIdx);
-    const key = FACT_ALIASES[alias];
+    // Object.hasOwn, а не прямой доступ: FACT_ALIASES — обычный литерал, и
+  // `/set constructor 5` вернул бы унаследованный Object вместо undefined,
+  // проскочил бы проверку на пустоту и упал бы уже в D1 — админ получил бы
+  // молчание вместо подсказки «не знаю такой факт».
+  const key = Object.hasOwn(FACT_ALIASES, alias) ? FACT_ALIASES[alias] : undefined;
     if (!key) {
       await tg.sendMessage(
         adminChat,
@@ -477,12 +528,21 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
   }
 
   if (text.startsWith("/resend")) {
-    const { results } = await env.DB.prepare("SELECT id FROM leads WHERE delivery_status = 'pending' ORDER BY id").all();
+    const pending = await env.DB
+      .prepare("SELECT count(*) AS n FROM leads WHERE delivery_status = 'pending'")
+      .first<{ n: number }>();
+    const { results } = await env.DB
+      .prepare(`SELECT id FROM leads WHERE delivery_status = 'pending' ORDER BY id LIMIT ${RESEND_BATCH}`)
+      .all();
     let delivered = 0;
     for (const row of results as any[]) {
       if (await deliverCard(row.id, env, tg)) delivered++;
     }
-    await tg.sendMessage(adminChat, `Переотправлено карточек: ${delivered} из ${results.length}`);
+    // Остаток называем явно: молча отправить 25 из 300 и отчитаться «готово»
+    // означало бы, что админ считает очередь разобранной и больше не вернётся.
+    const left = (pending?.n ?? 0) - delivered;
+    const tail = left > 0 ? ` Осталось в очереди: ${left} — повторите /resend.` : "";
+    await tg.sendMessage(adminChat, `Переотправлено карточек: ${delivered} из ${results.length}.${tail}`);
     return;
   }
 }

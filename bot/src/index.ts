@@ -42,9 +42,18 @@ function secretsMatch(expected: string, actual: string | null): boolean {
   return crypto.subtle.timingSafeEqual(a, b);
 }
 
-/** Имена секретов вебхука, которые не заданы или пусты. Пустой массив — всё на месте. */
+/**
+ * Имена обязательных настроек, которые не заданы или пусты. Пустой массив — всё на месте.
+ *
+ * ADMIN_CHAT_ID и ADMIN_IDS здесь не для безопасности, а против тихой потери
+ * заявок: [vars] в wrangler.toml намеренно нет, всё задаётся через
+ * `wrangler secret put`. Забыть их на свежем деплое легко, и тогда бот
+ * принимает анкеты, отвечает ученику «Заявка отправлена», а карточка уходит в
+ * чат NaN и не доходит никуда. Отказ на входе шумный, потеря заявок — нет.
+ */
 function missingSecrets(env: Env): string[] {
-  return (["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET"] as const).filter((name) => !env[name]);
+  return (["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET", "ADMIN_CHAT_ID", "ADMIN_IDS"] as const)
+    .filter((name) => !env[name]);
 }
 
 export default {

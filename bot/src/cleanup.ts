@@ -24,13 +24,21 @@ export async function runCleanup(db: D1Database): Promise<void> {
   await db.prepare(`DELETE FROM processed_updates WHERE seen_at < datetime('now', '-${UPDATES_KEEP_DAYS} days')`).run();
   await db.prepare("DELETE FROM conversations WHERE expires_at <= datetime('now')").run();
   await db.prepare(`DELETE FROM lead_events WHERE created_at < datetime('now', '-${EVENTS_KEEP_DAYS} days')`).run();
-  // Телефон нужен только для связи: после закрытия храним 90 дней, а в любом
-  // случае — не дольше 180 дней с создания заявки, даже если её не закрыли.
-  // Условие phone != метка делает прогон идемпотентным — второй раз строки не трогаются
-  // и updated_at (по нему же считается срок) не сдвигается.
+  // Контактные данные нужны только для связи: после закрытия храним 90 дней,
+  // а в любом случае — не дольше 180 дней с создания заявки, даже если её не
+  // закрыли. Условие phone != метка делает прогон идемпотентным — второй раз
+  // строки не трогаются и updated_at (по нему же считается срок) не сдвигается.
+  //
+  // Затирается не только телефон. Имя, свободный текст вопроса и
+  // student_chat_id вместе так же однозначно указывают на человека, а chat_id
+  // ещё и позволяет ему написать — то есть строка остаётся полноценной
+  // карточкой живого человека, и обещание «храним 90 дней» не выполняется.
+  // Сама строка остаётся: на её id ссылается lead_events, и по ней же
+  // считается статистика заявок.
   await db
     .prepare(
-      `UPDATE leads SET phone = '${PHONE_ERASED}'
+      `UPDATE leads SET phone = '${PHONE_ERASED}', name = '${PHONE_ERASED}',
+                        question = NULL, student_chat_id = 0
        WHERE phone != '${PHONE_ERASED}'
          AND (
            (status = 'closed' AND updated_at < datetime('now', '-${PHONE_RETENTION_DAYS} days'))

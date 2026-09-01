@@ -27,6 +27,31 @@ describe("TelegramClient", () => {
     await expect(tg.sendMessage(1, "x")).rejects.toThrow("Bad Request");
   });
 
+  // Токен стоит в URL, а часть ошибок рантайма Workers включает URL в текст.
+  // Это сообщение уходит в console.error, оттуда в `wrangler tail` и Logpush.
+  it("вычищает токен из текста сетевой ошибки", async () => {
+    const leaky = vi.fn(async (url: string) => {
+      throw new Error(`Fetch API cannot load: ${url}`);
+    }) as unknown as typeof fetch;
+    const tg = new TelegramClient("1234567890:SEKRETNIY-TOKEN-DLINNIY", leaky);
+    await expect(tg.sendMessage(1, "x")).rejects.toThrow(/<ТОКЕН>/);
+    await expect(tg.sendMessage(1, "x")).rejects.not.toThrow(/SEKRETNIY-TOKEN-DLINNIY/);
+  });
+
+  it("вычищает токен из описания ошибки Telegram", async () => {
+    const echoing = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          ok: false,
+          description: "Unauthorized at bot 1234567890:SEKRETNIY-TOKEN-DLINNIY/sendMessage",
+        }),
+        { status: 401 },
+      ),
+    ) as unknown as typeof fetch;
+    const tg = new TelegramClient("1234567890:SEKRETNIY-TOKEN-DLINNIY", echoing);
+    await expect(tg.sendMessage(1, "x")).rejects.not.toThrow(/SEKRETNIY-TOKEN-DLINNIY/);
+  });
+
   it("передаёт в fetch signal с таймаутом", async () => {
     const f = fakeFetch();
     const tg = new TelegramClient("TOKEN", f);
@@ -86,5 +111,17 @@ describe("splitMessage", () => {
     // нечем, но функция обязана завершиться и вернуть весь текст.
     const parts = splitMessage("&amp;&amp;&amp;", 3);
     expect(parts.join("")).toBe("&amp;&amp;&amp;");
+  });
+});
+
+describe("TelegramClient: короткий токен", () => {
+  // Замена по строке в один-два символа вырезала бы обычные буквы из каждого
+  // сообщения об ошибке, и в логе осталась бы каша вместо причины падения.
+  it("не портит текст ошибки, если токен слишком короткий для секрета", async () => {
+    const boom = vi.fn(async () => {
+      throw new Error("Telegram недоступен");
+    }) as unknown as typeof fetch;
+    const tg = new TelegramClient("T", boom);
+    await expect(tg.sendMessage(1, "x")).rejects.toThrow("Telegram недоступен");
   });
 });

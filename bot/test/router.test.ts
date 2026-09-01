@@ -1,6 +1,6 @@
 import { env } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
-import { routeUpdate } from "../src/router";
+import { routeUpdate, RESEND_BATCH, DAILY_LEAD_LIMIT } from "../src/router";
 import { getConversation } from "../src/conversation";
 import { getFact } from "../src/facts";
 import { createLead, getLead, takeLead, closeLead } from "../src/leads";
@@ -331,6 +331,18 @@ async function seedLead(submissionId: string): Promise<number> {
   return leadId;
 }
 
+/** Проход анкеты до «Согласен» — тем же путём, что и настоящий ученик. */
+async function fillFormAndConsent(chatId: number, sent: any[]): Promise<void> {
+  const e = makeEnv(sent);
+  const from = { id: chatId, first_name: "Ученик" };
+  const chat = { message: { chat: { id: chatId, type: "private" } } };
+  await routeUpdate({ update_id: chatId * 10, callback_query: { id: `z${chatId}`, from, ...chat, data: "menu:zapis" } }, e);
+  await routeUpdate(privateMessage(chatId, "Иван Поток"), e);
+  await routeUpdate(privateMessage(chatId, "+995599112255"), e);
+  await routeUpdate(privateMessage(chatId, "вопрос"), e);
+  await routeUpdate({ update_id: chatId * 10 + 1, callback_query: { id: `c${chatId}`, from, ...chat, data: "form:consent_yes" } }, e);
+}
+
 /** Тексты, ушедшие в админ-группу, одной строкой — по ним и проверяем ответы команд. */
 function adminTexts(sent: any[]): string {
   return sent.filter((s) => s.body.chat_id === ADMIN_CHAT).map((s) => s.body.text).join("\n");
@@ -548,5 +560,71 @@ describe("router: /card", () => {
     // Ни в группу, ни в личку телефон ученика уйти не должен.
     expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(0);
     expect(sent.map((s) => s.body.text).join("\n")).not.toContain("+995599000777");
+  });
+});
+
+// Любой пользователь Telegram может пройти анкету в цикле. Каждая заявка —
+// карточка в группу админов; за лимитом Telegram (~20 сообщений в минуту)
+// отправка начинает падать, карточки копятся в pending, и настоящие заявки
+// тонут среди спама.
+describe("защита от потока заявок", () => {
+  it("/resend берёт ограниченную пачку, а не всю очередь", async () => {
+    const total = RESEND_BATCH + 5;
+    for (let i = 0; i < total; i++) {
+      await db()
+        .prepare(
+          `INSERT INTO leads (submission_id, name, phone, student_chat_id, delivery_status)
+           VALUES (?, 'Ученик', '+995599000000', 900, 'pending')`,
+        )
+        .bind(`flood-${i}`)
+        .run();
+    }
+
+    const sent: any[] = [];
+    await routeUpdate(adminMessage("/resend"), makeEnv(sent));
+
+    // Карточки плюс итоговый отчёт — но не все 25+5 заявок разом.
+    const cards = sent.filter((s) => s.body.text.includes("Заявка #"));
+    expect(cards.length).toBe(RESEND_BATCH);
+    expect(adminTexts(sent)).toContain("5");
+  });
+
+  it("один и тот же ученик не может отправить больше суточного лимита заявок", async () => {
+    const chatId = 4242;
+    for (let i = 0; i < DAILY_LEAD_LIMIT; i++) {
+      await db()
+        .prepare(
+          `INSERT INTO leads (submission_id, name, phone, student_chat_id)
+           VALUES (?, 'Ученик', '+995599000000', ?)`,
+        )
+        .bind(`limit-${i}`, chatId)
+        .run();
+    }
+
+    const sent: any[] = [];
+    await fillFormAndConsent(chatId, sent);
+
+    // Карточка в группу не ушла, а ученик получил внятный ответ с телефоном.
+    expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(0);
+    const toStudent = sent.filter((s) => s.body.chat_id === chatId).map((s) => s.body.text).join("\n");
+    expect(toStudent).toContain("599");
+  });
+
+  it("заявки, поданные больше суток назад, лимит не расходуют", async () => {
+    const chatId = 4343;
+    for (let i = 0; i < DAILY_LEAD_LIMIT; i++) {
+      await db()
+        .prepare(
+          `INSERT INTO leads (submission_id, name, phone, student_chat_id, created_at)
+           VALUES (?, 'Ученик', '+995599000000', ?, datetime('now', '-2 days'))`,
+        )
+        .bind(`old-${i}`, chatId)
+        .run();
+    }
+
+    const sent: any[] = [];
+    await fillFormAndConsent(chatId, sent);
+
+    expect(sent.filter((s) => s.body.chat_id === ADMIN_CHAT).length).toBe(1);
   });
 });

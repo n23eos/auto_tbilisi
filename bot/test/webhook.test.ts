@@ -14,7 +14,7 @@ function makeEnv(fetchFn?: typeof fetch) {
     WEBHOOK_PATH_SECRET: PATH_SECRET,
     WEBHOOK_HEADER_SECRET: HEADER_SECRET,
     ADMIN_CHAT_ID: "-1",
-    ADMIN_IDS: "",
+    ADMIN_IDS: "777",
     __fetch:
       fetchFn ??
       vi.fn(async () => new Response(JSON.stringify({ ok: true, result: { message_id: 1 } }))),
@@ -119,7 +119,7 @@ describe("webhook", () => {
     expect(res.status).toBe(404);
   });
 
-  for (const missing of ["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET"] as const) {
+  for (const missing of ["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET", "ADMIN_CHAT_ID", "ADMIN_IDS"] as const) {
     for (const [label, value] of [["не задан", undefined], ["пустой", ""]] as const) {
       it(`${missing} ${label} — 404 даже с верными путём и заголовком, в лог уходит имя секрета`, async () => {
         const e = makeEnv() as any;

@@ -1,10 +1,14 @@
 import { KB_SECTIONS, type KbSection } from "./generated/kb";
 
+// Телефон отдельно от блока контактов: он нужен и в коротких ответах,
+// где весь блок был бы лишним, — а два места с одним номером разъедутся.
+export const PHONE = "+995 599 98 77 07";
+
 // Контакты стабильны годами — константа, а не парсинг txt
 export const CONTACTS = [
   "📞 <b>Контакты автошколы</b>",
   "",
-  "Телефон: +995 599 98 77 07 (звонки 10:00–20:00 ежедневно)",
+  `Телефон: ${PHONE} (звонки 10:00–20:00 ежедневно)`,
   "WhatsApp: wa.me/995599987707 (писать можно круглосуточно)",
   "Почта: info@avtoshkola.ge",
   "Аудитория: пр-т Важа Пшавела 9 (метро «Медицинский университет»)",
@@ -69,7 +73,7 @@ function extractWords(text: string): string[] {
 }
 
 function stem(word: string): string {
-  if (word in SHORT_WORD_OVERRIDES) return SHORT_WORD_OVERRIDES[word];
+  if (Object.hasOwn(SHORT_WORD_OVERRIDES, word)) return SHORT_WORD_OVERRIDES[word];
   return word.length <= STEM_LENGTH ? word : word.slice(0, STEM_LENGTH);
 }
 

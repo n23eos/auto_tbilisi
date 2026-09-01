@@ -79,12 +79,31 @@ export function splitMessage(text: string, limit = MESSAGE_LIMIT): string[] {
  */
 const REQUEST_TIMEOUT_MS = 10_000;
 
+/** Короче этого строка не может быть настоящим токеном бота — см. scrub(). */
+const MIN_SECRET_LENGTH = 20;
+
 export class TelegramClient {
   constructor(
     private token: string,
     private fetchFn: typeof fetch = fetch,
     private timeoutMs: number = REQUEST_TIMEOUT_MS,
   ) {}
+
+  /**
+   * Токен бота стоит в URL запроса, а часть ошибок рантайма Workers включает
+   * полный URL в текст («Fetch API cannot load: …»). Без вычистки этот текст
+   * уходит в console.error, а оттуда в `wrangler tail` и Logpush — то есть
+   * токен утекает в логи. Токен даёт полный доступ к боту: читать все заявки
+   * и писать всем ученикам от имени школы.
+   */
+  private scrub(text: string): string {
+    // Короткую строку не вычищаем: настоящий токен Telegram — это «цифры:35+
+    // символов», меньше двадцати не бывает. А замена по строке в один-два
+    // символа изуродовала бы каждое сообщение об ошибке, вырезая из него
+    // обычные буквы, — и в логе осталась бы каша вместо причины падения.
+    if (this.token.length < MIN_SECRET_LENGTH) return text;
+    return text.replaceAll(this.token, "<ТОКЕН>");
+  }
 
   private async call<T>(method: string, payload: Record<string, unknown>): Promise<T> {
     let res: Response;
@@ -99,10 +118,10 @@ export class TelegramClient {
       // Обрыв по таймауту и сетевая ошибка приходят сюда одинаково. Имя метода
       // в сообщении обязательно: иначе в `wrangler tail` видно «fetch failed»
       // без единого намёка, какой именно вызов не дошёл.
-      throw new Error(`Telegram ${method}: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error(this.scrub(`Telegram ${method}: ${err instanceof Error ? err.message : String(err)}`));
     }
     const body = (await res.json()) as { ok: boolean; result?: T; description?: string };
-    if (!body.ok) throw new Error(`Telegram ${method}: ${body.description ?? res.status}`);
+    if (!body.ok) throw new Error(this.scrub(`Telegram ${method}: ${body.description ?? res.status}`));
     return body.result as T;
   }
 
