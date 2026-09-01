@@ -43,7 +43,9 @@ function save() {
 }
 
 function renderCounters() {
-  const ru = state.all.filter((t) => t.lang === "ru");
+  // Тот же отбор, что и в filterTickets: изъятые билеты ученику не показываются,
+  // и в знаменателе прогресса их быть не должно — иначе шкала никогда не дойдёт до 100 %.
+  const ru = state.all.filter((t) => t.lang === "ru" && !t.withdrawn);
   const solved = state.progress.solved.length;
   el("t-total").textContent = String(state.list.length);
   el("t-index").textContent = String(state.list.length ? state.progress.position + 1 : 0);

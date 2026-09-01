@@ -285,7 +285,9 @@ el("btn-restart").addEventListener("click", start);
   startButton.disabled = true;
   try {
     state.pool = await loadTickets();
-    const ready = state.pool.filter((t) => t.lang === "ru").length;
+    // Тот же отбор, что и в selectExamTickets: изъятые билеты в экзамен не попадают,
+    // поэтому и в счётчике их быть не должно — иначе обещаем больше, чем показываем.
+    const ready = state.pool.filter((t) => t.lang === "ru" && !t.withdrawn).length;
     status.textContent = `Готово: ${ready} билетов на русском`;
     startButton.disabled = false;
   } catch (error) {
