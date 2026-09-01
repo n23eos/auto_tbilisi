@@ -2,11 +2,16 @@ import { env, createExecutionContext, waitOnExecutionContext } from "cloudflare:
 import { describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 
+// Два разных секрета: путь и заголовок больше не совпадают.
+const PATH_SECRET = "put-sekret";
+const HEADER_SECRET = "zagolovok-sekret";
+
 function makeEnv(fetchFn?: typeof fetch) {
   return {
     ...(env as any),
     BOT_TOKEN: "T",
-    WEBHOOK_SECRET: "sekret",
+    WEBHOOK_PATH_SECRET: PATH_SECRET,
+    WEBHOOK_HEADER_SECRET: HEADER_SECRET,
     ADMIN_CHAT_ID: "-1",
     ADMIN_IDS: "",
     __fetch:
@@ -15,10 +20,17 @@ function makeEnv(fetchFn?: typeof fetch) {
   };
 }
 
-function webhookRequest(body: object, secret = "sekret", path = "/webhook/sekret") {
+function webhookRequest(
+  body: object,
+  secret: string | null = HEADER_SECRET,
+  path = `/webhook/${PATH_SECRET}`,
+) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  // secret === null — заголовка нет вовсе (проверяем, что null не пройдёт как совпадение).
+  if (secret !== null) headers["X-Telegram-Bot-Api-Secret-Token"] = secret;
   return new Request(`https://bot.example${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Telegram-Bot-Api-Secret-Token": secret },
+    headers,
     body: JSON.stringify(body),
   });
 }
@@ -29,34 +41,114 @@ const update = (id: number) => ({
 });
 
 describe("webhook", () => {
+  it("верный путь и верный заголовок — 200, апдейт обработан", async () => {
+    const e = makeEnv() as any;
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(webhookRequest(update(11)), e, ctx);
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(200);
+    expect(e.__fetch.mock.calls.length).toBeGreaterThan(0);
+  });
+
   it("не тот путь — 404", async () => {
     const ctx = createExecutionContext();
-    const res = await worker.fetch(webhookRequest(update(1), "sekret", "/other"), makeEnv() as any, ctx);
+    const res = await worker.fetch(
+      webhookRequest(update(1), HEADER_SECRET, "/other"),
+      makeEnv() as any,
+      ctx,
+    );
     expect(res.status).toBe(404);
   });
 
   it("GET по правильному пути — 404", async () => {
     const ctx = createExecutionContext();
-    const req = new Request("https://bot.example/webhook/sekret", {
+    const req = new Request(`https://bot.example/webhook/${PATH_SECRET}`, {
       method: "GET",
-      headers: { "X-Telegram-Bot-Api-Secret-Token": "sekret" },
+      headers: { "X-Telegram-Bot-Api-Secret-Token": HEADER_SECRET },
     });
     const res = await worker.fetch(req, makeEnv() as any, ctx);
     expect(res.status).toBe(404);
   });
 
-  it("нет секретного заголовка — 403", async () => {
+  it("неверный секретный заголовок — 403", async () => {
     const ctx = createExecutionContext();
     const res = await worker.fetch(webhookRequest(update(2), "wrong"), makeEnv() as any, ctx);
     expect(res.status).toBe(403);
   });
 
+  it("заголовка нет вовсе — 403", async () => {
+    const e = makeEnv() as any;
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(webhookRequest(update(3), null), e, ctx);
+    expect(res.status).toBe(403);
+    expect(e.__fetch.mock.calls.length).toBe(0);
+  });
+
+  it("секрет пути в заголовке — 403: секреты независимы", async () => {
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(webhookRequest(update(4), PATH_SECRET), makeEnv() as any, ctx);
+    expect(res.status).toBe(403);
+  });
+
+  it("секрет заголовка в пути — 404: секреты независимы", async () => {
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      webhookRequest(update(5), HEADER_SECRET, `/webhook/${HEADER_SECRET}`),
+      makeEnv() as any,
+      ctx,
+    );
+    expect(res.status).toBe(404);
+  });
+
+  for (const missing of ["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET"] as const) {
+    for (const [label, value] of [["не задан", undefined], ["пустой", ""]] as const) {
+      it(`${missing} ${label} — 404 даже с верными путём и заголовком, в лог уходит имя секрета`, async () => {
+        const e = makeEnv() as any;
+        e[missing] = value;
+        const errors: string[] = [];
+        const spy = vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
+          errors.push(args.map(String).join(" "));
+        });
+
+        const ctx = createExecutionContext();
+        const res = await worker.fetch(webhookRequest(update(6)), e, ctx);
+        spy.mockRestore();
+
+        expect(res.status).toBe(404);
+        expect(e.__fetch.mock.calls.length).toBe(0);
+        expect(errors.join("\n")).toContain(missing);
+      });
+    }
+  }
+
+  it("оба секрета не заданы — путь /webhook/undefined не открывает вебхук", async () => {
+    const e = makeEnv() as any;
+    e.WEBHOOK_PATH_SECRET = undefined;
+    e.WEBHOOK_HEADER_SECRET = undefined;
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const ctx = createExecutionContext();
+    const req = new Request("https://bot.example/webhook/undefined", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update(7)),
+    });
+    const res = await worker.fetch(req, e, ctx);
+    spy.mockRestore();
+
+    expect(res.status).toBe(404);
+    expect(e.__fetch.mock.calls.length).toBe(0);
+  });
+
   it("битый JSON — 400, ничего не обрабатывается", async () => {
     const e = makeEnv() as any;
     const ctx = createExecutionContext();
-    const req = new Request("https://bot.example/webhook/sekret", {
+    const req = new Request(`https://bot.example/webhook/${PATH_SECRET}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Telegram-Bot-Api-Secret-Token": "sekret" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Telegram-Bot-Api-Secret-Token": HEADER_SECRET,
+      },
       body: "{не json",
     });
     const res = await worker.fetch(req, e, ctx);

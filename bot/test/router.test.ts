@@ -37,7 +37,8 @@ function makeEnv(sent: any[], failMethod?: string): Env {
   return {
     DB: (env as any).DB,
     BOT_TOKEN: "T",
-    WEBHOOK_SECRET: "S",
+    WEBHOOK_PATH_SECRET: "P",
+    WEBHOOK_HEADER_SECRET: "H",
     ADMIN_CHAT_ID: String(ADMIN_CHAT),
     ADMIN_IDS: String(ADMIN_ID),
     __fetch: fetchFn,

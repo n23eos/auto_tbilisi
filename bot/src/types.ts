@@ -1,7 +1,8 @@
 export interface Env {
   DB: D1Database;
   BOT_TOKEN: string;
-  WEBHOOK_SECRET: string;
+  WEBHOOK_PATH_SECRET: string;   // секретный сегмент URL вебхука
+  WEBHOOK_HEADER_SECRET: string; // значение X-Telegram-Bot-Api-Secret-Token
   ADMIN_CHAT_ID: string; // ID закрытой группы админов, строкой из vars
   ADMIN_IDS: string;     // Telegram ID админов через запятую
 }

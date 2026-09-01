@@ -22,15 +22,37 @@ function describeUpdate(update: any): string {
   return `update_id=${update?.update_id} chat_id=${chatId} user_id=${userId}`;
 }
 
+/** Имена секретов вебхука, которые не заданы или пусты. Пустой массив — всё на месте. */
+function missingSecrets(env: Env): string[] {
+  return (["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET"] as const).filter((name) => !env[name]);
+}
+
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+    const notFound = new Response("Not found", { status: 404 });
+
+    // Незаданный секрет — не «слабее», а опаснее: `${undefined}` превратил бы путь в
+    // общеизвестный `/webhook/undefined`. Поэтому проверяем оба секрета ДО сравнений и
+    // при пропаже отвечаем 404 на всё: снаружи воркер неотличим от неверного адреса,
+    // а причину видно в `wrangler tail`.
+    const missing = missingSecrets(env);
+    if (missing.length > 0) {
+      console.error(
+        `Вебхук отключён: не заданы секреты ${missing.join(", ")}. ` +
+          `Задайте их через \`npx wrangler secret put <ИМЯ>\` — см. bot/README.md, шаг 4.`,
+      );
+      return notFound;
+    }
+
     const url = new URL(request.url);
     // Секретный путь — первый рубеж: чужой запрос не должен даже узнать, что тут вебхук.
-    if (request.method !== "POST" || url.pathname !== `/webhook/${env.WEBHOOK_SECRET}`) {
-      return new Response("Not found", { status: 404 });
+    if (request.method !== "POST" || url.pathname !== `/webhook/${env.WEBHOOK_PATH_SECRET}`) {
+      return notFound;
     }
-    // Секретный заголовок — второй рубеж на случай утечки URL (логи прокси, реферер).
-    if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.WEBHOOK_SECRET) {
+    // Второй рубеж на случай утечки URL (логи прокси, Logpush, Referer): секрет заголовка
+    // независим от секрета пути, поэтому раскрытие адреса не раскрывает его. Отсутствующий
+    // заголовок даёт null, а null не равен непустой строке — проверка закрыта по умолчанию.
+    if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.WEBHOOK_HEADER_SECRET) {
       return new Response("Forbidden", { status: 403 });
     }
 
