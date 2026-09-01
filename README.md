@@ -107,6 +107,27 @@ python3 -m venv .venv && .venv/bin/pip install -r tools/requirements-dev.txt
 МВД Грузии, русский перевод и картинки — работа on.ge. **Перед публикацией раздела
 на сайте проверить условия использования и при необходимости запросить разрешение.**
 
+## Проверки перед коммитом
+
+```bash
+npm test                                   # логика экзамена и тренировки
+cd bot && npm test && npm run typecheck    # бот
+.venv/bin/python -m pytest tools -q        # инструменты сборки данных
+```
+
+Те же три набора гоняются автоматически на push и pull request —
+`.github/workflows/ci.yml`.
+
+## Служебные файлы, которые не пишутся руками
+
+`llms-full.txt` и даты в `sitemap.xml` собираются из содержимого сайта и
+истории git, чтобы не расходиться с ним:
+
+```bash
+.venv/bin/python tools/build_llms_full.py
+.venv/bin/python tools/update_sitemap.py
+```
+
 ## Запуск локально
 
 ```bash
