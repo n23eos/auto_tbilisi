@@ -13,6 +13,8 @@
 
 import json
 import re
+import subprocess
+from datetime import date as date_cls
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -39,6 +41,33 @@ Facebook: https://www.facebook.com/avtoshkolatbilisi
 """
 
 
+# Файл собирается ровно из этих источников, поэтому «дата обновления» — это
+# дата последней правки любого из них.
+CONTENT_SOURCES = ["index.html", "voprosy/index.html", "llms.txt"]
+
+
+def content_date():
+    """Дата последней правки источников, из которых собран файл.
+
+    Раньше дата стояла литералом в коде. Такая дата расходится с содержимым
+    молча: файл пересобирают, а «Дата обновления» остаётся прежней — и
+    языковая модель считает устаревшими актуальные цены. Из истории git она
+    не может отстать, потому что берётся из той же правки, что и текст.
+
+    Если git недоступен (архив без .git, чужая машина без git), берём
+    сегодняшнюю дату: файл собирают именно сейчас, и это честнее, чем
+    сорваться на ровном месте или подставить дату из прошлого.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "log", "-1", "--format=%cs", "--", *CONTENT_SOURCES],
+            capture_output=True, text=True, check=True, cwd=ROOT,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return date_cls.today().isoformat()
+    return result.stdout.strip() or date_cls.today().isoformat()
+
+
 def extract_questions(html_path):
     """Достаёт пары «вопрос → ответ» из разметки FAQPage на странице."""
     text = html_path.read_text(encoding="utf-8")
@@ -56,7 +85,7 @@ def extract_questions(html_path):
 
 
 def build():
-    date = "2026-08-31"
+    date = content_date()
     parts = [HEADER.format(date=date)]
 
     seen = set()
@@ -89,8 +118,10 @@ def build():
         "https://avtoshkola.ge/bilety/trenirovka/ — тренировка по всем действующим билетам\n"
     )
 
-    OUT.write_text("\n".join(parts), encoding="utf-8")
+    text = "\n".join(parts)
+    OUT.write_text(text, encoding="utf-8")
     print(f"{OUT.name}: {len(seen)} вопросов, {OUT.stat().st_size} байт")
+    return text
 
 
 if __name__ == "__main__":
