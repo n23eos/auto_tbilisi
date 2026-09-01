@@ -22,9 +22,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../css/tokens.css?v=22">
-  <link rel="stylesheet" href="../../css/style.css?v=26">
-  <link rel="stylesheet" href="../../css/exam.css?v=1">
+  <link rel="stylesheet" href="../../css/tokens.css?v=23">
+  <link rel="stylesheet" href="../../css/style.css?v=27">
+  <link rel="stylesheet" href="../../css/exam.css?v=19">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
@@ -89,9 +89,9 @@
     </p>
 
     <div class="exam__filters" role="group" aria-label="Что показывать">
-      <button class="exam__filter is-active" id="filter-all" type="button" data-filter="all">Все билеты</button>
-      <button class="exam__filter" id="filter-unsolved" type="button" data-filter="unsolved">Нерешённые</button>
-      <button class="exam__filter" id="filter-mistakes" type="button" data-filter="mistakes">Мои ошибки</button>
+      <button class="exam__filter is-active" id="filter-all" type="button" aria-pressed="true" data-filter="all">Все билеты</button>
+      <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
+      <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
     </div>
 
       <p class="exam__hint">Готовы проверить себя — <a href="../">пройти экзамен</a>.</p>
@@ -107,7 +107,7 @@
     <section class="exam__screen" id="t-card" hidden>
       <h2 class="exam__question" id="t-text" tabindex="-1"></h2>
       <figure class="exam__figure" id="t-figure" hidden>
-        <img class="exam__image" id="t-image" src="" alt="Изображение к вопросу билета">
+        <img class="exam__image" id="t-image" width="800" height="503" decoding="async" alt="Изображение к вопросу билета">
       </figure>
       <ul class="exam__answers" id="t-answers"></ul>
       <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
@@ -148,6 +148,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=24" defer></script>
-  <script type="module" src="../../js/training.js?v=1"></script>
+  <script type="module" src="../../js/training.js?v=2"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ import {
   readProgress,
   writeProgress,
 } from "./training-logic.js";
+import { markAnswerButtons } from "./answer-marking.js";
 
 const DATA_URL = "../../data/tickets-b-ru.json";
 const IMAGES_BASE = "../../data/";
@@ -117,12 +118,7 @@ function answer(index) {
   const ticket = state.list[state.progress.position];
   const correct = ticket.correct === index;
 
-  [...el("t-answers").querySelectorAll(".exam__answer")].forEach((button) => {
-    button.disabled = true;
-    const buttonIndex = Number(button.dataset.index);
-    if (buttonIndex === ticket.correct) button.classList.add("exam__answer--correct");
-    if (buttonIndex === index && !correct) button.classList.add("exam__answer--wrong");
-  });
+  markAnswerButtons(el("t-answers"), ticket.correct, index);
 
   const feedback = el("t-feedback");
   feedback.textContent = correct ? "Верно" : `Неверно. Правильный ответ — ${ticket.correct + 1}`;
@@ -153,7 +149,11 @@ function applyFilter(filter) {
   };
 
   document.querySelectorAll(".exam__filter").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.filter === filter);
+    const isActive = button.dataset.filter === filter;
+    button.classList.toggle("is-active", isActive);
+    // Выбранный фильтр отличался только цветом фона — в дереве доступности
+    // все три кнопки выглядели одинаково нажатыми.
+    button.setAttribute("aria-pressed", String(isActive));
   });
 
   save();
@@ -180,8 +180,10 @@ document.addEventListener("keydown", (event) => {
     const button = el("t-answers").querySelector(`[data-index="${Number(event.key) - 1}"]`);
     if (button && !button.disabled) button.click();
   }
-  if (event.key === "ArrowRight") go(1);
-  if (event.key === "ArrowLeft") go(-1);
+  // preventDefault обязателен: без него стрелка и листает билет, и прокручивает
+  // страницу — ученик уезжает к другому вопросу и вниз одновременно.
+  if (event.key === "ArrowRight") { event.preventDefault(); go(1); }
+  if (event.key === "ArrowLeft") { event.preventDefault(); go(-1); }
 });
 
 (async function init() {

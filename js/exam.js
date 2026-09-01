@@ -11,10 +11,14 @@ import {
   selectExamTickets,
 } from "./exam-logic.js";
 import { markAnswer, readProgress, writeProgress } from "./training-logic.js";
+import { markAnswerButtons } from "./answer-marking.js";
 
 const DATA_URL = "../data/tickets-b-ru.json";
 const IMAGES_BASE = "../data/";
 const URGENT_SEC = 60;
+// Все картинки билетов одного размера — источник отдаёт 800×503.
+const IMAGE_WIDTH = 800;
+const IMAGE_HEIGHT = 503;
 
 const el = (id) => document.getElementById(id);
 
@@ -116,14 +120,7 @@ function answer(answerIndex) {
 
   const ticket = state.questions[state.index];
   const correct = isCorrect(ticket, answerIndex);
-  const buttons = [...el("q-answers").querySelectorAll(".exam__answer")];
-
-  buttons.forEach((button) => {
-    button.disabled = true;
-    const index = Number(button.dataset.index);
-    if (index === ticket.correct) button.classList.add("exam__answer--correct");
-    if (index === answerIndex && !correct) button.classList.add("exam__answer--wrong");
-  });
+  markAnswerButtons(el("q-answers"), ticket.correct, answerIndex);
 
   // Ошибки экзамена попадают в общий прогресс, чтобы их можно было
   // отработать в разделе тренировки.
@@ -167,7 +164,15 @@ function tick() {
   const left = TIME_LIMIT_SEC - Math.floor((Date.now() - state.startedAt) / 1000);
   const timer = el("q-timer");
   timer.textContent = formatTime(left);
-  timer.classList.toggle("exam__timer--urgent", left <= URGENT_SEC);
+  const urgent = left <= URGENT_SEC;
+  timer.classList.toggle("exam__timer--urgent", urgent);
+  // Красный цвет — единственное предупреждение, которое было. Один раз
+  // произносим его вслух: сплошная живая область на каждую секунду сделала бы
+  // страницу непригодной для скринридера.
+  if (urgent && !state.urgentAnnounced) {
+    state.urgentAnnounced = true;
+    el("q-feedback").textContent = "Осталась минута.";
+  }
   if (left <= 0) finish(true);
 }
 
@@ -189,6 +194,11 @@ function renderReview() {
       const img = document.createElement("img");
       img.className = "exam__review-img";
       img.loading = "lazy";
+      // Размеры до загрузки: без них каждая картинка разбора, доехав,
+      // сдвигает вниз всё, что под ней, — а разбор читают прокручивая.
+      img.width = IMAGE_WIDTH;
+      img.height = IMAGE_HEIGHT;
+      img.decoding = "async";
       img.src = IMAGES_BASE + ticket.image;
       img.alt = "Изображение к вопросу билета";
       item.append(img);
@@ -239,7 +249,16 @@ function finish(timeUp) {
 
   renderReview();
   show("result");
-  title.scrollIntoView({ behavior: "smooth", block: "start" });
+  // show() прячет экран вопроса, а фокус в этот момент стоит на кнопке внутри
+  // него — браузер сбрасывает его в начало страницы, и о конце экзамена
+  // незрячий ученик не узнаёт вовсе. Особенно важно, когда экзамен оборвал
+  // таймер: человек этого не выбирал.
+  const verdictEl = el("r-verdict");
+  verdictEl.focus();
+  title.scrollIntoView({
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    block: "start",
+  });
 }
 
 function start() {
@@ -254,6 +273,7 @@ function start() {
   state.answered = 0;
   state.wrong = [];
   state.startedAt = Date.now();
+  state.urgentAnnounced = false;
 
   el("q-timer").textContent = formatTime(TIME_LIMIT_SEC);
   window.clearInterval(state.timerId);

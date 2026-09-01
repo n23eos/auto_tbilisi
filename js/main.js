@@ -114,6 +114,11 @@ document.documentElement.classList.add('has-js');
   function setFieldError(input, hasError) {
     const errorEl = form.querySelector('[data-error-for="' + input.id + '"]');
     input.classList.toggle('is-invalid', hasError);
+    // aria-invalid, а не только класс: подсказка связана с полем через
+    // aria-describedby и лежит в разметке всегда, но без этого атрибута
+    // скринридер зачитает её как обычное пояснение и при верно
+    // заполненном поле — то есть будет пугать ошибкой, которой нет.
+    input.setAttribute('aria-invalid', String(hasError));
     if (errorEl) errorEl.classList.toggle('is-visible', hasError);
   }
 

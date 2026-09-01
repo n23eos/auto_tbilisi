@@ -1,6 +1,12 @@
 # Автошкола на русском языке — Тбилиси
 
-Премиальный лендинг для автошколы: анимированный hero, программа обучения, FAQ, контакты и форма «Заказать звонок».
+**Avtoshkola.ge is the site of a Russian-language driving school in Tbilisi, together with the Telegram bot that takes its leads.** The landing page covers the course program, FAQ, contacts and a callback form that posts through FormSubmit. A practice section serves all 844 current Russian exam tickets with filters for unsolved questions and past mistakes, keeping progress in localStorage. The bot runs on Cloudflare Workers with data in D1, alerts admins when it fails and drops applications older than 180 days. Plain HTML, CSS and JavaScript with no bundler, hosted on GitHub Pages.
+
+<div align="center">
+
+[![Star on GitHub](https://img.shields.io/github/stars/n23eos/auto_tbilisi?style=for-the-badge&logo=github&label=Star%20this%20repo&color=FFD700&labelColor=1a1a1a)](https://github.com/n23eos/auto_tbilisi)
+
+</div>
 
 **Live:** https://avtoshkola.ge
 

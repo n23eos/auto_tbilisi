@@ -132,6 +132,10 @@
 .exam__image {
   width: 100%;
   height: auto;
+  /* Все картинки билетов — 800×503. Без заданной пропорции место под
+     картинку до её загрузки равно нулю, и каждый новый вопрос сдвигает
+     варианты ответа вниз ровно в тот момент, когда по ним целятся мышью. */
+  aspect-ratio: 800 / 503;
   border-radius: var(--radius-md);
   display: block;
   background: var(--color-paper-2);
@@ -146,7 +150,11 @@
   gap: var(--space-sm);
   align-items: baseline;
   background: var(--color-paper-2);
-  border: var(--rule-hair);
+  /* Не --rule-hair: у него контраст 2,16:1 к фону страницы, а фон самой
+     кнопки отличается от фона страницы на 1,03:1 — то есть эта рамка и есть
+     вся видимая граница главного элемента управления тренажёра. WCAG 1.4.11
+     требует 3:1 для границ элементов управления; --color-line-strong даёт 4,4. */
+  border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-sm);
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-body);
@@ -155,7 +163,9 @@
   cursor: pointer;
 }
 
-.exam__answer:hover:not([disabled]) { border-color: var(--color-line-strong); }
+/* В покое рамка уже --color-line-strong, поэтому наведение поднимаем
+   до акцента — иначе состояние наведения перестало бы быть заметным. */
+.exam__answer:hover:not([disabled]) { border-color: var(--color-accent); }
 .exam__answer:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .exam__answer[disabled] { cursor: default; }
 
@@ -197,7 +207,7 @@
 }
 
 .exam__review-q { font-weight: 600; margin: 0 0 var(--space-xs); }
-.exam__review-img { width: 100%; max-width: 26rem; height: auto; border-radius: var(--radius-sm); display: block; margin-bottom: var(--space-xs); }
+.exam__review-img { width: 100%; max-width: 26rem; height: auto; aspect-ratio: 800 / 503; border-radius: var(--radius-sm); display: block; margin-bottom: var(--space-xs); }
 .exam__review-line { margin: var(--space-2xs) 0; font-size: var(--text-sm); }
 .exam__review-line b { font-weight: 600; }
 .exam__review-line--wrong { color: var(--color-error); }
@@ -221,7 +231,9 @@
 .exam__filters { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-lg); }
 
 .exam__filter {
-  border: var(--rule-hair);
+  /* Та же причина, что у .exam__answer: --rule-hair даёт 2,16:1 к фону,
+     а это единственная граница кнопки-переключателя. WCAG 1.4.11 требует 3:1. */
+  border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-sm);
   background: var(--color-paper-2);
   color: var(--color-ink-muted);
@@ -232,7 +244,7 @@
   cursor: pointer;
 }
 
-.exam__filter:hover { border-color: var(--color-line-strong); }
+.exam__filter:hover { border-color: var(--color-accent); }
 .exam__filter:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
 .exam__filter.is-active {
@@ -244,3 +256,11 @@
 .exam__empty { font-size: var(--text-lg); color: var(--color-ink-muted); margin: var(--space-2xl) 0; }
 .exam__reset { margin-top: var(--space-3xl); }
 .exam__note { font-size: var(--text-xs); color: var(--color-ink-faint); max-width: 34rem; margin-top: var(--space-xs); }
+
+/* Подъём кнопки при наведении — единственная анимация на этих страницах,
+   которую не гасит общий блок в style.css: он не знает про exam.css. */
+@media (prefers-reduced-motion: reduce) {
+  .exam__btn { transition: none; }
+  .exam__btn:hover { transform: none; }
+  .exam__progress-fill { transition: none; }
+}

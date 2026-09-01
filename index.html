@@ -28,7 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
-  <link rel="stylesheet" href="css/style.css?v=26">
+  <link rel="stylesheet" href="css/style.css?v=27">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -610,14 +610,14 @@
 
       <div class="callback__field">
         <label for="cb-name">Ваше имя</label>
-        <input id="cb-name" name="Имя" type="text" autocomplete="name" required minlength="2" placeholder="Как к вам обращаться">
-        <p class="callback__error" data-error-for="cb-name">Напишите имя — хотя бы пару букв.</p>
+        <input id="cb-name" name="Имя" type="text" autocomplete="name" required minlength="2" placeholder="Как к вам обращаться" aria-describedby="cb-name-error">
+        <p class="callback__error" id="cb-name-error" data-error-for="cb-name">Напишите имя — хотя бы пару букв.</p>
       </div>
 
       <div class="callback__field">
         <label for="cb-phone">Телефон</label>
-        <input id="cb-phone" name="Телефон" type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX">
-        <p class="callback__error" data-error-for="cb-phone">Проверьте номер — минимум 9 цифр.</p>
+        <input id="cb-phone" name="Телефон" type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX" aria-describedby="cb-phone-error">
+        <p class="callback__error" id="cb-phone-error" data-error-for="cb-phone">Проверьте номер — минимум 9 цифр.</p>
       </div>
 
       <div class="callback__field">
@@ -695,6 +695,6 @@
   </div>
 
   <script src="js/analytics.js?v=24" defer></script>
-  <script src="js/main.js?v=25" defer></script>
+  <script src="js/main.js?v=26" defer></script>
 </body>
 </html>
