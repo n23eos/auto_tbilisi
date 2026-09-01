@@ -1,5 +1,6 @@
 import { routeUpdate } from "./router";
 import { runCleanup } from "./cleanup";
+import { alertAdmins } from "./alert";
 import type { Env } from "./types";
 
 /** true — обновление новое; false — уже видели (Telegram ретраит). */
@@ -99,15 +100,28 @@ export default {
         // Ошибку логируем, но отвечаем 200: update уже помечен обработанным,
         // ретрай Telegram всё равно был бы отброшен дедупликацией. Плюс ответ не-200
         // останавливает всю очередь апдейтов бота, а не только этот один.
-        console.error(`routeUpdate упал (${describeUpdate(update)}):`, err);
+        const where = describeUpdate(update);
+        console.error(`routeUpdate упал (${where}):`, err);
+        // `wrangler tail` работает, только пока его кто-то держит открытым.
+        // Без этого сообщения ученик остался бы без ответа, а школа узнала бы
+        // об этом от него самого — если он вообще напишет второй раз.
+        await alertAdmins(env, `Не ответили ученику: ${where}`, err);
       }
     }
     return Response.json({ ok: true });
   },
 
-  // Падение чистки намеренно не глушим: cron некому показать ошибку, кроме дашборда
-  // Cloudflare, а работа идемпотентна и полностью повторится завтра.
+  // Падение чистки намеренно не глушим: работа идемпотентна и повторится завтра,
+  // а проглоченная ошибка исчезла бы и из дашборда Cloudflare. Оповещение шлём
+  // до проброса — иначе про ночной сбой никто не узнал бы до следующего захода
+  // в дашборд, а телефоны учеников тем временем хранились бы дольше обещанного.
   async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
-    await runCleanup(env.DB);
+    try {
+      await runCleanup(env.DB);
+    } catch (err) {
+      console.error("runCleanup упал:", err);
+      await alertAdmins(env, "Ночная уборка базы не прошла", err);
+      throw err;
+    }
   },
 } satisfies ExportedHandler<Env>;

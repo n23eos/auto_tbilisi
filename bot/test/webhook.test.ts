@@ -1,6 +1,7 @@
 import { env, createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
+import { resetAlertThrottle } from "../src/alert";
 
 // Два разных секрета: путь и заголовок больше не совпадают.
 const PATH_SECRET = "put-sekret";
@@ -210,6 +211,34 @@ describe("webhook", () => {
     expect(line).toContain("44"); // update_id — чтобы найти апдейт
     expect(line).toContain("9"); // chat_id ученика — чтобы понять, кому не ответили
     expect(line).toContain("Telegram недоступен");
+  });
+
+  // `wrangler tail` показывает ошибку, только пока его кто-то держит открытым.
+  // Без сообщения в чат админов школа узнаёт о молчащем боте от самого ученика.
+  it("упавший апдейт уходит оповещением в чат админов", async () => {
+    resetAlertThrottle();
+    const calls: any[] = [];
+    // Первый вызов — работа роутера, он падает. Дальше идёт уже оповещение,
+    // и оно должно дойти: иначе сбой останется никому не виден.
+    const fetchFn = vi.fn(async (_url: string, init: RequestInit) => {
+      const body = JSON.parse(init.body as string);
+      calls.push(body);
+      if (calls.length === 1) throw new Error("Telegram недоступен");
+      return new Response(JSON.stringify({ ok: true, result: { message_id: 1 } }));
+    }) as unknown as typeof fetch;
+
+    const e = makeEnv(fetchFn) as any;
+    e.ADMIN_CHAT_ID = "-100777";
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const ctx = createExecutionContext();
+    await worker.fetch(webhookRequest(update(45)), e, ctx);
+    await waitOnExecutionContext(ctx);
+    spy.mockRestore();
+
+    const alert = calls.find((c) => c.chat_id === -100777);
+    expect(alert).toBeDefined();
+    expect(alert.text).toContain("45");
+    expect(alert.text).toContain("Telegram недоступен");
   });
 
   it("cron запускает чистку", async () => {
