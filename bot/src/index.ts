@@ -22,6 +22,25 @@ function describeUpdate(update: any): string {
   return `update_id=${update?.update_id} chat_id=${chatId} user_id=${userId}`;
 }
 
+const encoder = new TextEncoder();
+
+/**
+ * Сравнение секрета за постоянное время: время ответа не зависит от того, сколько первых
+ * символов угадано, поэтому подобрать секрет по таймингам нельзя.
+ *
+ * `timingSafeEqual` бросает TypeError на буферах разной длины, поэтому длину приходится
+ * проверять заранее — и этим мы выдаём длину секрета. Здесь это ничего не стоит: длина
+ * задана README (`openssl rand -hex 32`, 64 символа) и так публична, а разная длина в любом
+ * случае означает несовпадение. `null` (заголовка нет) отсекаем до сравнения.
+ */
+function secretsMatch(expected: string, actual: string | null): boolean {
+  if (actual === null) return false;
+  const a = encoder.encode(expected);
+  const b = encoder.encode(actual);
+  if (a.byteLength !== b.byteLength) return false;
+  return crypto.subtle.timingSafeEqual(a, b);
+}
+
 /** Имена секретов вебхука, которые не заданы или пусты. Пустой массив — всё на месте. */
 function missingSecrets(env: Env): string[] {
   return (["WEBHOOK_PATH_SECRET", "WEBHOOK_HEADER_SECRET"] as const).filter((name) => !env[name]);
@@ -46,13 +65,21 @@ export default {
 
     const url = new URL(request.url);
     // Секретный путь — первый рубеж: чужой запрос не должен даже узнать, что тут вебхук.
-    if (request.method !== "POST" || url.pathname !== `/webhook/${env.WEBHOOK_PATH_SECRET}`) {
+    if (
+      request.method !== "POST" ||
+      !secretsMatch(`/webhook/${env.WEBHOOK_PATH_SECRET}`, url.pathname)
+    ) {
       return notFound;
     }
     // Второй рубеж на случай утечки URL (логи прокси, Logpush, Referer): секрет заголовка
     // независим от секрета пути, поэтому раскрытие адреса не раскрывает его. Отсутствующий
     // заголовок даёт null, а null не равен непустой строке — проверка закрыта по умолчанию.
-    if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.WEBHOOK_HEADER_SECRET) {
+    if (
+      !secretsMatch(
+        env.WEBHOOK_HEADER_SECRET,
+        request.headers.get("X-Telegram-Bot-Api-Secret-Token"),
+      )
+    ) {
       return new Response("Forbidden", { status: 403 });
     }
 

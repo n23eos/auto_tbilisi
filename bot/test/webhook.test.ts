@@ -84,6 +84,24 @@ describe("webhook", () => {
     expect(e.__fetch.mock.calls.length).toBe(0);
   });
 
+  // Сравнение за постоянное время работает только на буферах одной длины, иначе бросает
+  // TypeError. Другая длина — обычный отказ, а не 500: иначе любой мусор клал бы вебхук.
+  it("заголовок другой длины — 403, а не падение", async () => {
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(webhookRequest(update(8), "x"), makeEnv() as any, ctx);
+    expect(res.status).toBe(403);
+  });
+
+  it("путь другой длины — 404, а не падение", async () => {
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      webhookRequest(update(9), HEADER_SECRET, "/webhook/x"),
+      makeEnv() as any,
+      ctx,
+    );
+    expect(res.status).toBe(404);
+  });
+
   it("секрет пути в заголовке — 403: секреты независимы", async () => {
     const ctx = createExecutionContext();
     const res = await worker.fetch(webhookRequest(update(4), PATH_SECRET), makeEnv() as any, ctx);
