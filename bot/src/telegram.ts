@@ -11,6 +11,31 @@ type Keyboard = InlineKeyboard | ReplyKeyboard | { remove_keyboard: true };
 // Telegram-лимит 4096 символов; берём с запасом на HTML-теги
 const MESSAGE_LIMIT = 3500;
 
+// Запас, в котором ищем начало HTML-сущности перед точкой разреза. Самая длинная
+// сущность, которую производит escapeHtml, — «&amp;» (5 символов); 10 берём на
+// случай других именованных сущностей, попавших в текст из базы знаний.
+const MAX_ENTITY_LENGTH = 10;
+
+/**
+ * Сдвинуть точку разреза влево, если она попала ВНУТРЬ HTML-сущности.
+ *
+ * Тексты базы знаний экранируются на сборке (scripts/build-kb.mjs), поэтому в
+ * абзаце встречаются «&amp;» и «&lt;». Разрез посреди сущности оставляет в куске
+ * огрызок «&am», и Telegram отвечает на него 400 — а по кнопке меню ученик не
+ * получает НИЧЕГО: апдейт к этому моменту уже помечен обработанным и не повторится.
+ *
+ * Если сущность не влезает в кусок целиком (лимит меньше самой сущности), режем
+ * как есть: битый кусок хуже целого, но бесконечный цикл хуже обоих.
+ */
+function safeCut(text: string, start: number, end: number): number {
+  if (end >= text.length) return end;
+  const tail = text.slice(Math.max(start, end - MAX_ENTITY_LENGTH), end);
+  const started = tail.match(/&[a-zA-Z0-9#]*$/);
+  if (!started) return end;
+  const cut = end - started[0].length;
+  return cut > start ? cut : end;
+}
+
 export function splitMessage(text: string, limit = MESSAGE_LIMIT): string[] {
   if (text.length <= limit) return [text];
 
@@ -32,9 +57,12 @@ export function splitMessage(text: string, limit = MESSAGE_LIMIT): string[] {
     if (paragraph.length <= limit) {
       current = paragraph;
     } else {
-      // Абзац сам длиннее лимита — режем его на части без разделителя.
-      for (let i = 0; i < paragraph.length; i += limit) {
-        chunks.push(paragraph.slice(i, i + limit));
+      // Абзац сам длиннее лимита — режем его на части без разделителя,
+      // не разрубая HTML-сущности (см. safeCut).
+      for (let i = 0; i < paragraph.length; ) {
+        const end = safeCut(paragraph, i, Math.min(i + limit, paragraph.length));
+        chunks.push(paragraph.slice(i, end));
+        i = end;
       }
     }
   }

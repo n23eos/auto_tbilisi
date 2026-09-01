@@ -39,4 +39,31 @@ describe("splitMessage", () => {
     for (const p of parts) expect(p.length).toBeLessThanOrEqual(500);
     expect(parts.join("\n\n")).toBe(long);
   });
+
+  // Тексты базы знаний экранируются на сборке (scripts/build-kb.mjs), поэтому
+  // в абзац может попасть «&amp;» или «&lt;». Разрез посреди сущности оставляет
+  // в куске огрызок «&am», Telegram отвечает на него 400 — и по кнопке меню
+  // ученик не получает НИЧЕГО: апдейт уже помечен обработанным и не повторится.
+  it("не разрезает HTML-сущность пополам", () => {
+    // Один абзац длиннее лимита — значит, режется вслепую по длине.
+    const paragraph = "&amp;".repeat(400);
+    const parts = splitMessage(paragraph, 101);
+    expect(parts.length).toBeGreaterThan(1);
+    for (const part of parts) {
+      expect(part.length).toBeLessThanOrEqual(101);
+      // Огрызок начала сущности в конце куска…
+      expect(part).not.toMatch(/&[a-zA-Z#][a-zA-Z0-9#]*$/);
+      expect(part.endsWith("&")).toBe(false);
+      // …и огрызок хвоста сущности в начале следующего.
+      expect(part).not.toMatch(/^[a-zA-Z0-9#]*;/);
+    }
+    expect(parts.join("")).toBe(paragraph);
+  });
+
+  it("сущность длиннее самого лимита не зацикливает разрез", () => {
+    // Патологический вход: лимит меньше одной сущности. Резать без потерь
+    // нечем, но функция обязана завершиться и вернуть весь текст.
+    const parts = splitMessage("&amp;&amp;&amp;", 3);
+    expect(parts.join("")).toBe("&amp;&amp;&amp;");
+  });
 });
