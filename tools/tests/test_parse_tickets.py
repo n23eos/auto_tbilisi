@@ -723,3 +723,32 @@ def test_collect_stores_webp_path_and_keeps_jpeg_in_cache(tmp_path, monkeypatch,
         assert (tmp_path / "data" / ticket["image"]).exists()
     assert not list((tmp_path / "data" / "tickets" / "images").glob("*.jpg"))
     assert list((tmp_path / "cache" / "images").glob("*.jpg")), "JPEG остаётся в кэше"
+
+
+# --- Хост картинки ---------------------------------------------------------
+#
+# image_url собирается из src в разметке СКАЧАННОЙ страницы, то есть приходит
+# извне. Абсолютный src на чужой домен отправил бы парсер туда с нашей сессией.
+
+
+def test_is_allowed_image_url_accepts_source_host():
+    assert pt.is_allowed_image_url("https://teoria.on.ge/img/a.jpg") is True
+    assert pt.is_allowed_image_url("http://teoria.on.ge/img/a.jpg") is True
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://evil.example/a.jpg",
+        # Хост-«приставка»: сравнение должно быть точным, а не по подстроке.
+        "https://teoria.on.ge.evil.example/a.jpg",
+        # Логин в URL — классический способ спрятать настоящий хост.
+        "https://teoria.on.ge@evil.example/a.jpg",
+        "file:///etc/passwd",
+        "ftp://teoria.on.ge/a.jpg",
+        None,
+        "",
+    ],
+)
+def test_is_allowed_image_url_rejects_everything_else(url):
+    assert pt.is_allowed_image_url(url) is False

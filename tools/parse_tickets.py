@@ -55,10 +55,25 @@ GEORGIAN_RE = re.compile(r"[Ⴀ-ჿ]")
 
 REQUEST_TIMEOUT_SEC = 30
 
+# Единственный хост, с которого можно качать картинки. Адрес картинки берётся из
+# РАЗМЕТКИ скачанной страницы (urljoin в parse_tickets), то есть приходит извне:
+# абсолютный src на чужой домен заставил бы парсер сходить туда с нашей сессией
+# и cookie. Тот факт, что источник сегодня отдаёт только свои картинки, — не
+# проверка, а везение.
+ALLOWED_IMAGE_HOST = urlparse(BASE_URL).hostname
+
 PAGE_DELAY_SEC = 0.7
 HTTP_RETRIES = 3
 RETRY_BACKOFF_SEC = 2
 USER_AGENT = "autoshkola.ge tickets parser (+https://avtoshkola.ge)"
+
+
+def is_allowed_image_url(url):
+    """Картинку можно качать только с хоста источника и только по http(s)."""
+    if not url:
+        return False
+    parsed = urlparse(url)
+    return parsed.scheme in ("http", "https") and parsed.hostname == ALLOWED_IMAGE_HOST
 
 
 def parse_total(html):
@@ -481,6 +496,15 @@ def collect(session, refresh=False):
     for ticket in tickets:
         ticket["image"] = None
         if not ticket["image_url"]:
+            continue
+        # Чужой хост в src — не «картинка не скачалась», а признак того, что
+        # страница не та, за кого себя выдаёт. Не качаем и говорим об этом:
+        # ticket["image"] остаётся None, и validate() уронит весь прогон.
+        if not is_allowed_image_url(ticket["image_url"]):
+            print(
+                f"  ! билет {ticket['id']}: картинка не с {ALLOWED_IMAGE_HOST}, "
+                f"пропущена ({ticket['image_url']})"
+            )
             continue
         # Имя берём из пути URL, а не из хвоста строки: query-параметр
         # превратился бы в часть имени файла.
