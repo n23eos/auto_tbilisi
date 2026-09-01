@@ -105,6 +105,11 @@ document.documentElement.classList.add('has-js');
 
   const MIN_NAME_LENGTH = 2;
   const MIN_PHONE_DIGITS = 9;
+  // Потолок ожидания ответа FormSubmit. Без него зависший запрос оставляет
+  // кнопку заблокированной с надписью «Отправляем…» навсегда: человек не видит
+  // ни успеха, ни ошибки и не знает, что можно позвонить. По таймауту сработает
+  // ветка .catch и покажет телефон школы.
+  const SUBMIT_TIMEOUT_MS = 15000;
 
   function setFieldError(input, hasError) {
     const errorEl = form.querySelector('[data-error-for="' + input.id + '"]');
@@ -170,7 +175,12 @@ document.documentElement.classList.add('has-js');
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      // AbortSignal.timeout есть не во всех старых браузерах; там остаётся
+      // прежнее поведение без обрыва, а не падение на этапе отправки.
+      signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout
+        ? AbortSignal.timeout(SUBMIT_TIMEOUT_MS)
+        : undefined
     })
       .then(function (response) {
         if (!response.ok) throw new Error('HTTP ' + response.status);
