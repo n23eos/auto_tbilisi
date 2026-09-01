@@ -10,6 +10,7 @@ import {
   forceReleaseLead,
   renderLeadCard,
 } from "../src/leads";
+import type { Lead } from "../src/types";
 
 const db = (env as any).DB as D1Database;
 
@@ -141,5 +142,34 @@ describe("renderLeadCard", () => {
     const card = renderLeadCard((await getLead(db, leadId))!);
     expect(card.text).toContain("&lt;b&gt;X&lt;/b&gt;");
     expect(card.text).not.toContain("<b>X</b>");
+  });
+});
+
+describe("renderLeadCard: неизвестный статус", () => {
+  // У leads.status нет CHECK в схеме, так что «не тот» статус может попасть в
+  // базу правкой руками или будущей миграцией. Карточка не должна показывать
+  // админу слово «undefined» — рядом уже есть statusLabel() ровно для этого.
+  it("печатает сам статус, а не «undefined»", () => {
+    const lead = {
+      id: 1,
+      submission_id: "x",
+      name: "Вася",
+      phone: "+995599000001",
+      question: null,
+      status: "cancelled",
+      assigned_to_id: null,
+      assigned_to_name: null,
+      student_chat_id: 5,
+      telegram_message_id: null,
+      delivery_status: "pending",
+      created_at: "2026-09-01 10:00:00",
+      updated_at: "2026-09-01 10:00:00",
+    } as unknown as Lead;
+
+    const card = renderLeadCard(lead);
+    expect(card.text).not.toContain("undefined");
+    expect(card.text).toContain("cancelled");
+    // Кнопок у неизвестного статуса нет — предлагать переход некуда.
+    expect(card.keyboard.inline_keyboard).toEqual([]);
   });
 });

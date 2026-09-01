@@ -131,7 +131,9 @@ const CARD_ADMIN_NAME_LIMIT = 300;
 
 export function renderLeadCard(lead: Lead): { text: string; keyboard: InlineKeyboard } {
   const lines = [
-    `<b>Заявка #${lead.id}</b> · ${STATUS_LABEL[lead.status]}`,
+    // statusLabel(), а не STATUS_LABEL напрямую: у leads.status нет CHECK в схеме,
+    // и неизвестное значение отрисовалось бы как «Заявка #7 · undefined».
+    `<b>Заявка #${lead.id}</b> · ${statusLabel(lead.status)}`,
     `Имя: ${escapeClamped(lead.name, CARD_NAME_LIMIT)}`,
   ];
   // Телефон показываем только после взятия — чтобы не звонили двое сразу
