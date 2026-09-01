@@ -56,6 +56,27 @@ describe("runCleanup", () => {
     expect(byId.fresh).toBe("+995599000022");
   });
 
+  // Журнал только пишется и нигде не читается кодом — он нужен для разбора
+  // спорных случаев «кто взял заявку и куда она делась». Дальше 180 дней
+  // разбирать нечего: у самой заявки к этому сроку уже затёрт телефон.
+  it("удаляет события журнала старше 180 дней, свежие оставляет", async () => {
+    await db.prepare(
+      `INSERT INTO leads (id, submission_id, name, phone, student_chat_id)
+       VALUES (900, 'events', 'Ж', '+995599000030', 30)`,
+    ).run();
+    await db.prepare(
+      `INSERT INTO lead_events (lead_id, event, actor_id, created_at)
+       VALUES (900, 'created', NULL, datetime('now', '-200 days')),
+              (900, 'taken', 1, datetime('now', '-181 days')),
+              (900, 'closed', 1, datetime('now', '-10 days'))`,
+    ).run();
+
+    await runCleanup(db);
+
+    const { results } = await db.prepare("SELECT event FROM lead_events WHERE lead_id = 900 ORDER BY id").all();
+    expect(results.map((r: any) => r.event)).toEqual(["closed"]);
+  });
+
   it("повторный прогон ничего не ломает: телефон уже затёрт, updated_at не сдвигается", async () => {
     await db.prepare(
       `INSERT INTO leads (submission_id, name, phone, student_chat_id, status, updated_at)
