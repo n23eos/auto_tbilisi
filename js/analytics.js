@@ -62,7 +62,13 @@ const GA_MEASUREMENT_ID = 'G-ZC7378W9KE';
   }
 
   document.addEventListener('click', function (event) {
-    const el = event.target.closest('a[href], button[data-channel]');
+    // target не всегда элемент: клик может прийти на document или на узел
+    // без closest (например, из синтетического события). Без проверки один
+    // такой клик роняет обработчик, и дальше не считается НИ ОДНО событие.
+    const target = event.target;
+    if (!target || typeof target.closest !== 'function') return;
+
+    const el = target.closest('a[href], button[data-channel]');
     if (!el) return;
 
     // Кнопка «Записаться на обучение» в hero — отдельное событие воронки
