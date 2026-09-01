@@ -246,6 +246,45 @@ describe("router: админы", () => {
     expect(sent[0].body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
   });
 
+  // Значение факта задаёт админ руками, и оно попадает и в подтверждение ему,
+  // и в ответ ученику на кнопку «Ближайшая группа». Без потолка одна длинная
+  // команда ломает обе точки разом: sendMessage отвечает 400, админ не видит
+  // ни подтверждения, ни причины, а кнопка у учеников молча перестаёт отвечать.
+  it("/set с огромным значением: подтверждение админу влезает в лимит Telegram", async () => {
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 74, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID, first_name: "Нина" }, text: "/set дата_группы " + "<".repeat(5000) } },
+      makeEnv(sent),
+    );
+    expect(sent.length).toBe(1);
+    expect(sent[0].body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
+  });
+
+  it("кнопка «Ближайшая группа» влезает в лимит, даже если в базе огромное значение", async () => {
+    await (env as any).DB.prepare(
+      "INSERT OR REPLACE INTO facts (key, value) VALUES ('next_group_date', ?)",
+    ).bind("<".repeat(5000)).run();
+
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 75, callback_query: { id: "cb75", from: { id: 5, first_name: "П" }, message: { chat: { id: 5, type: "private" } }, data: "menu:gruppa" } },
+      makeEnv(sent),
+    );
+    const message = sent.find((s) => s.url.endsWith("/sendMessage"));
+    expect(message).toBeDefined();
+    expect(message.body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
+  });
+
+  it("/set с огромным ИМЕНЕМ факта отвечает подсказкой, а не молчанием", async () => {
+    const sent: any[] = [];
+    await routeUpdate(
+      { update_id: 76, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID, first_name: "Нина" }, text: "/set " + "<".repeat(5000) + " значение" } },
+      makeEnv(sent),
+    );
+    expect(sent.length).toBe(1);
+    expect(sent[0].body.text.length).toBeLessThanOrEqual(TELEGRAM_TEXT_LIMIT);
+  });
+
   it("/set от чужого игнорируется", async () => {
     const sent: any[] = [];
     await routeUpdate(

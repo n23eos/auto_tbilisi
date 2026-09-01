@@ -10,7 +10,7 @@ import {
   createLead, getLead, takeLead, markCalled, closeLead, releaseLead, forceReleaseLead,
   renderLeadCard, statusLabel,
 } from "./leads";
-import { escapeHtml, escapeClamped } from "./escape";
+import { escapeClamped } from "./escape";
 import { formatTbilisi } from "./time";
 import type { Env } from "./types";
 
@@ -43,6 +43,14 @@ const FACT_ALIASES: Record<string, string> = {
 // Потолок на имя и на имя админа в строке списка /zayavki: 10 заявок × 2 поля
 // × 150 с запасом влезают в одно сообщение Telegram.
 const LIST_FIELD_LIMIT = 150;
+
+// Потолок на имя и значение факта в /set. Значение задаёт админ руками, и оно
+// уходит в ДВА сообщения: подтверждение ему самому («старое → новое») и ответ
+// ученику на кнопку «Ближайшая группа». Без потолка одна длинная команда ломает
+// обе точки разом: экранирование раздувает «<» вчетверо, sendMessage отвечает
+// 400 — админ не видит ни подтверждения, ни причины, а кнопка у учеников молча
+// перестаёт отвечать. 200 символов на дату группы — с большим запасом.
+const FACT_FIELD_LIMIT = 200;
 
 function makeClient(env: Env): TelegramClient {
   // __fetch — шов для тестов: они вызывают routeUpdate напрямую и подменяют fetch.
@@ -233,7 +241,7 @@ async function handleCallback(cb: any, env: Env, tg: TelegramClient): Promise<vo
     await tg.sendMessage(
       chatId,
       date
-        ? `📅 Ближайшая группа по теории стартует: <b>${escapeHtml(date)}</b>\nЗаписаться можно прямо здесь 👇`
+        ? `📅 Ближайшая группа по теории стартует: <b>${escapeClamped(date, FACT_FIELD_LIMIT)}</b>\nЗаписаться можно прямо здесь 👇`
         : "Дату ближайшей группы уточняем — оставьте заявку, и администратор сообщит вам лично.",
       MAIN_MENU,
     );
@@ -424,15 +432,21 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
     if (!key) {
       await tg.sendMessage(
         adminChat,
-        `Не знаю факт «${escapeHtml(alias)}». Сейчас можно менять только: ${Object.keys(FACT_ALIASES).join(", ")}.\nПример: /set дата_группы 15 сентября`,
+        `Не знаю факт «${escapeClamped(alias, FACT_FIELD_LIMIT)}». Сейчас можно менять только: ${Object.keys(FACT_ALIASES).join(", ")}.\nПример: /set дата_группы 15 сентября`,
       );
       return;
     }
-    const value = rest.slice(spaceIdx + 1).trim();
+    // Режем при ЗАПИСИ, а не только при показе: иначе обрезка спасала бы
+    // подтверждение админу, но в базе осталась бы строка, ломающая всё
+    // остальное, что этот факт когда-нибудь прочитает.
+    const raw = rest.slice(spaceIdx + 1).trim();
+    const value = truncate(raw, FACT_FIELD_LIMIT);
     const { oldValue, newValue } = await setFact(env.DB, key, value, String(fromId));
+    // oldValue мог попасть в базу до появления потолка — его тоже клампим.
     await tg.sendMessage(
       adminChat,
-      `${escapeHtml(alias)}: «${escapeHtml(oldValue ?? "не было")}» → «${escapeHtml(newValue)}»`,
+      `${escapeClamped(alias, FACT_FIELD_LIMIT)}: «${escapeClamped(oldValue ?? "не было", FACT_FIELD_LIMIT)}» → «${escapeClamped(newValue, FACT_FIELD_LIMIT)}»` +
+        (value !== raw ? `\nЗначение длинновато — сократил до ${FACT_FIELD_LIMIT} символов.` : ""),
     );
     return;
   }
