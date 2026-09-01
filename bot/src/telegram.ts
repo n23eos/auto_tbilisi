@@ -70,18 +70,37 @@ export function splitMessage(text: string, limit = MESSAGE_LIMIT): string[] {
   return chunks;
 }
 
+/**
+ * Потолок ожидания ответа api.telegram.org. Без него зависший вызов держит
+ * воркер до предела времени запроса Cloudflare, и на кнопку меню ученик просто
+ * не получает ничего: апдейт к этому моменту уже помечен обработанным и не
+ * повторится. Десять секунд — заведомо больше нормального ответа Telegram
+ * (сотни миллисекунд) и заведомо меньше терпения человека в чате.
+ */
+const REQUEST_TIMEOUT_MS = 10_000;
+
 export class TelegramClient {
   constructor(
     private token: string,
     private fetchFn: typeof fetch = fetch,
+    private timeoutMs: number = REQUEST_TIMEOUT_MS,
   ) {}
 
   private async call<T>(method: string, payload: Record<string, unknown>): Promise<T> {
-    const res = await this.fetchFn(`https://api.telegram.org/bot${this.token}/${method}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    let res: Response;
+    try {
+      res = await this.fetchFn(`https://api.telegram.org/bot${this.token}/${method}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+    } catch (err) {
+      // Обрыв по таймауту и сетевая ошибка приходят сюда одинаково. Имя метода
+      // в сообщении обязательно: иначе в `wrangler tail` видно «fetch failed»
+      // без единого намёка, какой именно вызов не дошёл.
+      throw new Error(`Telegram ${method}: ${err instanceof Error ? err.message : String(err)}`);
+    }
     const body = (await res.json()) as { ok: boolean; result?: T; description?: string };
     if (!body.ok) throw new Error(`Telegram ${method}: ${body.description ?? res.status}`);
     return body.result as T;

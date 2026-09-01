@@ -26,6 +26,27 @@ describe("TelegramClient", () => {
     const tg = new TelegramClient("TOKEN", f);
     await expect(tg.sendMessage(1, "x")).rejects.toThrow("Bad Request");
   });
+
+  it("передаёт в fetch signal с таймаутом", async () => {
+    const f = fakeFetch();
+    const tg = new TelegramClient("TOKEN", f);
+    await tg.sendMessage(1, "x");
+    const [, init] = (f as any).mock.calls[0];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  // Зависший api.telegram.org без таймаута держит воркер до предела времени
+  // запроса: ученик не получает ответа и не понимает, дошла ли заявка.
+  it("обрывает запрос, если Telegram не отвечает", async () => {
+    const hanging = vi.fn(
+      (_url: string, init: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init.signal!.addEventListener("abort", () => reject(new Error("aborted")));
+        }),
+    ) as unknown as typeof fetch;
+    const tg = new TelegramClient("TOKEN", hanging, 20);
+    await expect(tg.sendMessage(1, "x")).rejects.toThrow(/Telegram sendMessage/);
+  });
 });
 
 describe("splitMessage", () => {
