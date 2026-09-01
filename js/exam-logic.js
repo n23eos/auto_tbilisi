@@ -34,8 +34,10 @@ export function isCorrect(ticket, answerIndex) {
 }
 
 /**
- * Итог попытки. Правила настоящего экзамена: 30 вопросов, максимум 3 ошибки,
- * не уложился по времени — не сдал.
+ * Итог попытки. Правила: QUESTION_COUNT вопросов, не больше MAX_MISTAKES
+ * ошибок, не уложился по времени — не сдал. Числа берём из констант выше,
+ * а не из текста комментария: раньше здесь было зашито «максимум 3 ошибки»,
+ * и докстринг противоречил MAX_MISTAKES = 5.
  */
 export function examVerdict({ answered, mistakes, timeUp }) {
   if (mistakes > MAX_MISTAKES) {
