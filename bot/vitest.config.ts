@@ -1,16 +1,18 @@
-import { defineWorkersConfig, readD1Migrations } from "@cloudflare/vitest-pool-workers/config";
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
+import { defineConfig } from "vitest/config";
 
-export default defineWorkersConfig(async () => {
-  const migrations = await readD1Migrations("./migrations");
-  return {
-    test: {
-      setupFiles: ["./test/apply-migrations.ts"],
-      poolOptions: {
-        workers: {
-          wrangler: { configPath: "./wrangler.toml" },
-          miniflare: { bindings: { TEST_MIGRATIONS: migrations } },
-        },
-      },
-    },
-  };
+// Миграции читаются на старте и кладутся в биндинг: setupFiles применяет их
+// к чистой базе перед каждым файлом тестов (см. test/apply-migrations.ts).
+const migrations = await readD1Migrations("./migrations");
+
+export default defineConfig({
+  plugins: [
+    cloudflareTest({
+      wrangler: { configPath: "./wrangler.toml" },
+      miniflare: { bindings: { TEST_MIGRATIONS: migrations } },
+    }),
+  ],
+  test: {
+    setupFiles: ["./test/apply-migrations.ts"],
+  },
 });
