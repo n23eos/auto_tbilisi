@@ -427,7 +427,10 @@ def fetch_page(session, page, refresh=False):
             raise
         except Exception as error:
             last_error = error
-            time.sleep(RETRY_BACKOFF_SEC * attempt)
+            # Пауза нужна ПЕРЕД следующей попыткой. После последней ждать нечего:
+            # впереди только исключение, а со штатным backoff это 6 секунд простоя.
+            if attempt < HTTP_RETRIES:
+                time.sleep(RETRY_BACKOFF_SEC * attempt)
 
     raise RuntimeError(f"страница {page}: не удалось скачать за {HTTP_RETRIES} попыток ({last_error})")
 

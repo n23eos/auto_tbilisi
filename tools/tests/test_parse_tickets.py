@@ -752,3 +752,23 @@ def test_is_allowed_image_url_accepts_source_host():
 )
 def test_is_allowed_image_url_rejects_everything_else(url):
     assert pt.is_allowed_image_url(url) is False
+
+
+def test_fetch_page_does_not_sleep_after_the_last_attempt(tmp_path, monkeypatch, html_ru):
+    """Пауза нужна ПЕРЕД следующей попыткой; после последней ждать нечего.
+
+    Со штатным RETRY_BACKOFF_SEC = 2 лишняя пауза — это 6 секунд простоя
+    перед исключением, которое всё равно уже решено бросить.
+    """
+    monkeypatch.setattr(pt, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(pt, "PAGE_DELAY_SEC", 0)
+
+    slept = []
+    monkeypatch.setattr(pt.time, "sleep", slept.append)
+
+    session = FlakySession(html_ru, fail_times=99)
+    with pytest.raises(RuntimeError):
+        pt.fetch_page(session, 1)
+
+    assert session.calls == pt.HTTP_RETRIES
+    assert len(slept) == pt.HTTP_RETRIES - 1
