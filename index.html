@@ -323,10 +323,14 @@
 
   <!-- Hero · Marquee поверх видео 2:1 -->
   <section class="marquee" id="top">
-    <video class="marquee__video" autoplay muted loop playsinline preload="metadata"
-           poster="media/hero-poster.jpg" aria-hidden="true" tabindex="-1">
-      <source src="media/hero.mp4" type="video/mp4">
-    </video>
+    <!-- src намеренно в data-src: браузер сканирует разметку до выполнения
+         скриптов, и при autoplay он игнорирует preload="metadata" — все 1,6 МБ
+         видео начинали качаться немедленно, отбирая полосу у стоп-кадра и
+         шрифтов на первом экране. А отказ от видео при экономии трафика в
+         js/main.js к тому моменту уже опаздывал. Теперь источник ставит скрипт. -->
+    <video class="marquee__video" autoplay muted loop playsinline preload="none"
+           poster="media/hero-poster.jpg" aria-hidden="true" tabindex="-1"
+           data-src="media/hero.mp4" data-type="video/mp4"></video>
     <div class="marquee__scrim" aria-hidden="true"></div>
 
     <div class="marquee__content">
@@ -695,6 +699,6 @@
   </div>
 
   <script src="js/analytics.js?v=24" defer></script>
-  <script src="js/main.js?v=26" defer></script>
+  <script src="js/main.js?v=27" defer></script>
 </body>
 </html>

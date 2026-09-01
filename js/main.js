@@ -11,14 +11,11 @@ document.documentElement.classList.add('has-js');
 
   const savesData = navigator.connection && navigator.connection.saveData;
 
+  // Источник лежит в data-src, а не в <source src>: иначе браузер начинал
+  // качать видео ещё до выполнения этого скрипта, и отказ ниже опаздывал.
   if (savesData || prefersReducedMotion) {
     video.removeAttribute('autoplay');
-    video.pause();
     // Остаётся стоп-кадр — статичная панорама города
-    video.querySelectorAll('source').forEach(function (source) {
-      source.removeAttribute('src');
-    });
-    video.load();
     return;
   }
 
@@ -26,11 +23,13 @@ document.documentElement.classList.add('has-js');
     video.classList.add('is-ready');
   }
 
-  if (video.readyState >= 2) {
-    showVideo();
-  } else {
-    video.addEventListener('loadeddata', showVideo, { once: true });
-  }
+  video.addEventListener('loadeddata', showVideo, { once: true });
+
+  const source = document.createElement('source');
+  source.src = video.dataset.src;
+  source.type = video.dataset.type;
+  video.append(source);
+  video.load();
 })();
 
 // Блоки проявляются, когда доходят до экрана. Один раз, без повторов.
