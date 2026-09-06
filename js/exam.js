@@ -12,6 +12,7 @@ import {
 } from "./exam-logic.js";
 import { markAnswer, readProgress, writeProgress } from "./training-logic.js";
 import { markAnswerButtons } from "./answer-marking.js";
+import { learningNextStep } from "./learning-next-step.js?v=1";
 
 const DATA_URL = "../data/tickets-b-ru.json";
 const IMAGES_BASE = "../data/";
@@ -37,6 +38,8 @@ const state = {
   wrong: [],
   startedAt: 0,
   timerId: null,
+  finishTimerId: null,
+  finished: false,
   locked: false,
 };
 
@@ -144,7 +147,7 @@ function answer(answerIndex) {
   el("q-mistakes").textContent = String(state.mistakes);
 
   if (state.mistakes > MAX_MISTAKES || state.index + 1 >= QUESTION_COUNT) {
-    window.setTimeout(() => finish(false), 900);
+    state.finishTimerId = window.setTimeout(() => finish(false), 900);
     return;
   }
   el("btn-next").hidden = false;
@@ -152,6 +155,7 @@ function answer(answerIndex) {
 }
 
 function next() {
+  if (screens.quiz.hidden || !state.locked || state.mistakes > MAX_MISTAKES) return;
   if (state.index + 1 >= QUESTION_COUNT) {
     finish(false);
     return;
@@ -221,6 +225,11 @@ function renderReview() {
 }
 
 function finish(timeUp) {
+  // Таймер и задержка после последнего ответа могут сработать вместе.
+  // Итог и событие конверсии должны появиться только один раз.
+  if (state.finished) return;
+  state.finished = true;
+  window.clearTimeout(state.finishTimerId);
   window.clearInterval(state.timerId);
   const verdict = examVerdict({
     answered: state.answered,
@@ -248,6 +257,19 @@ function finish(timeUp) {
     `${reasons[verdict.reason]} Отвечено ${state.answered} из ${QUESTION_COUNT}, время — ${formatTime(spent)}.`;
 
   renderReview();
+  const recommendation = learningNextStep(verdict);
+  el('r-next-title').textContent = recommendation.title;
+  el('r-next-text').textContent = recommendation.text;
+  const nextLink = el('r-next-link');
+  nextLink.textContent = recommendation.label;
+  nextLink.href = `../?from=exam&goal=${recommendation.goal}#callback-form`;
+  nextLink.dataset.learningCta = recommendation.goal;
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'exam_complete', {
+      result: verdict.passed ? 'pass' : 'fail', reason: verdict.reason,
+      answered: state.answered, mistakes: state.mistakes,
+    });
+  }
   show("result");
   // show() прячет экран вопроса, а фокус в этот момент стоит на кнопке внутри
   // него — браузер сбрасывает его в начало страницы, и о конце экзамена
@@ -262,6 +284,9 @@ function finish(timeUp) {
 }
 
 function start() {
+  window.clearTimeout(state.finishTimerId);
+  state.finished = false;
+  if (typeof window.gtag === 'function') window.gtag('event', 'exam_start');
   // Порог берём из логики, а не из разметки: иначе при его изменении
   // текст на странице и поведение экзамена разъедутся.
   el("q-max").textContent = String(MAX_MISTAKES);

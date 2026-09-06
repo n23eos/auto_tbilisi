@@ -28,7 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
-  <link rel="stylesheet" href="css/style.css?v=27">
+  <link rel="stylesheet" href="css/style.css?v=28">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -369,10 +369,16 @@
   <!-- О школе -->
   <section class="about" id="about">
     <div class="about__text" data-reveal>
-      <h2 class="section-title">Русскоязычное отделение автошколы в Грузии</h2>
-      <p><strong>Avtoshkola.ge — автошкола на русском языке в Тбилиси</strong>, проспект Важа Пшавела 9. Переехали в Тбилиси и хотите получить права — но грузинского пока не знаете? Мы ведём весь курс на русском языке: разбираем теорию ПДД Грузии, отрабатываем вождение на площадке и в городе, готовим к экзамену.</p>
-      <p>Теорию можно проходить онлайн из любой точки, практика — очно в Тбилиси. Инструкторы объясняют спокойно и по делу: без криков, без спешки, с первого занятия за рулём.</p>
+      <p class="section-kicker">Ваш город. Ваш ритм.</p>
+      <h2 class="section-title">Тбилиси —<br>теперь за рулём.</h2>
+      <p>Начните с теории на русском, освойтесь на площадке и переходите к городским улицам. Подъёмы, перекрёстки, перестроения — разбираем всё на практике.</p>
+      <p>Теория — в классе на Важа Пшавела 9 или онлайн. Вождение — в Тбилиси, с инструктором, который объясняет спокойно и по делу.</p>
+      <a class="exam-link" href="#program">Посмотреть этапы обучения ↓</a>
     </div>
+    <figure class="about__city" data-reveal>
+      <img src="media/tbilisi-wide.webp" srcset="media/tbilisi-wide-900.webp 900w, media/tbilisi-wide.webp 1774w" sizes="(max-width: 700px) calc(100vw - 32px), 92vw" width="1774" height="887" loading="lazy" decoding="async" alt="Иллюстрация Тбилиси: дома с балконами, мост Мира и дорога вдоль реки">
+      <figcaption><span>ТБИЛИСИ · ГРУЗИЯ</span></figcaption>
+    </figure>
     <ul class="about__list" data-reveal>
       <li>Полный курс: теория ПДД + вождение</li>
       <li>Занятия очно и онлайн</li>
@@ -385,8 +391,9 @@
 
   <!-- Программа · F4 step sequence -->
   <section class="steps" id="program">
+    <p class="section-kicker" data-reveal>От первого билета до городских улиц</p>
     <h2 class="section-title" data-reveal>Как проходит обучение</h2>
-    <ol class="steps__list" data-reveal-group>
+    <ol class="steps__list" role="list" data-reveal-group>
       <li class="steps__item" data-reveal>
         <span class="steps__num">01</span>
         <div>
@@ -430,13 +437,16 @@
 
   <!-- Форматы -->
   <section class="formats" id="formats">
+    <p class="section-kicker" data-reveal>Учиться так, как удобно вам</p>
     <h2 class="section-title" data-reveal>Форматы занятий</h2>
     <div class="formats__grid" data-reveal-group>
       <article class="formats__card" data-reveal>
+        <span class="formats__tag">01 / В классе и за рулём</span>
         <h3>Очно в Тбилиси</h3>
         <p>Теория в классе на пр-те Важа Пшавела 9 у метро Медицинский университет, площадка — у метро Церетели, затем вождение по городу с инструктором.</p>
       </article>
       <article class="formats__card formats__card--wide" data-reveal>
+        <span class="formats__tag">02 / Теория из любой точки</span>
         <h3>Теория онлайн</h3>
         <p>Живые занятия по теории из дома — удобно, если вы ещё в пути в Грузию или совмещаете с работой. Вождение затем проходит очно.</p>
       </article>
@@ -445,6 +455,22 @@
   </section>
 
   <!-- Цены -->
+  <section class="practice-invite" aria-labelledby="practice-title">
+    <div data-reveal>
+      <p class="section-kicker">Попробуйте прямо сейчас</p>
+      <h2 class="section-title" id="practice-title">Как у вас<br>с теорией?</h2>
+      <p>Пройдите пробный экзамен или тренируйтесь без таймера. После попытки увидите ошибки и правильные ответы.</p>
+      <div class="practice-invite__actions">
+        <a class="learning-button" href="bilety/" data-learning-entry="home_exam">Проверить себя →</a>
+        <a class="exam-link" href="bilety/trenirovka/" data-learning-entry="home_training">Тренироваться без таймера</a>
+      </div>
+    </div>
+    <div class="practice-invite__visual" role="img" aria-label="30 вопросов, 30 минут, без регистрации">
+      <span class="practice-invite__number" aria-hidden="true">30</span>
+      <span aria-hidden="true">вопросов · 30 минут</span>
+      <span class="practice-invite__badge" aria-hidden="true">Без регистрации</span>
+    </div>
+  </section>
   <section class="prices" id="prices">
     <h2 class="section-title" data-reveal>Цены</h2>
 
@@ -698,7 +724,7 @@
     </button>
   </div>
 
-  <script src="js/analytics.js?v=24" defer></script>
-  <script src="js/main.js?v=27" defer></script>
+  <script src="js/analytics.js?v=25" defer></script>
+  <script src="js/main.js?v=28" defer></script>
 </body>
 </html>

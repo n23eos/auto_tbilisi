@@ -102,6 +102,24 @@ document.documentElement.classList.add('has-js');
   const successMsg = form.querySelector('.callback__success');
   const failMsg = form.querySelector('.callback__fail');
 
+  // Только известные значения: произвольный текст URL не попадает в заявку
+  // и аналитику. Выбор ученика сохраняется при переходе из тренажёра.
+  const params = new URLSearchParams(window.location.search);
+  const source = ['exam', 'training'].includes(params.get('from')) ? params.get('from') : null;
+  const goal = ['theory', 'practice'].includes(params.get('goal')) ? params.get('goal') : null;
+  const learningContext = source && goal ? { source, goal } : null;
+  if (learningContext) {
+    const isPractice = goal === 'practice';
+    form.querySelector('.callback__title').textContent = isPractice ? 'Подобрать вождение' : 'Обсудить теорию';
+    const comment = form.querySelector('#cb-comment');
+    if (!comment.value) comment.value = isPractice
+      ? 'После тренажёра хочу подобрать практическое вождение.'
+      : 'После тренажёра хочу обсудить занятия по теории.';
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'learning_form_view', learningContext);
+    }
+  }
+
   const MIN_NAME_LENGTH = 2;
   const MIN_PHONE_DIGITS = 9;
   // Потолок ожидания ответа FormSubmit. Без него зависший запрос оставляет
@@ -172,6 +190,10 @@ document.documentElement.classList.add('has-js');
       _template: 'table',
       _captcha: 'false'
     };
+    if (learningContext) {
+      payload['Источник'] = source === 'exam' ? 'Результат экзамена ПДД' : 'Тренировка ПДД';
+      payload['Интерес'] = goal === 'practice' ? 'Практическое вождение' : 'Теория';
+    }
 
     fetch('https://formsubmit.co/ajax/6ed6e9175806c7f41929f562953ff7f2', {
       method: 'POST',
@@ -195,7 +217,7 @@ document.documentElement.classList.add('has-js');
         form.reset();
         // Заявка дошла — фиксируем конверсию в GA4
         if (typeof window.gtag === 'function') {
-          window.gtag('event', 'generate_lead', { method: 'callback_form' });
+          window.gtag('event', 'generate_lead', { method: 'callback_form', ...(learningContext || {}) });
         }
       })
       .catch(function () {

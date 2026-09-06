@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
-  <link rel="stylesheet" href="../../css/style.css?v=27">
-  <link rel="stylesheet" href="../../css/exam.css?v=19">
+  <link rel="stylesheet" href="../../css/style.css?v=28">
+  <link rel="stylesheet" href="../../css/exam.css?v=20">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -127,6 +127,13 @@
 
     <p class="exam__empty" id="t-empty" hidden></p>
 
+    <aside class="learning-next" aria-labelledby="training-help-title">
+      <p class="section-kicker">Если хочется разобраться вместе</p>
+      <h2 id="training-help-title">Сложный билет? Обсудим.</h2>
+      <p>Сохраните текст вопроса и спросите преподавателя на консультации. Поможем выбрать занятия по теории, если они нужны.</p>
+      <a class="learning-button" href="../../?from=training&goal=theory#callback-form" data-learning-cta="theory">Задать вопрос о теории</a>
+      <p class="learning-next__note">Консультация бесплатная. Можно продолжить тренировку самостоятельно.</p>
+    </aside>
     <div class="exam__reset">
       <button class="exam__btn exam__btn--ghost" id="t-reset" type="button">Сбросить прогресс</button>
       <p class="exam__note">
@@ -154,7 +161,7 @@
     </p>
   </footer>
 
-  <script src="../../js/analytics.js?v=24" defer></script>
+  <script src="../../js/analytics.js?v=25" defer></script>
   <script type="module" src="../../js/training.js?v=2"></script>
 </body>
 </html>

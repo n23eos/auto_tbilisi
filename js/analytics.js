@@ -71,6 +71,16 @@ const GA_MEASUREMENT_ID = 'G-ZC7378W9KE';
     const el = target.closest('a[href], button[data-channel]');
     if (!el) return;
 
+    if (el.dataset.learningEntry) {
+      track('learning_entry', { place: el.dataset.learningEntry });
+    }
+    if (el.dataset.learningCta) {
+      track('learning_cta_click', {
+        goal: el.dataset.learningCta,
+        place: window.location.pathname.includes('trenirovka') ? 'training' : 'exam_result',
+      });
+    }
+
     // Кнопка «Записаться на обучение» в hero — отдельное событие воронки
     if (el.matches('.marquee__cta') && el.getAttribute('href') === '#contact') {
       track('cta_click', { place: 'hero' });

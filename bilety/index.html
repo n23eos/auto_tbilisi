@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/tokens.css?v=23">
-  <link rel="stylesheet" href="../css/style.css?v=27">
-  <link rel="stylesheet" href="../css/exam.css?v=19">
+  <link rel="stylesheet" href="../css/style.css?v=28">
+  <link rel="stylesheet" href="../css/exam.css?v=20">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -144,8 +144,15 @@
       <p class="exam__summary" id="r-summary"></p>
       <div class="exam__actions">
         <button class="exam__btn exam__btn--primary" id="btn-restart" type="button">Пройти ещё раз</button>
-        <a class="exam__btn exam__btn--ghost" href="../#callback-form">Записаться на курс</a>
+        <a class="exam__btn exam__btn--ghost" href="trenirovka/">Тренироваться без таймера</a>
       </div>
+      <aside class="learning-next" aria-labelledby="r-next-title">
+        <p class="section-kicker">Ваш следующий шаг</p>
+        <h3 id="r-next-title">Разберёмся вместе</h3>
+        <p id="r-next-text">Поможем выбрать подходящий формат занятий.</p>
+        <a class="learning-button" id="r-next-link" href="../?from=exam&goal=theory#callback-form" data-learning-cta="theory">Обсудить занятия по теории</a>
+        <p class="learning-next__note">Консультация бесплатная. Результат тренажёра не заменяет официальный экзамен.</p>
+      </aside>
       <h3 class="exam__mistakes-title" id="r-mistakes-title" hidden>Разбор ошибок</h3>
       <ol class="exam__review" id="r-review"></ol>
     </section>
@@ -171,7 +178,7 @@
     </p>
   </footer>
 
-  <script src="../js/analytics.js?v=24" defer></script>
-  <script type="module" src="../js/exam.js?v=20"></script>
+  <script src="../js/analytics.js?v=25" defer></script>
+  <script type="module" src="../js/exam.js?v=21"></script>
 </body>
 </html>
