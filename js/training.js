@@ -6,6 +6,7 @@ import {
   filterTickets,
   markAnswer,
   movePosition,
+  progressSummary,
   readProgress,
   writeProgress,
 } from "./training-logic.js";
@@ -19,16 +20,26 @@ const el = (id) => document.getElementById(id);
 const state = {
   all: [],
   list: [],
-  progress: { solved: [], mistakes: [], position: 0 },
-  filter: FILTERS.ALL,
+  progress: { solved: [], mistakes: [], position: 0, reviews: {} },
+  filter: FILTERS.TODAY,
   answered: false,
 };
 
 const EMPTY_TEXT = {
+  [FILTERS.TODAY]: "На сегодня всё готово. Возвращайтесь завтра или выберите другой режим.",
   [FILTERS.ALL]: "Билеты не загрузились.",
   [FILTERS.UNSOLVED]: "Нерешённых билетов не осталось — вы прошли все.",
   [FILTERS.MISTAKES]: "Ошибок пока нет. Они появятся здесь после экзамена или тренировки.",
 };
+
+function ticketWord(count) {
+  const mod100 = count % 100;
+  const mod10 = count % 10;
+  if (mod100 >= 11 && mod100 <= 14) return "билетов";
+  if (mod10 === 1) return "билет";
+  if (mod10 >= 2 && mod10 <= 4) return "билета";
+  return "билетов";
+}
 
 function store() {
   // localStorage может быть запрещён — тогда работаем без запоминания.
@@ -55,6 +66,23 @@ function renderCounters() {
   el("t-progress").style.width = ru.length ? `${(solved / ru.length) * 100}%` : "0";
 }
 
+function renderDashboard() {
+  const summary = progressSummary(state.all, state.progress);
+  el("t-stat-solved").textContent = String(summary.solved);
+  el("t-stat-due").textContent = String(summary.due);
+  el("t-stat-remaining").textContent = String(summary.remaining);
+
+  if (summary.due > 0) {
+    el("t-plan-note").textContent = `Сначала повторите ${summary.due} ${ticketWord(summary.due)}, затем переходите к новым.`;
+  } else if (summary.remaining > 0) {
+    el("t-plan-note").textContent = "Повторений пока нет — начните с короткой подборки новых билетов.";
+  } else {
+    el("t-plan-note").textContent = "Все билеты решены, и срочных повторений нет. Можно пройти пробный экзамен.";
+  }
+  el("t-start-today").disabled = summary.due === 0 && summary.remaining === 0;
+  el("t-dashboard").hidden = false;
+}
+
 function renderCard() {
   const ticket = state.list[state.progress.position];
   state.answered = false;
@@ -78,6 +106,18 @@ function renderCard() {
   } else {
     el("t-image").removeAttribute("src");
     figure.hidden = true;
+  }
+
+  el("t-source-id").textContent = String(ticket.id);
+  const sourceLink = el("t-source-link");
+  try {
+    const source = new URL(ticket.source);
+    if (source.protocol !== "https:" || source.hostname !== "teoria.on.ge") throw new Error("неизвестный источник");
+    sourceLink.href = source.href;
+    sourceLink.hidden = false;
+  } catch {
+    sourceLink.removeAttribute("href");
+    sourceLink.hidden = true;
   }
 
   const list = el("t-answers");
@@ -121,12 +161,17 @@ function answer(index) {
   markAnswerButtons(el("t-answers"), ticket.correct, index);
 
   const feedback = el("t-feedback");
-  feedback.textContent = correct ? "Верно" : `Неверно. Правильный ответ — ${ticket.correct + 1}`;
+  const correctText = ticket.answers[ticket.correct];
+  feedback.textContent = correct ? `Верно: ${correctText}` : `Неверно. Правильный ответ: ${correctText}`;
   feedback.className = `exam__feedback ${correct ? "exam__feedback--ok" : "exam__feedback--bad"}`;
 
   state.progress = markAnswer(state.progress, ticket.id, correct);
   save();
   renderCounters();
+  renderDashboard();
+  if (typeof window.gtag === "function") {
+    window.gtag("event", "training_answer", { correct, mode: state.filter });
+  }
 }
 
 function go(delta) {
@@ -161,7 +206,24 @@ function applyFilter(filter) {
 }
 
 document.querySelectorAll(".exam__filter").forEach((button) => {
-  button.addEventListener("click", () => applyFilter(button.dataset.filter));
+  button.addEventListener("click", () => {
+    const filter = button.dataset.filter;
+    applyFilter(filter);
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "training_mode_select", { mode: filter });
+    }
+  });
+});
+
+el("t-start-today").addEventListener("click", () => {
+  applyFilter(FILTERS.TODAY);
+  if (typeof window.gtag === "function") {
+    window.gtag("event", "training_mode_select", { mode: FILTERS.TODAY });
+  }
+  el("t-text").scrollIntoView({
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    block: "start",
+  });
 });
 
 el("t-prev").addEventListener("click", () => go(-1));
@@ -169,7 +231,7 @@ el("t-next").addEventListener("click", () => go(1));
 
 el("t-reset").addEventListener("click", () => {
   if (!window.confirm("Стереть весь прогресс тренировки? Отменить это будет нельзя.")) return;
-  state.progress = { solved: [], mistakes: [], position: 0 };
+  state.progress = { solved: [], mistakes: [], position: 0, reviews: {} };
   save();
   applyFilter(state.filter);
 });
@@ -195,7 +257,8 @@ document.addEventListener("keydown", (event) => {
     state.all = data.tickets;
     state.progress = readProgress(store());
     status.hidden = true;
-    applyFilter(FILTERS.ALL);
+    renderDashboard();
+    applyFilter(FILTERS.TODAY);
   } catch (error) {
     status.textContent = `Не удалось загрузить билеты: ${error.message}. Обновите страницу.`;
     status.classList.add("exam__status--error");

@@ -4,17 +4,38 @@
 export const STORAGE_KEY = "avtoshkola-progress-v1";
 
 export const FILTERS = {
+  TODAY: "today",
   ALL: "all",
   UNSOLVED: "unsolved",
   MISTAKES: "mistakes",
 };
 
+export const DAILY_SESSION_SIZE = 20;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const REVIEW_INTERVAL_DAYS = [1, 3, 7, 14, 30];
+
 function emptyProgress() {
-  return { solved: [], mistakes: [], position: 0 };
+  return { solved: [], mistakes: [], position: 0, reviews: {} };
 }
 
 function intList(value) {
   return Array.isArray(value) ? value.filter(Number.isInteger) : [];
+}
+
+function reviewMap(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const reviews = {};
+  Object.entries(value).forEach(([key, review]) => {
+    const id = Number(key);
+    if (!Number.isInteger(id) || !review || typeof review !== "object") return;
+    reviews[id] = {
+      attempts: Number.isInteger(review.attempts) && review.attempts >= 0 ? review.attempts : 0,
+      streak: Number.isInteger(review.streak) && review.streak >= 0 ? review.streak : 0,
+      lastAnsweredAt: Number.isFinite(review.lastAnsweredAt) ? review.lastAnsweredAt : 0,
+      nextReviewAt: Number.isFinite(review.nextReviewAt) ? review.nextReviewAt : 0,
+    };
+  });
+  return reviews;
 }
 
 /**
@@ -31,6 +52,7 @@ export function readProgress(storage) {
       solved: intList(parsed.solved),
       mistakes: intList(parsed.mistakes),
       position: Number.isInteger(parsed.position) ? parsed.position : 0,
+      reviews: reviewMap(parsed.reviews),
     };
   } catch {
     return emptyProgress();
@@ -46,9 +68,11 @@ export function writeProgress(storage, progress) {
   }
 }
 
-export function markAnswer(progress, ticketId, wasCorrect) {
+export function markAnswer(progress, ticketId, wasCorrect, now = Date.now()) {
   const solved = new Set(progress.solved);
   const mistakes = new Set(progress.mistakes);
+  const reviews = { ...(progress.reviews || {}) };
+  const previous = reviews[ticketId] || { attempts: 0, streak: 0 };
 
   if (wasCorrect) {
     solved.add(ticketId);
@@ -58,13 +82,61 @@ export function markAnswer(progress, ticketId, wasCorrect) {
     solved.delete(ticketId);
   }
 
+  const streak = wasCorrect ? previous.streak + 1 : 0;
+  const intervalIndex = Math.min(Math.max(streak - 1, 0), REVIEW_INTERVAL_DAYS.length - 1);
+  reviews[ticketId] = {
+    attempts: previous.attempts + 1,
+    streak,
+    lastAnsweredAt: now,
+    nextReviewAt: wasCorrect ? now + REVIEW_INTERVAL_DAYS[intervalIndex] * DAY_MS : now,
+  };
+
   const asSortedList = (set) => [...set].sort((a, b) => a - b);
-  return { ...progress, solved: asSortedList(solved), mistakes: asSortedList(mistakes) };
+  return { ...progress, solved: asSortedList(solved), mistakes: asSortedList(mistakes), reviews };
 }
 
-export function filterTickets(tickets, progress, filter) {
+function activeTickets(tickets) {
+  return tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn);
+}
+
+function dueTickets(tickets, progress, now) {
+  const mistakes = new Set(progress.mistakes);
+  const reviews = progress.reviews || {};
+  return tickets.filter((ticket) => {
+    const review = reviews[ticket.id];
+    return mistakes.has(ticket.id) || (review && review.nextReviewAt > 0 && review.nextReviewAt <= now);
+  });
+}
+
+export function buildDailySession(tickets, progress, now = Date.now(), limit = DAILY_SESSION_SIZE) {
+  const active = activeTickets(tickets);
+  const due = dueTickets(active, progress, now);
+  const selected = new Set(due.map((ticket) => ticket.id));
+  const solved = new Set(progress.solved);
+  const unsolved = active.filter((ticket) => !selected.has(ticket.id) && !solved.has(ticket.id));
+  return [...due, ...unsolved].slice(0, Math.max(0, limit));
+}
+
+export function progressSummary(tickets, progress, now = Date.now()) {
+  const active = activeTickets(tickets);
+  const activeIds = new Set(active.map((ticket) => ticket.id));
+  const solved = new Set(progress.solved.filter((id) => activeIds.has(id)));
+  const mistakes = new Set(progress.mistakes.filter((id) => activeIds.has(id)));
+  return {
+    total: active.length,
+    solved: solved.size,
+    due: dueTickets(active, progress, now).length,
+    remaining: active.filter((ticket) => !solved.has(ticket.id)).length,
+    mistakes: mistakes.size,
+  };
+}
+
+export function filterTickets(tickets, progress, filter, now = Date.now()) {
   // Изъятые из официального банка вопросы ученику показывать незачем.
-  const ru = tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn);
+  const ru = activeTickets(tickets);
+  if (filter === FILTERS.TODAY) {
+    return buildDailySession(ru, progress, now);
+  }
   if (filter === FILTERS.UNSOLVED) {
     const solved = new Set(progress.solved);
     return ru.filter((ticket) => !solved.has(ticket.id));

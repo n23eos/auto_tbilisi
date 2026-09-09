@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
   <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=20">
+  <link rel="stylesheet" href="../../css/exam.css?v=21">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -91,12 +91,30 @@
   <main class="exam" id="training">
     <h1 class="exam__title">Тренировка по билетам ПДД</h1>
     <p class="exam__lead">
-      Все действующие билеты по порядку, без таймера и лимита ошибок. Браузер запомнит,
-      где вы остановились и что уже решено.
+      Учитесь короткими сессиями, возвращайтесь к ошибкам и закрепляйте уже решённые
+      билеты. Регистрация не нужна — прогресс хранится в этом браузере.
     </p>
 
+    <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
+      <div class="training-dashboard__head">
+        <div>
+          <p class="section-kicker">Ваш прогресс</p>
+          <h2 id="t-dashboard-title">План подготовки на сегодня</h2>
+          <p class="training-dashboard__note" id="t-plan-note"></p>
+        </div>
+        <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 билетов</button>
+      </div>
+      <dl class="training-stats">
+        <div><dt>Верно решено</dt><dd id="t-stat-solved">0</dd></div>
+        <div><dt>Повторить сейчас</dt><dd id="t-stat-due">0</dd></div>
+        <div><dt>Ещё не освоено</dt><dd id="t-stat-remaining">0</dd></div>
+      </dl>
+    </section>
+
+    <h2 class="training-subtitle">Выберите режим</h2>
     <div class="exam__filters" role="group" aria-label="Что показывать">
-      <button class="exam__filter is-active" id="filter-all" type="button" aria-pressed="true" data-filter="all">Все билеты</button>
+      <button class="exam__filter is-active" id="filter-today" type="button" aria-pressed="true" data-filter="today">На сегодня</button>
+      <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Все билеты</button>
       <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
       <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
     </div>
@@ -118,6 +136,10 @@
       </figure>
       <ul class="exam__answers" id="t-answers"></ul>
       <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
+      <p class="exam__ticket-meta" id="t-ticket-meta">
+        <span>Официальный билет № <b id="t-source-id"></b></span>
+        <a id="t-source-link" rel="nofollow noopener" target="_blank">Открыть первоисточник ↗</a>
+      </p>
       <div class="exam__actions">
         <button class="exam__btn exam__btn--ghost" id="t-prev" type="button">← Назад</button>
         <button class="exam__btn exam__btn--primary" id="t-next" type="button">Дальше →</button>
@@ -162,6 +184,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=2"></script>
+  <script type="module" src="../../js/training.js?v=3"></script>
 </body>
 </html>
