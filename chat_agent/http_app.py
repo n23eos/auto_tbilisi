@@ -164,6 +164,8 @@ class Application:
         if method == 'OPTIONS':
             headers.extend([('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'),
                             ('Access-Control-Allow-Headers', 'Content-Type')])
+            if environ.get('HTTP_ACCESS_CONTROL_REQUEST_PRIVATE_NETWORK') == 'true':
+                headers.append(('Access-Control-Allow-Private-Network', 'true'))
             return self._json(start_response, headers, 200, {})
         if path == '/api/catalog' and method == 'GET':
             try:

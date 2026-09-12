@@ -31,6 +31,12 @@ def test_public_response_has_no_trace():
     assert headers['Access-Control-Allow-Origin'] == 'https://avtoshkola.ge'
 
 
+def test_private_network_preflight_for_tailscale_owner():
+    app=Application(Stub())
+    code,_,headers=request(app,REQUEST_METHOD='OPTIONS',HTTP_ACCESS_CONTROL_REQUEST_PRIVATE_NETWORK='true')
+    assert code == 200 and headers['Access-Control-Allow-Private-Network'] == 'true'
+
+
 def test_reject_wrong_origin_before_model():
     stub = Stub()
     code, _, headers = request(Application(stub), HTTP_ORIGIN='https://evil.example')
