@@ -1,4 +1,4 @@
-import {SUGGESTIONS, formatPrice, nextHistory, publicAnswer} from './chat-logic.js?v=1';
+import {SUGGESTIONS, formatPrice, nextHistory, publicAnswer} from './chat-logic.js?v=2';
 
 const loader = document.querySelector('script[data-chat-api]');
 const api = (loader?.dataset.chatApi || '').replace(/\/$/, '');
