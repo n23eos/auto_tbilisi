@@ -7,6 +7,28 @@ if (!api) throw new Error('chat_api_missing');
 let history = [];
 let previousFocus = null;
 let busy = false;
+let interacted = false;
+let audioContext;
+function ping(sent = false) {
+  if (!audioContext || audioContext.state !== 'running' || document.hidden) return;
+  const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
+  oscillator.connect(gain); gain.connect(audioContext.destination);
+  const now = audioContext.currentTime;
+  oscillator.frequency.setValueAtTime(sent ? 520 : 720, now);
+  oscillator.frequency.setValueAtTime(sent ? 660 : 960, now + .08);
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.045, now + .015);
+  gain.gain.exponentialRampToValueAtTime(.0001, now + .22);
+  oscillator.start(now); oscillator.stop(now + .23);
+}
+function unlockAudio() {
+  const Audio = window.AudioContext || window.webkitAudioContext;
+  if (!Audio) return;
+  audioContext ||= new Audio();
+  audioContext.resume().catch(() => {});
+}
+document.addEventListener('pointerdown', unlockAudio, {once: true});
+document.addEventListener('keydown', unlockAudio, {once: true});
 
 const make = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -16,27 +38,34 @@ const make = (tag, className, text) => {
 };
 
 const root = make('div', 'school-chat');
-const toggle = make('button', 'school-chat__toggle', 'Задать вопрос');
+const toggle = make('button', 'school-chat__toggle');
+toggle.setAttribute('aria-label', 'Открыть чат с ботом');
+const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+icon.setAttribute('viewBox', '0 0 24 24');
+icon.setAttribute('aria-hidden', 'true');
+const outline = document.createElementNS(icon.namespaceURI, 'path');
+outline.setAttribute('d', 'M20 11.5a8 8 0 0 1-8 8H5l-4 3 1.5-6A8 8 0 1 1 20 11.5Z M6 10h9 M6 14h6');
+icon.append(outline); toggle.append(icon);
 toggle.type = 'button';
 toggle.setAttribute('aria-expanded', 'false');
 toggle.setAttribute('aria-controls', 'school-chat-panel');
 const panel = make('section', 'school-chat__panel');
 panel.id = 'school-chat-panel';
 panel.setAttribute('role', 'dialog');
-panel.setAttribute('aria-modal', 'true');
 panel.setAttribute('aria-labelledby', 'school-chat-title');
 panel.hidden = true;
 const header = make('header', 'school-chat__header');
 const heading = make('div');
-heading.append(make('strong', '', 'Помощник автошколы'), make('span', '', 'Ответы из базы школы · AI'));
+heading.append(make('strong', '', 'Помощник автошколы'), make('span', '', 'Бот · на связи'));
 heading.firstChild.id = 'school-chat-title';
 const close = make('button', 'school-chat__close', 'Закрыть');
 close.type = 'button';
 close.setAttribute('aria-label', 'Закрыть чат');
-header.append(heading, close);
+const avatar = Object.assign(make('img', 'school-chat__avatar'), {src: new URL('../images/chat-robot.png', import.meta.url).href, alt: '', width: 44, height: 44});
+header.append(avatar, heading, close);
 const messages = make('div', 'school-chat__messages');
 messages.setAttribute('aria-live', 'polite');
-messages.append(make('p', 'school-chat__message school-chat__message--bot', 'Здравствуйте! Выберите вопрос или напишите свой. Точные цены и даты я проверяю перед ответом.'));
+messages.append(make('p', 'school-chat__message school-chat__message--bot', 'Здравствуйте! Что вы хотели узнать? Выберите вопрос ниже или напишите свой 👋'));
 const suggestions = make('div', 'school-chat__suggestions');
 SUGGESTIONS.forEach(question => {
   const button = make('button', '', question);
@@ -50,11 +79,12 @@ label.htmlFor = 'school-chat-input';
 const input = make('textarea');
 input.id = 'school-chat-input';
 input.name = 'question';
-input.rows = 2;
+input.rows = 1;
 input.maxLength = 2000;
-input.placeholder = 'Например: сколько стоит курс?';
+input.placeholder = 'Напишите сообщение…';
 input.required = true;
-const submit = make('button', '', 'Отправить');
+const submit = make('button', '', '↑');
+submit.setAttribute('aria-label', 'Отправить сообщение');
 submit.type = 'submit';
 form.append(label, input, submit);
 const contacts = make('p', 'school-chat__contacts');
@@ -62,14 +92,15 @@ contacts.append('Нужен человек? ', Object.assign(make('a', '', 'По
 panel.append(header, messages, suggestions, form, contacts);
 root.append(toggle, panel);
 document.body.append(root);
+document.body.classList.add('has-school-chat');
 
-function setOpen(open) {
+function setOpen(open, automatic = false) {
   panel.hidden = !open;
   toggle.setAttribute('aria-expanded', String(open));
   if (open) {
     previousFocus = document.activeElement;
-    input.focus();
-  } else {
+    if (!automatic) input.focus();
+  } else if (panel.contains(document.activeElement)) {
     (previousFocus || toggle).focus();
   }
 }
@@ -87,6 +118,7 @@ async function send(question) {
   input.value = '';
   input.disabled = submit.disabled = true;
   addMessage(clean, 'user');
+  ping(true);
   const waiting = make('p', 'school-chat__message school-chat__message--bot', 'Проверяю информацию…');
   messages.append(waiting);
   const controller = new AbortController();
@@ -106,21 +138,34 @@ async function send(question) {
     clearTimeout(timer);
     input.disabled = submit.disabled = false;
     busy = false;
-    input.focus();
+    if (!panel.hidden) { input.focus(); ping(); }
     messages.scrollTop = messages.scrollHeight;
   }
 }
 
-toggle.addEventListener('click', () => setOpen(panel.hidden));
-close.addEventListener('click', () => setOpen(false));
+function rememberInteraction() {
+  interacted = true;
+  try { sessionStorage.setItem('school-chat-seen', '1'); } catch { /* В приватном режиме достаточно флага вкладки. */ }
+}
+toggle.addEventListener('click', () => { rememberInteraction(); setOpen(panel.hidden); });
+close.addEventListener('click', () => { rememberInteraction(); setOpen(false); });
+setTimeout(() => {
+  let seen = interacted;
+  try { seen ||= sessionStorage.getItem('school-chat-seen') === '1'; } catch { /* Хранилище может быть недоступно. */ }
+  if (seen || document.hidden || document.querySelector('dialog[open], [aria-modal="true"]')) return;
+  rememberInteraction(); setOpen(true, true); ping();
+}, 10000);
+document.querySelector('[data-fab-toggle]')?.addEventListener('click', () => {
+  rememberInteraction(); if (!panel.hidden) setOpen(false);
+});
+input.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+    event.preventDefault(); send(input.value);
+  }
+});
 form.addEventListener('submit', event => { event.preventDefault(); send(input.value); });
 panel.addEventListener('keydown', event => {
-  if (event.key === 'Escape') setOpen(false);
-  if (event.key !== 'Tab') return;
-  const controls = [...panel.querySelectorAll('button:not([disabled]),a[href],textarea:not([disabled])')];
-  const first = controls[0], last = controls.at(-1);
-  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-  if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  if (event.key === 'Escape') { rememberInteraction(); setOpen(false); }
 });
 
 async function updatePrices() {
