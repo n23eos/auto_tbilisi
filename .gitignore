@@ -7,3 +7,7 @@ __pycache__/
 *.pyc
 transcriptions/
 baza-znaniy.zip
+\!notes/
+.env
+.env.*
+!.env.example

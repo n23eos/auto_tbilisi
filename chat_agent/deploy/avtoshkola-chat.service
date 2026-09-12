@@ -1,0 +1,40 @@
+[Unit]
+Description=Avtoshkola.ge grounded website chat
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=avtoshkola-chat
+Group=avtoshkola-chat
+WorkingDirectory=/opt/avtoshkola-chat/current
+EnvironmentFile=/etc/avtoshkola-chat.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=CHAT_STATE_DIR=/var/lib/avtoshkola-chat
+Environment=CHAT_KB_DIR=/opt/avtoshkola-chat/current/baza-znaniy/dlya-bota
+Environment=CHAT_ALLOWED_ORIGINS=https://avtoshkola.ge,https://www.avtoshkola.ge,http://127.0.0.1:8765
+Environment=CHAT_ADMIN_ORIGIN=https://admin.avtoshkola.ge
+ExecStart=/opt/avtoshkola-chat/venv/bin/gunicorn chat_agent.wsgi:application --bind 127.0.0.1:8092 --workers 1 --threads 4 --timeout 40 --graceful-timeout 10 --keep-alive 3 --access-logfile /dev/null --error-logfile -
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/avtoshkola-chat
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

@@ -29,6 +29,7 @@
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
   <link rel="stylesheet" href="css/style.css?v=28">
+  <link rel="stylesheet" href="css/chat.css?v=1">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -483,28 +484,28 @@
               Группа в аудитории
               <span class="prices__note">9 занятий по 90 минут, две недели, будни в 19:00. Группы до 12 человек</span>
             </dt>
-            <dd>150 ₾<span class="prices__unit">за курс</span></dd>
+            <dd><span data-price-service="theory_group">150 ₾</span><span class="prices__unit">за курс</span></dd>
           </div>
           <div class="prices__row">
             <dt>
               Индивидуально онлайн
               <span class="prices__note">10 занятий по 90 минут, график подбираем под вас</span>
             </dt>
-            <dd>280 ₾<span class="prices__unit">за курс</span></dd>
+            <dd><span data-price-service="theory_individual_online">280 ₾</span><span class="prices__unit">за курс</span></dd>
           </div>
           <div class="prices__row">
             <dt>
               Одно занятие онлайн
               <span class="prices__note">если полный курс не нужен — после бесплатного тестирования</span>
             </dt>
-            <dd>28 ₾<span class="prices__unit">за занятие</span></dd>
+            <dd><span data-price-service="theory_online_lesson">28 ₾</span><span class="prices__unit">за занятие</span></dd>
           </div>
           <div class="prices__row">
             <dt>
               Онлайн своей компанией
               <span class="prices__note">вдвоём, втроём или вчетвером — цена за курс с каждого</span>
             </dt>
-            <dd>210 / 180 / 150 ₾<span class="prices__unit">с человека</span></dd>
+            <dd><span data-price-service="theory_company_2">210 ₾</span> / <span data-price-service="theory_company_3">180 ₾</span> / <span data-price-service="theory_company_4">150 ₾</span><span class="prices__unit">с человека</span></dd>
           </div>
         </dl>
       </article>
@@ -517,14 +518,14 @@
               Площадка (автодром)
               <span class="prices__note">занятие 45 минут, площадка у метро Церетели. Механика или автомат — цена одна</span>
             </dt>
-            <dd>40 ₾<span class="prices__unit">за занятие</span></dd>
+            <dd><span data-price-service="driving_ground">40 ₾</span><span class="prices__unit">за занятие</span></dd>
           </div>
           <div class="prices__row">
             <dt>
               Город
               <span class="prices__note">реальные маршруты Тбилиси с инструктором</span>
             </dt>
-            <dd>50 ₾<span class="prices__unit">за занятие</span></dd>
+            <dd><span data-price-service="driving_city">50 ₾</span><span class="prices__unit">за занятие</span></dd>
           </div>
         </dl>
       </article>
@@ -548,14 +549,14 @@
           </div>
           <div class="prices__row">
             <dt>Медицинская справка</dt>
-            <dd>45 ₾</dd>
+            <dd data-price-service="medical_certificate">45 ₾</dd>
           </div>
           <div class="prices__row">
             <dt>
               Справка об обучении
               <span class="prices__note">нужна ученикам, которые выходят на экзамен в 17 лет</span>
             </dt>
-            <dd>50 ₾</dd>
+            <dd data-price-service="training_certificate">50 ₾</dd>
           </div>
         </dl>
       </article>
@@ -567,12 +568,12 @@
       <h3 class="prices__group-title">Государственные пошлины</h3>
       <p class="prices__fees-lede">Платятся государству при записи на экзамен, не автошколе.</p>
       <ul class="prices__fees-list">
-        <li><b>55 ₾</b> — экзамен по теории, первая попытка (в цену входит изготовление удостоверения)</li>
-        <li><b>40 ₾</b> — каждая пересдача теории</li>
-        <li><b>90 ₾</b> — экзамен по вождению в городе</li>
-        <li><b>40 ₾</b> — пересдача площадки, начиная со второй попытки</li>
-        <li><b>250 ₾</b> — если не хотите ждать очереди и нужна ближайшая дата</li>
-        <li><b>109 ₾</b> — международное водительское удостоверение, по желанию (действует 3 года)</li>
+        <li><b data-price-service="state_theory_first">55 ₾</b> — экзамен по теории, первая попытка (в цену входит изготовление удостоверения)</li>
+        <li><b data-price-service="state_theory_retry">40 ₾</b> — каждая пересдача теории</li>
+        <li><b data-price-service="state_city_exam">90 ₾</b> — экзамен по вождению в городе</li>
+        <li><b data-price-service="state_ground_retry">40 ₾</b> — пересдача площадки, начиная со второй попытки</li>
+        <li><b data-price-service="state_priority_exam">250 ₾</b> — если не хотите ждать очереди и нужна ближайшая дата</li>
+        <li><b data-price-service="international_license">109 ₾</b> — международное водительское удостоверение, по желанию (действует 3 года)</li>
       </ul>
     </div>
 
@@ -726,5 +727,6 @@
 
   <script src="js/analytics.js?v=25" defer></script>
   <script src="js/main.js?v=28" defer></script>
+  <script type="module" src="js/chat.js?v=1" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
 </body>
 </html>
