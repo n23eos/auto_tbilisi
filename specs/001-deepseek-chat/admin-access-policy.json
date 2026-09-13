@@ -1,0 +1,11 @@
+{
+  "name": "School pricing and intake administrators",
+  "decision": "allow",
+  "include": [
+    {"email": {"email": "mns.nicholas@gmail.com"}},
+    {"email": {"email": "nomadarkon@gmail.com"}},
+    {"email": {"email": "autoshkola.ge@gmail.com"}}
+  ],
+  "exclude": [],
+  "require": []
+}
