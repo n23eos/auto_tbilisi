@@ -9,10 +9,38 @@ import re
 STOP = set('и в во на по о об от до с со к как что это ли я вы мы мне у для или а не за'.split())
 ALIASES = {'дистанционно': 'онлайн', 'удаленно': 'онлайн', 'стоимость': 'цена',
            'стоит': 'цена', 'оплачивать': 'платить', 'предоплату': 'предоплата',
-           'новичок': 'нуля', 'новичкам': 'нуля', 'адрес': 'находитесь'}
+           'новичок': 'нуля', 'новичкам': 'нуля', 'адрес': 'находитесь',
+           'заявка': 'контакты', 'заявку': 'контакты', 'заявки': 'контакты'}
 EXCLUDED = {'Цены школы', 'Теория', 'Вождение', 'Дополнительно', 'Государственные пошлины',
             'Когда стартует ближайшая группа?', 'Сколько билетов в базе?',
             'Кто преподаёт теорию?', 'Ограничения для 17-летних водителей', 'Страницы сайта'}
+SERVICE_BLOCK = re.compile(
+    r'^(?:ВНИМАНИЕ:\s*Расхождение|'
+    r'ОГРАНИЧЕНИЯ ДЛЯ|'
+    r'В разговоре с клиентом|'
+    r'Бот(?:\s|у\b))|'
+    r'при фактчекинге|'
+    r'аудиоответе школы|'
+    r'правильный ответ',
+    re.I,
+)
+
+
+def customer_text(body):
+    # Два смешанных абзаца содержат полезный факт внутри директивы боту.
+    body = body.replace(
+        'Точную сумму бот не называет: она ',
+        'Точная сумма ',
+    ).replace(
+        'Правильный ответ — предложить бесплатный расчёт по телефону или заявку на звонок.',
+        'Можно получить бесплатный расчёт по телефону или оставить заявку на звонок.',
+    ).replace(
+        'Бот срок не называет — предлагает уточнить при получении справки.',
+        'Точный срок действия лучше уточнить при получении справки.',
+    )
+    paragraphs = [paragraph.strip() for paragraph in re.split(r'\n\s*\n', body)]
+    return '\n\n'.join(paragraph for paragraph in paragraphs
+                         if paragraph and not SERVICE_BLOCK.search(paragraph))
 
 
 def tokens(text):
@@ -48,6 +76,9 @@ class Knowledge:
                 if re.search(r'боту не выдавать|непроверенн|опровергнут', body, re.I):
                     continue
                 body = re.sub(r'(?m)^\*?Похожие формулировки:.*$', '', body).strip()
+                body = customer_text(body)
+                if not body:
+                    continue
                 # Не обрезаем длинный раздел: так можно потерять исключение в конце.
                 if len(body) > 3500:
                     raise ValueError(f'Раздел требует смыслового разбиения: {path.name}: {title}')
@@ -62,10 +93,15 @@ class Knowledge:
                       for key, chunk in self.chunks.items()}
         self.title_index = {key: set(tokens(chunk.title)) for key, chunk in self.chunks.items()}
 
-    def search(self, query, *, limit=4, max_chars=6000):
+    def search(self, query, *, current_question=None, limit=4, max_chars=6000):
         if not isinstance(query, str) or not 1 <= len(query.strip()) <= 500:
             raise ValueError('invalid_query')
         terms = set(tokens(query))
+        if current_question is not None:
+            if not isinstance(current_question, str) or not 1 <= len(current_question.strip()) <= 2000:
+                raise ValueError('invalid_current_question')
+            # Переформулировка модели не должна вытеснять точный вопрос из FAQ.
+            terms.update(tokens(current_question))
         ranking = []
         for key, words in self.index.items():
             score = 0

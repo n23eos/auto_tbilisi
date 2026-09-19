@@ -32,6 +32,10 @@ def answer(**kwargs):
     return {'content': json.dumps({'action': 'answer', 'excerpt_ids': [], 'prices': [], 'groups': [], **kwargs})}
 
 
+def approved():
+    return {'content': json.dumps({'verdict': 'accept', 'reason': 'ok', 'scope': 'school'})}
+
+
 def test_search_online_and_no_prices():
     kb = Knowledge(KB)
     result = kb.search('Можно ли заниматься дистанционно?')
@@ -50,7 +54,7 @@ def test_knowledge_unknown():
 def test_grounded_answer(tmp_path):
     kb = Knowledge(KB)
     selected = kb.search('Можно ли заниматься онлайн?')['chunks'][0]
-    model = Fake([call('search_knowledge_base', {'query': 'Можно ли заниматься онлайн?'}), answer(excerpt_ids=[selected['id']])])
+    model = Fake([call('search_knowledge_base', {'query': 'Можно ли заниматься онлайн?'}), answer(excerpt_ids=[selected['id']]), approved()])
     result = Harness(model, Catalog(tmp_path/'facts'), kb).run('Можно ли заниматься онлайн?')
     assert result['status'] == 'success'
     assert result['answer'] == selected['text']
@@ -70,7 +74,7 @@ def test_multiple_excerpts_are_rejected(tmp_path):
     found = kb.search('онлайн')['chunks'][:2]
     model = Fake([call('search_knowledge_base', {'query': 'онлайн'}),
                   answer(excerpt_ids=[row['id'] for row in found]),
-                  answer(excerpt_ids=[found[0]['id']])])
+                  answer(excerpt_ids=[found[0]['id']]), approved()])
     result = Harness(model, Catalog(tmp_path/'facts'), kb).run('Можно ли онлайн?')
     assert result['status'] == 'success'
     assert result['answer'] == found[0]['text']
@@ -88,7 +92,7 @@ def test_price_correction(tmp_path):
     catalog.save_price(Price('theory_group', 'Группа', 15000, 'GEL', 'course', 'fixture', '2026-01-01', '2099-01-01'), expected_revision=0, actor='fixture')
     bad = {'service_id': 'theory_group', 'amount_minor': 20000, 'currency': 'GEL', 'unit': 'course'}
     model = Fake([call('get_school_info', {'service_id': 'theory_group'}), answer(prices=[bad]),
-                  answer(prices=[{**bad, 'amount_minor': 15000}])])
+                  answer(prices=[{**bad, 'amount_minor': 15000}]), approved()])
     result = Harness(model, catalog, Knowledge(KB)).run('Цена группы?')
     assert '150' in result['answer'] and '200' not in result['answer']
     assert [v['result'] for v in result['trace']['validation']] == ['FAIL', 'PASS']
@@ -149,7 +153,7 @@ def test_price_changed_while_model_was_answering(tmp_path):
             return super().complete(*args, **kwargs)
     model = ChangingModel([call('get_school_info', {'service_id': 'theory_group'}),
         answer(prices=[old]), call('get_school_info', {'service_id': 'theory_group'}),
-        answer(prices=[{**old, 'amount_minor': 17000}])])
+        answer(prices=[{**old, 'amount_minor': 17000}]), approved()])
     result = Harness(model, catalog, Knowledge(KB)).run('Цена группы?')
     assert result['status'] == 'success'
     assert '170' in result['answer'] and '150' not in result['answer']
