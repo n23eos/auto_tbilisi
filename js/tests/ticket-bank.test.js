@@ -14,7 +14,8 @@ const translations = Object.assign({}, ...[
 test("весь раздел эко-вождения доступен на русском без изменения правильных ответов", () => {
   const tickets = applyRussianTranslations(bank.tickets, translations);
   assert.equal(Object.keys(translations).length, 51);
-  assert.equal(tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn).length, 898);
+  assert.equal(tickets.filter((ticket) => ticket.lang === "ru").length, 921);
+  assert.equal(tickets.filter((ticket) => ticket.withdrawn).length, 23);
   for (const source of bank.tickets.filter((ticket) => ticket.lang === "ka")) {
     const translated = tickets.find((ticket) => ticket.id === source.id);
     assert.equal(translated.lang, "ru", `билет ${source.id}`);

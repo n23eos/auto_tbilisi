@@ -14,8 +14,8 @@ import {
   nextUnansweredIndex,
   recordExamAnswer,
   selectExamTickets,
-} from "./exam-logic.js?v=2";
-import { markAnswer, readProgress, writeProgress } from "./training-logic.js?v=2";
+} from "./exam-logic.js?v=3";
+import { markAnswer, readProgress, writeProgress } from "./training-logic.js?v=3";
 import { markAnswerButtons } from "./answer-marking.js";
 import { learningNextStep } from "./learning-next-step.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
@@ -402,10 +402,12 @@ el("btn-restart").addEventListener("click", start);
   startButton.disabled = true;
   try {
     state.pool = await loadTickets();
-    // Тот же отбор, что и в selectExamTickets: изъятые билеты в экзамен не попадают,
-    // поэтому и в счётчике их быть не должно — иначе обещаем больше, чем показываем.
-    const ready = state.pool.filter((t) => t.lang === "ru" && !t.withdrawn).length;
-    status.textContent = `Готово: ${ready} билетов на русском`;
+    // Счётчик использует тот же языковой отбор, что и экзамен.
+    const ready = state.pool.filter((t) => t.lang === "ru").length;
+    const word = ready % 100 >= 11 && ready % 100 <= 14
+      ? "вопросов"
+      : ready % 10 === 1 ? "вопрос" : ready % 10 >= 2 && ready % 10 <= 4 ? "вопроса" : "вопросов";
+    status.textContent = `Готово: ${ready} ${word} на русском`;
     startButton.disabled = false;
   } catch (error) {
     status.textContent = `Не удалось загрузить билеты: ${error.message}. Обновите страницу.`;

@@ -11,10 +11,10 @@ const tickets = [
 ];
 const ids = (options, p = progress) => selectTrainingTickets(tickets, p, options).map(t => t.id);
 
-test("поиск номера точный, поддерживает # и не показывает скрытые вопросы", () => {
+test("поиск номера точный, поддерживает # и включает спорные вопросы", () => {
   assert.deepEqual(ids({ query: "1" }), [1]);
   assert.deepEqual(ids({ query: " #10 " }), [10]);
-  assert.deepEqual(ids({ query: "11" }), []);
+  assert.deepEqual(ids({ query: "11" }), [11]);
   assert.deepEqual(ids({ query: "12" }), []);
 });
 

@@ -47,13 +47,11 @@ test("при нехватке русских билетов выборка па�
   assert.throws(() => selectExamTickets(pool), /русских билетов 5/);
 });
 
-test("изъятые билеты в экзамен не попадают", () => {
-  const pool = [
-    ...makeTickets(40, "ru"),
-    ...makeTickets(40, "ru").map((t) => ({ ...t, id: t.id + 100, withdrawn: true })),
-  ];
+test("билеты с пометкой withdrawn доступны в экзамене", () => {
+  const pool = makeTickets(30, "ru").map((ticket) => ({ ...ticket, withdrawn: true }));
   const picked = selectExamTickets(pool);
-  assert.ok(picked.every((t) => !t.withdrawn));
+  assert.equal(picked.length, 30);
+  assert.ok(picked.every((ticket) => ticket.withdrawn));
 });
 
 test("проверка ответа сравнивает индекс с полем correct", () => {

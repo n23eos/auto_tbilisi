@@ -10,7 +10,7 @@ import {
   selectTrainingTickets,
   toggleFavorite,
   writeProgress,
-} from "./training-logic.js?v=2";
+} from "./training-logic.js?v=3";
 import { markAnswerButtons } from "./answer-marking.js";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 
@@ -327,7 +327,7 @@ function populateTopics(topics) {
   const selected = state.topicId;
   select.textContent = "";
   select.append(new Option("Все темы", ""));
-  const activeIds = new Set(state.all.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn).map((ticket) => ticket.id));
+  const activeIds = new Set(state.all.filter((ticket) => ticket.lang === "ru").map((ticket) => ticket.id));
   const solvedIds = new Set((state.progress.solved || []).filter((id) => activeIds.has(id)));
   topics.forEach((topic) => {
     const availableIds = topic.ticket_ids.filter((id) => activeIds.has(id));

@@ -140,13 +140,13 @@ test("сессия на сегодня ограничена двадцатью �
   assert.equal(list.length, 20);
 });
 
-test("сводка считает только действующие русские билеты", () => {
+test("сводка считает все русские билеты, включая спорные", () => {
   const pool = [...tickets, { id: 4, lang: "ru", withdrawn: true }];
   const summary = progressSummary(pool, {
     solved: [1, 4, 9], mistakes: [2, 4], position: 0,
     reviews: { 1: { nextReviewAt: 50 }, 2: { nextReviewAt: 200 } },
   }, 100);
-  assert.deepEqual(summary, { total: 3, solved: 1, due: 2, remaining: 2, mistakes: 1 });
+  assert.deepEqual(summary, { total: 4, solved: 2, due: 3, remaining: 2, mistakes: 2 });
 });
 
 test("фильтр «все» отдаёт только русские билеты", () => {
@@ -171,14 +171,14 @@ test("грузинские билеты не попадают ни в один �
   }
 });
 
-test("изъятые билеты не попадают ни в один фильтр", () => {
+test("билеты с пометкой withdrawn остаются доступны в тренировке", () => {
   const pool = [
     { id: 1, lang: "ru" },
     { id: 2, lang: "ru", withdrawn: true },
   ];
-  for (const filter of Object.values(FILTERS)) {
-    const list = filterTickets(pool, { solved: [2], mistakes: [2], position: 0 }, filter);
-    assert.ok(list.every((t) => !t.withdrawn));
+  const progress = { solved: [], mistakes: [2], favorites: [2], reviews: {}, position: 0 };
+  for (const filter of [FILTERS.ALL, FILTERS.UNSOLVED, FILTERS.MISTAKES, FILTERS.FAVORITES, FILTERS.TODAY]) {
+    assert.ok(filterTickets(pool, progress, filter).some((ticket) => ticket.id === 2), filter);
   }
 });
 

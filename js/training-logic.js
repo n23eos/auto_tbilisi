@@ -98,7 +98,7 @@ export function markAnswer(progress, ticketId, wasCorrect, now = Date.now()) {
 }
 
 function activeTickets(tickets) {
-  return tickets.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn);
+  return tickets.filter((ticket) => ticket.lang === "ru");
 }
 
 function dueTickets(tickets, progress, now) {
@@ -134,7 +134,7 @@ export function progressSummary(tickets, progress, now = Date.now()) {
 }
 
 export function filterTickets(tickets, progress, filter, now = Date.now()) {
-  // Изъятые из официального банка вопросы ученику показывать незачем.
+  // Пометки спорных вопросов не определяют состав каталога для тренировки.
   const ru = activeTickets(tickets);
   if (filter === FILTERS.TODAY) {
     return buildDailySession(ru, progress, now);
