@@ -143,8 +143,9 @@
 .partners { padding-block: 1.75rem; gap: 1rem; }
 .partners__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.5rem; }
 .partners__heading h2 { margin: 0; font-size: clamp(1.1rem, 2vw, 1.5rem); }
-.partners__track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.partners__track { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
 .partners__track .partner-banner {
+  opacity: 0.85;
   grid-template-columns: minmax(0, 1fr) 8rem;
   --ticket-seam: calc(100% - 8rem);
   border-radius: 12px;
@@ -197,8 +198,8 @@
   position: relative;
   z-index: var(--z-raised);
   width: 100%;
-  max-width: 64rem;
-  margin: 0 auto auto;
+  max-width: 32rem;
+  margin: 0 auto auto 0;
   padding: 0;
   background: transparent;
   gap: 0.5rem;
