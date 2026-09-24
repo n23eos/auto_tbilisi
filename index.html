@@ -29,7 +29,7 @@
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
   <link rel="stylesheet" href="css/style.css?v=28">
-  <link rel="stylesheet" href="css/partner.css?v=1">
+  <link rel="stylesheet" href="css/partner.css?v=2">
   <link rel="stylesheet" href="css/chat.css?v=3">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
@@ -336,16 +336,17 @@
     <div class="marquee__scrim" aria-hidden="true"></div>
 
     <aside class="partner-banner" aria-label="Партнёрское предложение Holafly">
-      <p class="partner-banner__brand">Holafly</p>
+      <div class="partner-banner__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><rect x="12" y="5" width="24" height="38" rx="6" stroke="currentColor" stroke-width="2"/><path d="M20 10h8M21 37h6M17 22a10 10 0 0 1 14 0m-11 4a6 6 0 0 1 8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="30" r="1.5" fill="currentColor"/></svg>
+      </div>
       <div class="partner-banner__copy">
-        <p class="partner-banner__message">
-          <strong>За границу на машине?</strong>
-          <span>Интернет для карт и связи в поездке. eSIM Holafly.</span>
-        </p>
-        <div class="partner-banner__meta">
-          <p class="partner-banner__offer">Скидка 5% по коду <strong>HOLAAVTO</strong> на eSIM для поездок.</p>
-          <p class="partner-banner__disclosure">Партнёрская ссылка: получаем комиссию с покупок.</p>
-        </div>
+        <p class="partner-banner__brand">Holafly <span>· eSIM для путешествий</span></p>
+        <p class="partner-banner__title">За границу на машине?</p>
+        <p class="partner-banner__description">Карты, маршруты и близкие на связи.</p>
+      </div>
+      <div class="partner-banner__deal">
+        <span class="partner-banner__discount">−5%</span>
+        <span class="partner-banner__code">по коду <strong>HOLAAVTO</strong></span>
       </div>
       <a class="partner-banner__cta"
          href="https://holafly.sjv.io/c/7837896/2006335/24764?subId1=avtoshkola&amp;subId2=home-banner"
@@ -353,6 +354,7 @@
          target="_blank"
          data-affiliate="holafly"
          data-placement="home_banner">Выбрать eSIM <span aria-hidden="true">↗</span></a>
+      <p class="partner-banner__disclosure">Партнёрская ссылка · получаем комиссию</p>
     </aside>
 
     <div class="marquee__content">
