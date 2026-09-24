@@ -1,18 +1,21 @@
-// Интерфейс тренировки. Правила и прогресс — в training-logic.js.
+// Интерфейс тренировки. Правила и прогресс - в training-logic.js.
 
 import {
   FILTERS,
   clampPosition,
-  filterTickets,
   markAnswer,
   movePosition,
   progressSummary,
   readProgress,
+  selectTrainingTickets,
+  toggleFavorite,
   writeProgress,
-} from "./training-logic.js";
+} from "./training-logic.js?v=2";
 import { markAnswerButtons } from "./answer-marking.js";
+import { loadTicketBank } from "./ticket-bank.js?v=1";
 
-const DATA_URL = "../../data/tickets-b-ru.json";
+const DATA_URL = "../../data/tickets-b-ru.json?v=2";
+const TOPICS_URL = "../../data/ticket-topics.json";
 const IMAGES_BASE = "../../data/";
 
 const el = (id) => document.getElementById(id);
@@ -20,16 +23,23 @@ const el = (id) => document.getElementById(id);
 const state = {
   all: [],
   list: [],
-  progress: { solved: [], mistakes: [], position: 0, reviews: {} },
+  topics: [],
+  progress: { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] },
   filter: FILTERS.TODAY,
+  query: "",
+  topicId: "",
+  limit: 20,
   answered: false,
+  completed: false,
+  storageAvailable: true,
 };
 
 const EMPTY_TEXT = {
   [FILTERS.TODAY]: "На сегодня всё готово. Возвращайтесь завтра или выберите другой режим.",
-  [FILTERS.ALL]: "Билеты не загрузились.",
-  [FILTERS.UNSOLVED]: "Нерешённых билетов не осталось — вы прошли все.",
+  [FILTERS.ALL]: "Доступных билетов нет.",
+  [FILTERS.UNSOLVED]: "Нерешённых билетов не осталось. Вы прошли все доступные вопросы.",
   [FILTERS.MISTAKES]: "Ошибок пока нет. Они появятся здесь после экзамена или тренировки.",
+  [FILTERS.FAVORITES]: "В избранном пока ничего нет. Добавьте билет кнопкой со звездой.",
 };
 
 function ticketWord(count) {
@@ -42,57 +52,137 @@ function ticketWord(count) {
 }
 
 function store() {
-  // localStorage может быть запрещён — тогда работаем без запоминания.
+  // localStorage может быть запрещён - тогда работаем без запоминания.
   try {
     return window.localStorage;
   } catch {
-    return { getItem: () => null, setItem: () => {} };
+    state.storageAvailable = false;
+    return { getItem: () => null, setItem: () => { throw new Error("хранилище недоступно"); } };
   }
 }
 
 function save() {
-  writeProgress(store(), state.progress);
+  if (!writeProgress(store(), state.progress)) state.storageAvailable = false;
+  el("t-storage-status").hidden = state.storageAvailable;
+}
+
+function selectionOptions() {
+  return {
+    filter: state.filter,
+    query: state.query,
+    topicId: state.topicId,
+    topics: state.topics,
+    limit: state.limit,
+  };
 }
 
 function renderCounters() {
-  // Тот же отбор, что и в filterTickets: изъятые билеты ученику не показываются,
-  // и в знаменателе прогресса их быть не должно — иначе шкала никогда не дойдёт до 100 %.
-  const ru = state.all.filter((t) => t.lang === "ru" && !t.withdrawn);
-  const solved = state.progress.solved.length;
+  const summary = progressSummary(state.all, state.progress);
   el("t-total").textContent = String(state.list.length);
-  el("t-index").textContent = String(state.list.length ? state.progress.position + 1 : 0);
-  el("t-solved").textContent = String(solved);
-  el("t-pool").textContent = String(ru.length);
-  el("t-progress").style.width = ru.length ? `${(solved / ru.length) * 100}%` : "0";
+  el("t-index").textContent = String(state.list.length && !state.completed ? state.progress.position + 1 : 0);
+  el("t-solved").textContent = String(summary.solved);
+  el("t-pool").textContent = String(summary.total);
+  el("t-available-count").textContent = String(summary.total);
+  el("t-progress").style.width = summary.total ? `${(summary.solved / summary.total) * 100}%` : "0";
 }
 
 function renderDashboard() {
   const summary = progressSummary(state.all, state.progress);
+  const today = selectTrainingTickets(state.all, state.progress, {
+    ...selectionOptions(),
+    filter: FILTERS.TODAY,
+  });
   el("t-stat-solved").textContent = String(summary.solved);
   el("t-stat-due").textContent = String(summary.due);
   el("t-stat-remaining").textContent = String(summary.remaining);
 
-  if (summary.due > 0) {
+  if (state.query || state.topicId) {
+    el("t-plan-note").textContent = today.length
+      ? `В выбранной подборке на сегодня: ${today.length} ${ticketWord(today.length)}.`
+      : "В выбранной подборке на сегодня нет вопросов.";
+  } else if (summary.due > 0) {
     el("t-plan-note").textContent = `Сначала повторите ${summary.due} ${ticketWord(summary.due)}, затем переходите к новым.`;
   } else if (summary.remaining > 0) {
-    el("t-plan-note").textContent = "Повторений пока нет — начните с короткой подборки новых билетов.";
+    el("t-plan-note").textContent = "Повторений пока нет. Начните с короткой подборки новых билетов.";
   } else {
-    el("t-plan-note").textContent = "Все билеты решены, и срочных повторений нет. Можно пройти пробный экзамен.";
+    el("t-plan-note").textContent = "Все доступные билеты решены, срочных повторений нет.";
   }
-  el("t-start-today").disabled = summary.due === 0 && summary.remaining === 0;
+  el("t-start-today").textContent = today.length
+    ? `Начать ${today.length} ${ticketWord(today.length)}`
+    : "Нет вопросов на сегодня";
+  el("t-start-today").disabled = today.length === 0;
   el("t-dashboard").hidden = false;
 }
 
-function renderCard() {
-  const ticket = state.list[state.progress.position];
+function renderFilterState() {
+  document.querySelectorAll(".exam__filter").forEach((button) => {
+    const isActive = button.dataset.filter === state.filter;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  el("t-clear-filters").hidden = !state.query && !state.topicId;
+}
+
+function renderEmpty() {
+  const empty = el("t-empty");
+  const action = el("t-empty-action");
+  empty.hidden = false;
+
+  if (state.completed) {
+    el("t-empty-text").textContent = state.storageAvailable
+      ? "Сессия завершена. Ответы сохранены в вашем прогрессе."
+      : "Сессия завершена. Ответы останутся только до закрытия страницы.";
+    action.textContent = "Пройти эту подборку ещё раз";
+    action.hidden = false;
+    return;
+  }
+
+  if (state.query || state.topicId) {
+    el("t-empty-text").textContent = "По выбранным условиям билетов не найдено. Попробуйте другой запрос или сбросьте поиск и тему.";
+    action.textContent = "Сбросить поиск и тему";
+    action.hidden = false;
+    return;
+  }
+
+  el("t-empty-text").textContent = EMPTY_TEXT[state.filter] || EMPTY_TEXT[FILTERS.ALL];
+  action.hidden = true;
+}
+
+function ticketPermalink(ticketId) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("ticket", String(ticketId));
+  return url.href;
+}
+
+function helpLink(ticketId) {
+  const url = new URL("../../", window.location.href);
+  url.searchParams.set("from", "training");
+  url.searchParams.set("goal", "theory");
+  url.searchParams.set("ticket", String(ticketId));
+  url.hash = "callback-form";
+  return url.href;
+}
+
+function renderFavoriteButton(ticketId) {
+  const isFavorite = (state.progress.favorites || []).includes(ticketId);
+  const favorite = el("t-favorite");
+  favorite.textContent = isFavorite ? "★ В избранном" : "☆ В избранное";
+  favorite.setAttribute("aria-pressed", String(isFavorite));
+}
+
+function renderCard({ focusQuestion = false } = {}) {
+  const ticket = state.completed ? null : state.list[state.progress.position];
   state.answered = false;
 
   el("t-empty").hidden = Boolean(ticket);
   el("t-card").hidden = !ticket;
+  el("t-help").hidden = !ticket;
   renderCounters();
 
   if (!ticket) {
-    el("t-empty").textContent = EMPTY_TEXT[state.filter];
+    renderEmpty();
     return;
   }
 
@@ -101,14 +191,20 @@ function renderCard() {
 
   const figure = el("t-figure");
   if (ticket.image) {
-    el("t-image").src = IMAGES_BASE + ticket.image;
+    const imageUrl = IMAGES_BASE + ticket.image;
+    el("t-image").src = imageUrl;
+    el("t-image-large").src = imageUrl;
     figure.hidden = false;
   } else {
     el("t-image").removeAttribute("src");
+    el("t-image-large").removeAttribute("src");
     figure.hidden = true;
   }
 
   el("t-source-id").textContent = String(ticket.id);
+  el("t-help-id").textContent = String(ticket.id);
+  el("t-permalink").href = ticketPermalink(ticket.id);
+  el("t-help-link").href = helpLink(ticket.id);
   const sourceLink = el("t-source-link");
   try {
     const source = new URL(ticket.source);
@@ -119,6 +215,8 @@ function renderCard() {
     sourceLink.removeAttribute("href");
     sourceLink.hidden = true;
   }
+
+  renderFavoriteButton(ticket.id);
 
   const list = el("t-answers");
   list.textContent = "";
@@ -146,9 +244,13 @@ function renderCard() {
   feedback.textContent = "";
   feedback.className = "exam__feedback";
 
+  const atEnd = state.progress.position >= state.list.length - 1;
   el("t-prev").disabled = state.progress.position === 0;
-  el("t-next").disabled = state.progress.position >= state.list.length - 1;
-  question.focus();
+  el("t-next").disabled = false;
+  el("t-next").textContent = atEnd
+    ? (state.filter === FILTERS.TODAY ? "Завершить сессию" : "Завершить просмотр")
+    : "Дальше →";
+  if (focusQuestion) question.focus();
 }
 
 function answer(index) {
@@ -169,40 +271,87 @@ function answer(index) {
   save();
   renderCounters();
   renderDashboard();
+  if (state.topics.length) populateTopics(state.topics);
   if (typeof window.gtag === "function") {
     window.gtag("event", "training_answer", { correct, mode: state.filter });
   }
 }
 
+function finishSession() {
+  state.completed = true;
+  renderCard();
+}
+
 function go(delta) {
+  const atEnd = state.progress.position >= state.list.length - 1;
+  if (delta > 0 && atEnd) {
+    finishSession();
+    return;
+  }
   state.progress = {
     ...state.progress,
     position: movePosition(state.progress.position, delta, state.list.length),
   };
   save();
-  renderCard();
+  renderCard({ focusQuestion: true });
+}
+
+function applySelection({ resetPosition = true, focusQuestion = false } = {}) {
+  state.list = selectTrainingTickets(state.all, state.progress, selectionOptions());
+  state.completed = false;
+  state.progress = {
+    ...state.progress,
+    position: resetPosition ? 0 : clampPosition(state.progress.position, state.list.length),
+  };
+  renderFilterState();
+  renderDashboard();
+  save();
+  renderCard({ focusQuestion });
 }
 
 function applyFilter(filter) {
   state.filter = filter;
-  state.list = filterTickets(state.all, state.progress, filter);
-  // Позиция запоминается только для полного списка: в отфильтрованных
-  // наборах старый номер указывал бы на другой билет.
-  state.progress = {
-    ...state.progress,
-    position: filter === FILTERS.ALL ? clampPosition(state.progress.position, state.list.length) : 0,
-  };
+  applySelection();
+}
 
-  document.querySelectorAll(".exam__filter").forEach((button) => {
-    const isActive = button.dataset.filter === filter;
-    button.classList.toggle("is-active", isActive);
-    // Выбранный фильтр отличался только цветом фона — в дереве доступности
-    // все три кнопки выглядели одинаково нажатыми.
-    button.setAttribute("aria-pressed", String(isActive));
+function clearSearchAndTopic() {
+  state.query = "";
+  state.topicId = "";
+  el("t-search").value = "";
+  el("t-topic").value = "";
+  applySelection();
+}
+
+function populateTopics(topics) {
+  const select = el("t-topic");
+  const selected = state.topicId;
+  select.textContent = "";
+  select.append(new Option("Все темы", ""));
+  const activeIds = new Set(state.all.filter((ticket) => ticket.lang === "ru" && !ticket.withdrawn).map((ticket) => ticket.id));
+  const solvedIds = new Set((state.progress.solved || []).filter((id) => activeIds.has(id)));
+  topics.forEach((topic) => {
+    const availableIds = topic.ticket_ids.filter((id) => activeIds.has(id));
+    const count = availableIds.length;
+    const solved = availableIds.filter((id) => solvedIds.has(id)).length;
+    const option = document.createElement("option");
+    option.value = String(topic.id);
+    option.textContent = count
+      ? `${topic.name} - решено ${solved} из ${count}`
+      : `${topic.name} - нет доступных вопросов на русском`;
+    option.disabled = count === 0;
+    select.append(option);
   });
+  select.value = selected;
+  select.disabled = false;
+  el("t-topic-field").hidden = false;
+  el("t-topics-status").hidden = true;
+}
 
-  save();
-  renderCard();
+function topicsUnavailable() {
+  el("t-topic").disabled = true;
+  el("t-topic-field").hidden = true;
+  el("t-topics-status").textContent = "Темы сейчас недоступны. Остальные режимы продолжают работать.";
+  el("t-topics-status").hidden = false;
 }
 
 document.querySelectorAll(".exam__filter").forEach((button) => {
@@ -213,6 +362,35 @@ document.querySelectorAll(".exam__filter").forEach((button) => {
       window.gtag("event", "training_mode_select", { mode: filter });
     }
   });
+});
+
+el("t-search-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  state.query = el("t-search").value.trim();
+  applySelection();
+});
+
+el("t-topic").addEventListener("change", () => {
+  state.topicId = el("t-topic").value;
+  applySelection();
+});
+
+el("t-limit").addEventListener("change", () => {
+  state.limit = Number(el("t-limit").value) === 10 ? 10 : 20;
+  renderDashboard();
+  if (state.filter === FILTERS.TODAY) applySelection();
+});
+
+el("t-clear-filters").addEventListener("click", clearSearchAndTopic);
+el("t-empty-action").addEventListener("click", () => {
+  if (state.completed) {
+    state.completed = false;
+    state.progress = { ...state.progress, position: 0 };
+    save();
+    renderCard({ focusQuestion: true });
+  } else {
+    clearSearchAndTopic();
+  }
 });
 
 el("t-start-today").addEventListener("click", () => {
@@ -229,38 +407,108 @@ el("t-start-today").addEventListener("click", () => {
 el("t-prev").addEventListener("click", () => go(-1));
 el("t-next").addEventListener("click", () => go(1));
 
-el("t-reset").addEventListener("click", () => {
-  if (!window.confirm("Стереть весь прогресс тренировки? Отменить это будет нельзя.")) return;
-  state.progress = { solved: [], mistakes: [], position: 0, reviews: {} };
+el("t-favorite").addEventListener("click", () => {
+  const ticket = state.list[state.progress.position];
+  if (!ticket) return;
+  state.progress = toggleFavorite(state.progress, ticket.id);
   save();
-  applyFilter(state.filter);
+  // Подборка остаётся стабильной до следующего выбора режима:
+  // снятие звезды не должно прятать ответ и менять текущий вопрос.
+  renderFavoriteButton(ticket.id);
+});
+
+const imageDialog = el("t-image-dialog");
+let imageTrigger = null;
+
+function openImageDialog() {
+  imageTrigger = el("t-image-open");
+  if (typeof imageDialog.showModal === "function") imageDialog.showModal();
+  else imageDialog.setAttribute("open", "");
+  el("t-image-close").focus();
+}
+
+function closeImageDialog() {
+  if (typeof imageDialog.close === "function" && imageDialog.open) imageDialog.close();
+  else imageDialog.removeAttribute("open");
+}
+
+el("t-image-open").addEventListener("click", openImageDialog);
+el("t-image-close").addEventListener("click", closeImageDialog);
+imageDialog.addEventListener("click", (event) => {
+  if (event.target === imageDialog) closeImageDialog();
+});
+imageDialog.addEventListener("close", () => {
+  imageTrigger?.focus();
+  imageTrigger = null;
+});
+imageDialog.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && typeof imageDialog.close !== "function") {
+    event.preventDefault();
+    closeImageDialog();
+    imageTrigger?.focus();
+    imageTrigger = null;
+  }
+});
+
+el("t-reset").addEventListener("click", () => {
+  if (!window.confirm("Стереть весь прогресс тренировки, включая избранное? Отменить это будет нельзя.")) return;
+  state.progress = { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] };
+  save();
+  renderDashboard();
+  if (state.topics.length) populateTopics(state.topics);
+  applySelection();
 });
 
 document.addEventListener("keydown", (event) => {
-  if (el("t-card").hidden) return;
+  if (el("t-card").hidden || imageDialog.open || event.defaultPrevented || event.repeat) return;
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.target instanceof Element && event.target.closest("form, input, select, textarea, button, a, [contenteditable='true']")) return;
+
   if (event.key >= "1" && event.key <= "4") {
     const button = el("t-answers").querySelector(`[data-index="${Number(event.key) - 1}"]`);
     if (button && !button.disabled) button.click();
   }
-  // preventDefault обязателен: без него стрелка и листает билет, и прокручивает
-  // страницу — ученик уезжает к другому вопросу и вниз одновременно.
+  // Без preventDefault стрелка одновременно меняет билет и прокручивает страницу.
   if (event.key === "ArrowRight") { event.preventDefault(); go(1); }
   if (event.key === "ArrowLeft") { event.preventDefault(); go(-1); }
 });
 
+async function loadTopics() {
+  try {
+    const response = await fetch(TOPICS_URL);
+    if (!response.ok) throw new Error(`код ${response.status}`);
+    const data = await response.json();
+    if (!Array.isArray(data.topics) || data.topics.some((topic) => !Array.isArray(topic.ticket_ids))) {
+      throw new Error("неверный формат");
+    }
+    state.topics = data.topics;
+    populateTopics(state.topics);
+  } catch {
+    state.topics = [];
+    topicsUnavailable();
+  }
+}
+
 (async function init() {
   const status = el("t-status");
   try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) throw new Error(`код ${response.status}`);
-    const data = await response.json();
-    state.all = data.tickets;
+    state.all = await loadTicketBank(DATA_URL);
     state.progress = readProgress(store());
+
+    const requestedTicket = new URLSearchParams(window.location.search).get("ticket");
+    if (requestedTicket && /^\d+$/.test(requestedTicket)) {
+      state.filter = FILTERS.ALL;
+      state.query = requestedTicket;
+      el("t-search").value = requestedTicket;
+    }
+
     status.hidden = true;
     renderDashboard();
-    applyFilter(FILTERS.TODAY);
+    applySelection({ resetPosition: true, focusQuestion: false });
+    loadTopics();
   } catch (error) {
     status.textContent = `Не удалось загрузить билеты: ${error.message}. Обновите страницу.`;
     status.classList.add("exam__status--error");
+    topicsUnavailable();
   }
 })();

@@ -34,6 +34,58 @@ export function isCorrect(ticket, answerIndex) {
 }
 
 /**
+ * Ответы хранятся отдельно от DOM, чтобы переход между вопросами не стирал
+ * уже выбранный вариант и не позволял повторно засчитать тот же вопрос.
+ */
+export function createExamAnswers(count = QUESTION_COUNT) {
+  return Array.from({ length: count }, () => null);
+}
+
+export function recordExamAnswer(answers, questionIndex, chosen, correctIndex) {
+  if (!Number.isInteger(questionIndex) || questionIndex < 0 || questionIndex >= answers.length) {
+    throw new RangeError("вопрос вне экзамена");
+  }
+  if (answers[questionIndex] !== null) {
+    return { answers, recorded: false };
+  }
+
+  const nextAnswers = answers.slice();
+  nextAnswers[questionIndex] = {
+    chosen,
+    correct: chosen === correctIndex,
+  };
+  return { answers: nextAnswers, recorded: true };
+}
+
+export function examProgress(answers) {
+  return answers.reduce(
+    (progress, answer) => {
+      if (answer === null) return progress;
+      progress.answered += 1;
+      if (!answer.correct) progress.mistakes += 1;
+      return progress;
+    },
+    { answered: 0, mistakes: 0 }
+  );
+}
+
+/**
+ * Ищет следующий вопрос без ответа по кругу. Благодаря обходу по кругу
+ * пропущенный вопрос снова появится после остальных, а не потеряется.
+ */
+export function nextUnansweredIndex(answers, currentIndex) {
+  for (let offset = 1; offset <= answers.length; offset += 1) {
+    const index = (currentIndex + offset) % answers.length;
+    if (answers[index] === null) return index;
+  }
+  return -1;
+}
+
+export function isExamTerminal({ answered, mistakes }) {
+  return answered >= QUESTION_COUNT || mistakes > MAX_MISTAKES;
+}
+
+/**
  * Итог попытки. Правила: QUESTION_COUNT вопросов, не больше MAX_MISTAKES
  * ошибок, не уложился по времени — не сдал. Числа берём из констант выше,
  * а не из текста комментария: раньше здесь было зашито «максимум 3 ошибки»,

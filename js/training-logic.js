@@ -8,6 +8,7 @@ export const FILTERS = {
   ALL: "all",
   UNSOLVED: "unsolved",
   MISTAKES: "mistakes",
+  FAVORITES: "favorites",
 };
 
 export const DAILY_SESSION_SIZE = 20;
@@ -15,7 +16,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const REVIEW_INTERVAL_DAYS = [1, 3, 7, 14, 30];
 
 function emptyProgress() {
-  return { solved: [], mistakes: [], position: 0, reviews: {} };
+  return { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] };
 }
 
 function intList(value) {
@@ -53,6 +54,7 @@ export function readProgress(storage) {
       mistakes: intList(parsed.mistakes),
       position: Number.isInteger(parsed.position) ? parsed.position : 0,
       reviews: reviewMap(parsed.reviews),
+      favorites: [...new Set(intList(parsed.favorites))],
     };
   } catch {
     return emptyProgress();
@@ -145,7 +147,45 @@ export function filterTickets(tickets, progress, filter, now = Date.now()) {
     const mistakes = new Set(progress.mistakes);
     return ru.filter((ticket) => mistakes.has(ticket.id));
   }
+  if (filter === FILTERS.FAVORITES) {
+    const favorites = new Set(progress.favorites || []);
+    return ru.filter((ticket) => favorites.has(ticket.id));
+  }
   return ru;
+}
+
+export function toggleFavorite(progress, ticketId) {
+  const favorites = new Set(progress.favorites || []);
+  if (favorites.has(ticketId)) favorites.delete(ticketId);
+  else favorites.add(ticketId);
+  return { ...progress, favorites: [...favorites].sort((a, b) => a - b) };
+}
+
+/** Отбор по теме и поиску до ограничения сессии: иначе нужный билет
+ * мог оказаться за пределами первых двадцати и ошибочно исчезнуть из поиска. */
+export function selectTrainingTickets(tickets, progress, options = {}, now = Date.now()) {
+  const { filter = FILTERS.ALL, query = "", topicId = "", topics = [], limit = DAILY_SESSION_SIZE } = options;
+  let pool = tickets;
+  if (topicId !== "" && topicId != null) {
+    const topic = topics.find((item) => String(item.id) === String(topicId));
+    const ids = new Set(topic?.ticket_ids || []);
+    pool = pool.filter((ticket) => ids.has(ticket.id));
+  }
+  const normalize = (text) => String(text).toLocaleLowerCase("ru").replaceAll("ё", "е");
+  const search = normalize(query).trim();
+  if (search) {
+    if (/^#?\d+$/.test(search)) {
+      const id = Number(search.replace(/^#/, ""));
+      pool = pool.filter((ticket) => ticket.id === id);
+    } else {
+      const words = search.split(/\s+/);
+      pool = pool.filter((ticket) => words.every((word) => normalize(ticket.question || "").includes(word)));
+    }
+  }
+  if (filter === FILTERS.TODAY) {
+    return buildDailySession(pool, progress, now, limit === 10 ? 10 : 20);
+  }
+  return filterTickets(pool, progress, filter, now);
 }
 
 export function clampPosition(position, length) {

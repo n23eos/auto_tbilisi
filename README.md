@@ -1,6 +1,6 @@
 # Автошкола на русском языке — Тбилиси
 
-**Avtoshkola.ge is the site of a Russian-language driving school in Tbilisi, together with the Telegram bot that takes its leads.** The landing page covers the course program, FAQ, contacts and a callback form that posts through FormSubmit. A practice section serves all 844 current Russian exam tickets with filters for unsolved questions and past mistakes, keeping progress in localStorage. The bot runs on Cloudflare Workers with data in D1, alerts admins when it fails and drops applications older than 180 days. Plain HTML, CSS and JavaScript with no bundler, hosted on GitHub Pages.
+**Avtoshkola.ge is the site of a Russian-language driving school in Tbilisi, together with the Telegram bot that takes its leads.** The landing page covers the course program, FAQ, contacts and a callback form that posts through FormSubmit. The practice section offers 898 Russian questions, including 51 locally translated eco-driving questions, with topics, search, favorites and review sessions. Full coverage of the current official bank has not been verified. Progress is kept in localStorage. The bot runs on Cloudflare Workers with data in D1, alerts admins when it fails and drops applications older than 180 days. Plain HTML, CSS and JavaScript with no bundler, hosted on GitHub Pages.
 
 <div align="center">
 
@@ -34,8 +34,9 @@
 
 ## Тренировка и работа над ошибками
 
-Страница `/bilety/trenirovka/` — 844 действующих русских билета по порядку, без таймера
-и лимита ошибок, плюс фильтры «нерешённые» и «мои ошибки».
+Страница `/bilety/trenirovka/`: 898 доступных вопросов на русском без таймера
+и лимита ошибок. Есть поиск по номеру и словам, темы источника, избранное,
+нерешённые, ошибки и короткие сессии на 10 или 20 вопросов.
 
 - `js/training-logic.js` — прогресс, фильтры, навигация; без DOM, покрыто тестами;
 - `js/training.js` — интерфейс.
@@ -60,7 +61,7 @@
 - `js/exam.js` — интерфейс, таймер, отрисовка;
 - `css/exam.css` — стили, значения берутся из `css/tokens.css`.
 
-В выборку идут только действующие русские билеты — 844 из 921. Тесты логики:
+В выборку идут русские вопросы без пометки `withdrawn`: 898 из 921 после наложения переводов. Тесты логики:
 
 ```bash
 npm test
@@ -81,15 +82,20 @@ python3 -m venv .venv && .venv/bin/pip install -r tools/requirements-dev.txt
 только если база прошла проверки: при любой проблеме скрипт печатает список претензий,
 возвращает код 1 и оставляет прошлую базу нетронутой.
 
-Официальный банк вопросов Сервисного агентства — 898 билетов. Разницу с 921 составляют
-билеты, изъятые министерством, но оставленные источником в общем списке: они перечислены
-в [data/withdrawn-tickets.json](data/withdrawn-tickets.json), парсер помечает их полем
-`withdrawn`, тренажёр их не показывает.
+Число 898 и список предполагаемых изъятий получены из сторонних источников.
+Официальный банк после авторизации пока не сверен. В
+[data/withdrawn-tickets.json](data/withdrawn-tickets.json) 23 скрытых вопроса.
+Публичный каталог imecadine.ge содержит ровно те же 898 ID из 921, что доступны
+у нас после исключения. Поле `withdrawn` не является подтверждением
+актуального официального статуса.
+
+Темы: `data/ticket-topics.json`, обновление через `.venv/bin/python -m tools.import_ticket_topics`.
+Импортёр проверяет полное покрытие ID локальной базы и отсутствие дублей.
 
 У каждого билета есть поле `lang`. У 870 билетов это `ru`, у 51 (подкатегория
-«эко-вождение», id 1742–1792) — `ka`: у источника русского перевода для них нет вообще,
-при любой выбранной локали приходит грузинский текст. Раздел на сайте должен либо
-прятать такие билеты, либо явно их подписывать.
+«эко-вождение», id 1742-1792) - `ka`: у источника русского перевода для них нет.
+Наши переводы в `data/eco-ru-*.json` применяет `js/ticket-bank.js` при загрузке;
+исходная база и индексы правильных ответов не меняются.
 
 ### Известная ошибка в данных источника
 

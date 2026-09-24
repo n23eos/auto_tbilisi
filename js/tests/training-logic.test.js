@@ -12,6 +12,8 @@ import {
   progressSummary,
   readProgress,
   writeProgress,
+  selectTrainingTickets,
+  toggleFavorite,
 } from "../training-logic.js";
 
 function fakeStorage(initial = null, { throwOnGet = false, throwOnSet = false } = {}) {
@@ -38,22 +40,22 @@ const tickets = [
 
 test("пустое хранилище даёт пустой прогресс", () => {
   const progress = readProgress(fakeStorage());
-  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {} });
+  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] });
 });
 
 test("битый JSON не роняет тренажёр", () => {
   const progress = readProgress(fakeStorage("{не json"));
-  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {} });
+  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] });
 });
 
 test("хранилище с мусором вместо массивов даёт пустой прогресс", () => {
   const progress = readProgress(fakeStorage('{"solved":"всё","mistakes":7,"position":"да"}'));
-  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {} });
+  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] });
 });
 
 test("недоступное хранилище не роняет чтение", () => {
   const progress = readProgress(fakeStorage(null, { throwOnGet: true }));
-  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {} });
+  assert.deepEqual(progress, { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] });
 });
 
 test("недоступное хранилище не роняет запись", () => {
@@ -64,7 +66,7 @@ test("недоступное хранилище не роняет запись",
 test("запись и чтение возвращают тот же прогресс", () => {
   const storage = fakeStorage();
   writeProgress(storage, { solved: [2], mistakes: [3], position: 5 });
-  assert.deepEqual(readProgress(storage), { solved: [2], mistakes: [3], position: 5, reviews: {} });
+  assert.deepEqual(readProgress(storage), { solved: [2], mistakes: [3], position: 5, reviews: {}, favorites: [] });
 });
 
 test("верный ответ добавляет билет в решённые", () => {

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Тренировка по билетам ПДД Грузии на русском — 844 действующих билета</title>
-  <meta name="description" content="Свободная тренировка по всем билетам ПДД Грузии на русском: без таймера и лимита ошибок, с фильтрами и работой над ошибками. Браузер запоминает прогресс.">
+  <title>Тренировка по билетам ПДД Грузии на русском</title>
+  <meta name="description" content="Тренировка по доступным билетам ПДД Грузии на русском: поиск, темы, избранное и работа над ошибками. Браузер запоминает прогресс.">
   <link rel="canonical" href="https://avtoshkola.ge/bilety/trenirovka/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#faf9f6">
@@ -15,7 +15,7 @@
   <meta property="og:site_name" content="Автошкола на русском языке — Тбилиси">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Тренировка по билетам ПДД Грузии на русском">
-  <meta property="og:description" content="Все действующие билеты по порядку, без таймера и лимита ошибок. Прогресс и работа над ошибками сохраняются в браузере.">
+  <meta property="og:description" content="Поиск, темы, избранное и работа над ошибками без таймера. Прогресс сохраняется в браузере.">
   <meta property="og:image" content="https://avtoshkola.ge/media/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -27,11 +27,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
   <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=21">
+  <link rel="stylesheet" href="../../css/exam.css?v=24">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
-  <link rel="preload" as="fetch" href="../../data/tickets-b-ru.json" crossorigin>
+  <link rel="preload" as="fetch" href="../../data/tickets-b-ru.json?v=2" crossorigin>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
@@ -92,14 +92,15 @@
     <h1 class="exam__title">Тренировка по билетам ПДД</h1>
     <p class="exam__lead">
       Учитесь короткими сессиями, возвращайтесь к ошибкам и закрепляйте уже решённые
-      билеты. Регистрация не нужна — прогресс хранится в этом браузере.
+      билеты. Доступно <a href="#bank-coverage"><b id="t-available-count">898</b> вопросов на русском</a>.
+      Регистрация не нужна, прогресс хранится в этом браузере.
     </p>
 
     <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
       <div class="training-dashboard__head">
         <div>
           <p class="section-kicker">Ваш прогресс</p>
-          <h2 id="t-dashboard-title">План подготовки на сегодня</h2>
+          <h2 id="t-dashboard-title">На сегодня</h2>
           <p class="training-dashboard__note" id="t-plan-note"></p>
         </div>
         <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 билетов</button>
@@ -111,12 +112,41 @@
       </dl>
     </section>
 
-    <h2 class="training-subtitle">Выберите режим</h2>
+    <h2 class="training-subtitle">Настройте тренировку</h2>
+    <section class="training-tools" aria-label="Поиск и настройки тренировки">
+      <form class="training-search" id="t-search-form" role="search">
+        <label for="t-search">Номер или слова из вопроса</label>
+        <div class="training-search__row">
+          <input id="t-search" name="query" type="search" inputmode="search" autocomplete="off" placeholder="Например, 125 или дорожный знак">
+          <button class="exam__btn exam__btn--primary" type="submit">Найти</button>
+        </div>
+      </form>
+      <div class="training-options">
+        <label id="t-topic-field" for="t-topic">
+          Тема
+          <select id="t-topic" disabled>
+            <option value="">Все темы</option>
+          </select>
+        </label>
+        <label for="t-limit">
+          В сессии «На сегодня»
+          <select id="t-limit">
+            <option value="10">10 билетов</option>
+            <option value="20" selected>20 билетов</option>
+          </select>
+        </label>
+      </div>
+      <p class="training-tools__status" id="t-topics-status" role="status">Загружаем темы...</p>
+      <button class="training-clear" id="t-clear-filters" type="button" hidden>Сбросить поиск и тему</button>
+    </section>
+
+    <h2 class="sr-only">Режим тренировки</h2>
     <div class="exam__filters" role="group" aria-label="Что показывать">
       <button class="exam__filter is-active" id="filter-today" type="button" aria-pressed="true" data-filter="today">На сегодня</button>
       <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Все билеты</button>
       <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
       <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
+      <button class="exam__filter" id="filter-favorites" type="button" aria-pressed="false" data-filter="favorites">Избранное</button>
     </div>
 
       <p class="exam__hint">Готовы проверить себя — <a href="../">пройти экзамен</a>.</p>
@@ -128,16 +158,23 @@
     <div class="exam__progress"><div class="exam__progress-fill" id="t-progress"></div></div>
 
     <p class="exam__status" id="t-status" role="status">Загружаем билеты…</p>
+    <p class="exam__status exam__status--error" id="t-storage-status" role="status" hidden>
+      Прогресс не сохраняется: хранилище браузера недоступно.
+    </p>
 
     <section class="exam__screen" id="t-card" hidden>
       <h2 class="exam__question" id="t-text" tabindex="-1"></h2>
       <figure class="exam__figure" id="t-figure" hidden>
-        <img class="exam__image" id="t-image" width="800" height="503" decoding="async" alt="Изображение к вопросу билета">
+        <button class="exam__image-button" id="t-image-open" type="button" aria-label="Увеличить изображение">
+          <img class="exam__image" id="t-image" width="800" height="503" decoding="async" alt="Изображение к вопросу билета">
+        </button>
       </figure>
       <ul class="exam__answers" id="t-answers"></ul>
       <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
       <p class="exam__ticket-meta" id="t-ticket-meta">
-        <span>Официальный билет № <b id="t-source-id"></b></span>
+        <span>ID в источнике: <b id="t-source-id"></b></span>
+        <button class="exam__favorite" id="t-favorite" type="button" aria-pressed="false">☆ В избранное</button>
+        <a id="t-permalink">Ссылка на билет</a>
         <a id="t-source-link" rel="nofollow noopener" target="_blank">Открыть первоисточник ↗</a>
       </p>
       <div class="exam__actions">
@@ -147,13 +184,27 @@
       <p class="exam__hint">Ответ — клавиши 1–4, переход — стрелки влево и вправо</p>
     </section>
 
-    <p class="exam__empty" id="t-empty" hidden></p>
+    <div class="exam__empty" id="t-empty" hidden>
+      <p id="t-empty-text" role="status"></p>
+      <button class="exam__btn exam__btn--ghost" id="t-empty-action" type="button" hidden></button>
+    </div>
 
-    <aside class="learning-next" aria-labelledby="training-help-title">
+    <dialog class="exam__image-dialog" id="t-image-dialog" aria-labelledby="t-image-dialog-title">
+      <div class="exam__image-dialog-head">
+        <h2 id="t-image-dialog-title">Схема к билету</h2>
+        <button class="exam__image-close" id="t-image-close" type="button" aria-label="Закрыть увеличенное изображение">Закрыть</button>
+      </div>
+      <div class="exam__image-pan" tabindex="0" role="region" aria-label="Увеличенная схема, прокручивайте для просмотра">
+        <img id="t-image-large" width="800" height="503" alt="Увеличенное изображение к вопросу билета">
+      </div>
+      <p>Прокручивайте схему пальцем или стрелками. Для закрытия нажмите Escape.</p>
+    </dialog>
+
+    <aside class="learning-next" id="t-help" aria-labelledby="training-help-title" hidden>
       <p class="section-kicker">Если хочется разобраться вместе</p>
       <h2 id="training-help-title">Сложный билет? Обсудим.</h2>
-      <p>Сохраните текст вопроса и спросите преподавателя на консультации. Поможем выбрать занятия по теории, если они нужны.</p>
-      <a class="learning-button" href="../../?from=training&goal=theory#callback-form" data-learning-cta="theory">Задать вопрос о теории</a>
+      <p>Сообщите преподавателю ID вопроса: <b id="t-help-id"></b>. Поможем разобрать билет и выбрать занятия по теории, если они нужны.</p>
+      <a class="learning-button" id="t-help-link" href="../../?from=training&goal=theory#callback-form" data-learning-cta="theory">Задать вопрос о теории</a>
       <p class="learning-next__note">Консультация бесплатная. Можно продолжить тренировку самостоятельно.</p>
     </aside>
     <div class="exam__reset">
@@ -164,10 +215,12 @@
       </p>
     </div>
 
-    <p class="exam__source">
-      Вопросы и изображения — официальные экзаменационные билеты Грузии, источник:
+    <p class="exam__source" id="bank-coverage">
+      Источник содержит 921 билет для категории B/B1:
       <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>.
-      Тема «эко-вождение» (51 билет) есть только на грузинском и в тренировку не включена. Ещё 26 билетов исключены как изъятые из официального банка вопросов — старый портал держит их в общем списке, на экзамене они не встречаются.
+      В источнике нет русского текста для 51 вопроса по эко-вождению: здесь доступен наш перевод.
+      Ещё 23 вопроса исключены по сверке со сторонним каталогом на 898 билетов.
+      Официальный банк после авторизации пока не сверен.
     </p>
   </main>
 
@@ -184,6 +237,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=3"></script>
+  <script type="module" src="../../js/training.js?v=7"></script>
 </body>
 </html>

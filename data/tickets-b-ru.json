@@ -7,7 +7,7 @@
     ],
     "lang": "ru",
     "source": "https://teoria.on.ge/tickets/2",
-    "parsed_at": "2026-08-27T16:49:35+04:00",
+    "parsed_at": "2026-09-24T14:31:17+04:00",
     "total": 921
   },
   "tickets": [
@@ -2892,7 +2892,7 @@
     {
       "id": 330,
       "lang": "ru",
-      "withdrawn": true,
+      "withdrawn": false,
       "question": "Какой автомобиль стоит с нарушением правил о стоянке?",
       "image": "tickets/images/3f5eedabc8d64879b5206f817060f244.webp",
       "answers": [
@@ -3019,7 +3019,7 @@
     {
       "id": 345,
       "lang": "ru",
-      "withdrawn": true,
+      "withdrawn": false,
       "question": "Какое транспортное средство стоит с нарушением правил стоянки?",
       "image": "tickets/images/31d933759a3e13ae52ea0e2fc7c5b7aa.webp",
       "answers": [
@@ -9675,7 +9675,7 @@
     {
       "id": 1069,
       "lang": "ru",
-      "withdrawn": true,
+      "withdrawn": false,
       "question": "Водителю дальнейшее движение транспортного средства запрещается, если:",
       "image": null,
       "answers": [

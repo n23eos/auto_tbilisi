@@ -27,11 +27,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/tokens.css?v=23">
   <link rel="stylesheet" href="../css/style.css?v=28">
-  <link rel="stylesheet" href="../css/exam.css?v=21">
+  <link rel="stylesheet" href="../css/exam.css?v=24">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
-  <link rel="preload" as="fetch" href="../data/tickets-b-ru.json" crossorigin>
+  <link rel="preload" as="fetch" href="../data/tickets-b-ru.json?v=2" crossorigin>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
@@ -94,6 +94,9 @@
 <body>
   <header class="nav is-solid">
     <a class="nav__brand" href="../">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <nav class="nav__links" aria-label="Разделы билетов">
+      <a class="nav__link" href="trenirovka/">Тренировка</a>
+    </nav>
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
 
@@ -125,6 +128,7 @@
         <span class="exam__mistakes">Ошибок: <b id="q-mistakes">0</b> из <b id="q-max">5</b></span>
       </div>
       <div class="exam__progress"><div class="exam__progress-fill" id="q-progress"></div></div>
+      <nav class="exam__filters" id="q-navigation" aria-label="Навигация по вопросам"></nav>
 
       <h2 class="exam__question" id="q-text" tabindex="-1"></h2>
       <figure class="exam__figure" id="q-figure" hidden>
@@ -134,7 +138,10 @@
       <ul class="exam__answers" id="q-answers"></ul>
 
       <p class="exam__feedback" id="q-feedback" role="status" aria-live="polite"></p>
-      <button class="exam__btn exam__btn--primary" id="btn-next" type="button" hidden>Дальше</button>
+      <div class="exam__actions">
+        <button class="exam__btn exam__btn--ghost" id="btn-skip" type="button">Пропустить</button>
+        <button class="exam__btn exam__btn--primary" id="btn-next" type="button" hidden>К следующему без ответа</button>
+      </div>
       <p class="exam__hint">Ответ — клавиши 1–4, дальше — Enter</p>
     </section>
 
@@ -158,11 +165,13 @@
     </section>
 
     <p class="exam__source">
-      Вопросы и изображения — официальные экзаменационные билеты Грузии,
+      Вопросы и изображения из учебного каталога B/B1,
       источник: <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>.
-      Тема «эко-вождение» (51 билет) на реальном экзамене существует только на грузинском,
-      поэтому в тренажёр она не включена. Ещё 26 билетов исключены как изъятые
-      из официального банка вопросов.
+      Доступно 898 вопросов на русском из 921 у источника. Для 51 вопроса по
+      эко-вождению подготовлен наш перевод. Ещё 23 исключены по сверке
+      со сторонним каталогом.
+      Полное соответствие актуальному официальному банку пока не подтверждено.
+      <a href="trenirovka/#bank-coverage">Подробнее о составе базы</a>.
     </p>
   </main>
 
@@ -179,6 +188,6 @@
   </footer>
 
   <script src="../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../js/exam.js?v=21"></script>
+  <script type="module" src="../js/exam.js?v=24"></script>
 </body>
 </html>

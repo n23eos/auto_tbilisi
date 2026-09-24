@@ -5,16 +5,22 @@ import {
   MAX_MISTAKES,
   QUESTION_COUNT,
   TIME_LIMIT_SEC,
+  createExamAnswers,
+  examProgress,
   examVerdict,
   formatTime,
+  isExamTerminal,
   isCorrect,
+  nextUnansweredIndex,
+  recordExamAnswer,
   selectExamTickets,
-} from "./exam-logic.js";
-import { markAnswer, readProgress, writeProgress } from "./training-logic.js";
+} from "./exam-logic.js?v=2";
+import { markAnswer, readProgress, writeProgress } from "./training-logic.js?v=2";
 import { markAnswerButtons } from "./answer-marking.js";
 import { learningNextStep } from "./learning-next-step.js?v=1";
+import { loadTicketBank } from "./ticket-bank.js?v=1";
 
-const DATA_URL = "../data/tickets-b-ru.json";
+const DATA_URL = "../data/tickets-b-ru.json?v=2";
 const IMAGES_BASE = "../data/";
 const URGENT_SEC = 60;
 // Все картинки билетов одного размера — источник отдаёт 800×503.
@@ -32,6 +38,7 @@ const screens = {
 const state = {
   pool: [],
   questions: [],
+  answers: [],
   index: 0,
   mistakes: 0,
   answered: 0,
@@ -50,12 +57,7 @@ function show(name) {
 }
 
 async function loadTickets() {
-  const response = await fetch(DATA_URL);
-  if (!response.ok) {
-    throw new Error(`не удалось загрузить билеты (${response.status})`);
-  }
-  const data = await response.json();
-  return data.tickets;
+  return loadTicketBank(DATA_URL);
 }
 
 function preloadImage(ticket) {
@@ -64,14 +66,36 @@ function preloadImage(ticket) {
   img.src = IMAGES_BASE + ticket.image;
 }
 
+function renderNavigation() {
+  const navigation = el("q-navigation");
+  navigation.textContent = "";
+
+  state.answers.forEach((answerState, questionIndex) => {
+    const button = document.createElement("button");
+    const current = questionIndex === state.index;
+    const answered = answerState !== null;
+    button.type = "button";
+    button.className = `exam__filter${current ? " is-active" : ""}`;
+    button.textContent = answered ? `${questionIndex + 1} ✓` : String(questionIndex + 1);
+    button.setAttribute(
+      "aria-label",
+      `Вопрос ${questionIndex + 1}, ${answered ? "отвечен" : "без ответа"}${current ? ", текущий" : ""}`
+    );
+    if (current) button.setAttribute("aria-current", "step");
+    button.addEventListener("click", () => goToQuestion(questionIndex));
+    navigation.append(button);
+  });
+}
+
 function renderQuestion() {
   const ticket = state.questions[state.index];
-  state.locked = false;
+  const answerState = state.answers[state.index];
+  state.locked = answerState !== null;
 
   el("q-index").textContent = String(state.index + 1);
   el("q-total").textContent = String(QUESTION_COUNT);
   el("q-mistakes").textContent = String(state.mistakes);
-  el("q-progress").style.width = `${(state.index / QUESTION_COUNT) * 100}%`;
+  el("q-progress").style.width = `${(state.answered / QUESTION_COUNT) * 100}%`;
 
   const question = el("q-text");
   question.textContent = ticket.question;
@@ -110,19 +134,39 @@ function renderQuestion() {
   const feedback = el("q-feedback");
   feedback.textContent = "";
   feedback.className = "exam__feedback";
-  el("btn-next").hidden = true;
+  el("btn-next").hidden = answerState === null;
+  el("btn-skip").hidden = answerState !== null;
 
+  if (answerState !== null) {
+    markAnswerButtons(el("q-answers"), ticket.correct, answerState.chosen);
+    if (answerState.correct) {
+      feedback.textContent = "Верно";
+      feedback.className = "exam__feedback exam__feedback--ok";
+    } else {
+      feedback.textContent = `Неверно. Правильный ответ - ${ticket.correct + 1}`;
+      feedback.className = "exam__feedback exam__feedback--bad";
+    }
+  }
+
+  renderNavigation();
   question.focus();
-  preloadImage(state.questions[state.index + 1]);
+  const preloadIndex = nextUnansweredIndex(state.answers, state.index);
+  preloadImage(preloadIndex >= 0 ? state.questions[preloadIndex] : null);
 }
 
 function answer(answerIndex) {
-  if (state.locked) return;
-  state.locked = true;
-  state.answered += 1;
+  if (state.locked || state.finished || isExamTerminal(state)) return;
 
   const ticket = state.questions[state.index];
   const correct = isCorrect(ticket, answerIndex);
+  const result = recordExamAnswer(state.answers, state.index, answerIndex, ticket.correct);
+  if (!result.recorded) return;
+
+  state.answers = result.answers;
+  state.locked = true;
+  const progress = examProgress(state.answers);
+  state.answered = progress.answered;
+  state.mistakes = progress.mistakes;
   markAnswerButtons(el("q-answers"), ticket.correct, answerIndex);
 
   // Ошибки экзамена попадают в общий прогресс, чтобы их можно было
@@ -139,29 +183,54 @@ function answer(answerIndex) {
     feedback.textContent = "Верно";
     feedback.className = "exam__feedback exam__feedback--ok";
   } else {
-    state.mistakes += 1;
     state.wrong.push({ ticket, chosen: answerIndex });
-    feedback.textContent = `Неверно. Правильный ответ — ${ticket.correct + 1}`;
+    feedback.textContent = `Неверно. Правильный ответ - ${ticket.correct + 1}`;
     feedback.className = "exam__feedback exam__feedback--bad";
   }
   el("q-mistakes").textContent = String(state.mistakes);
+  el("q-progress").style.width = `${(state.answered / QUESTION_COUNT) * 100}%`;
+  renderNavigation();
 
-  if (state.mistakes > MAX_MISTAKES || state.index + 1 >= QUESTION_COUNT) {
+  if (isExamTerminal(state)) {
     state.finishTimerId = window.setTimeout(() => finish(false), 900);
     return;
   }
   el("btn-next").hidden = false;
+  el("btn-skip").hidden = true;
   el("btn-next").focus();
 }
 
+function goToQuestion(questionIndex) {
+  if (
+    screens.quiz.hidden ||
+    state.finished ||
+    isExamTerminal(state) ||
+    questionIndex < 0 ||
+    questionIndex >= state.questions.length
+  ) return;
+
+  state.index = questionIndex;
+  renderQuestion();
+}
+
 function next() {
-  if (screens.quiz.hidden || !state.locked || state.mistakes > MAX_MISTAKES) return;
-  if (state.index + 1 >= QUESTION_COUNT) {
+  if (screens.quiz.hidden || state.answers[state.index] === null || isExamTerminal(state)) return;
+  const questionIndex = nextUnansweredIndex(state.answers, state.index);
+  if (questionIndex < 0) {
     finish(false);
     return;
   }
-  state.index += 1;
-  renderQuestion();
+  goToQuestion(questionIndex);
+}
+
+function skip() {
+  if (screens.quiz.hidden || state.answers[state.index] !== null || isExamTerminal(state)) return;
+  const questionIndex = nextUnansweredIndex(state.answers, state.index);
+  if (questionIndex === state.index) {
+    el("q-feedback").textContent = "Других вопросов без ответа нет.";
+    return;
+  }
+  goToQuestion(questionIndex);
 }
 
 function tick() {
@@ -293,6 +362,7 @@ function start() {
   el("rule-max").textContent = String(MAX_MISTAKES);
 
   state.questions = selectExamTickets(state.pool);
+  state.answers = createExamAnswers(state.questions.length);
   state.index = 0;
   state.mistakes = 0;
   state.answered = 0;
@@ -314,13 +384,15 @@ document.addEventListener("keydown", (event) => {
     const button = el("q-answers").querySelector(`[data-index="${Number(event.key) - 1}"]`);
     if (button && !button.disabled) button.click();
   }
-  if ((event.key === "Enter" || event.key === " ") && !el("btn-next").hidden) {
+  const interactive = event.target.closest?.("button, a, input, select, textarea");
+  if ((event.key === "Enter" || event.key === " ") && !interactive && !el("btn-next").hidden) {
     event.preventDefault();
     next();
   }
 });
 
 el("btn-next").addEventListener("click", next);
+el("btn-skip").addEventListener("click", skip);
 el("btn-start").addEventListener("click", start);
 el("btn-restart").addEventListener("click", start);
 
