@@ -30,7 +30,7 @@
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
   <link rel="stylesheet" href="css/style.css?v=28">
-  <link rel="stylesheet" href="css/partner.css?v=4">
+  <link rel="stylesheet" href="css/partner.css?v=5">
   <link rel="stylesheet" href="css/chat.css?v=3">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
@@ -336,6 +336,24 @@
            data-src="media/hero.mp4" data-type="video/mp4"></video>
     <div class="marquee__scrim" aria-hidden="true"></div>
 
+    <div class="marquee__content">
+      <h1 class="marquee__display">
+        <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
+        <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
+      </h1>
+      <div class="marquee__actions">
+        <a class="marquee__cta" href="#contact">Записаться на обучение</a>
+        <a class="marquee__cta marquee__cta--ghost" href="https://wa.me/995599987707" rel="noopener" target="_blank">Написать в WhatsApp</a>
+      </div>
+      <p class="marquee__geo">Avtoshkola.ge — автошкола на русском языке в Тбилиси, пр-т Важа Пшавела 9</p>
+    </div>
+  </section>
+
+  <section class="partners" aria-labelledby="partners-title">
+    <div class="partners__heading">
+      <p class="section-kicker">Партнёрские предложения</p>
+      <h2 id="partners-title">Для ваших путешествий</h2>
+    </div>
     <aside class="partner-banner" aria-label="Партнёрское предложение Holafly">
       <div class="partner-banner__main">
         <div class="partner-banner__icon" aria-hidden="true">
@@ -343,7 +361,7 @@
         </div>
         <div class="partner-banner__copy">
           <p class="partner-banner__brand">Holafly</p>
-          <h2 class="partner-banner__title">eSIM для путешествий</h2>
+          <h3 class="partner-banner__title">eSIM для путешествий</h3>
           <p class="partner-banner__description">Карты, мессенджеры и связь с близкими в поездке за границу.</p>
         </div>
         <p class="partner-banner__disclosure">Партнёрская ссылка · получаем комиссию</p>
@@ -361,18 +379,28 @@
            data-placement="home_banner">Выбрать eSIM <span aria-hidden="true">↗</span></a>
       </div>
     </aside>
-
-    <div class="marquee__content">
-      <h1 class="marquee__display">
-        <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
-        <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
-      </h1>
-      <div class="marquee__actions">
-        <a class="marquee__cta" href="#contact">Записаться на обучение</a>
-        <a class="marquee__cta marquee__cta--ghost" href="https://wa.me/995599987707" rel="noopener" target="_blank">Написать в WhatsApp</a>
+    <aside class="partner-banner partner-banner--omio" aria-label="Партнёрское предложение Omio">
+      <div class="partner-banner__main">
+        <div class="partner-banner__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="10" y="5" width="28" height="30" rx="7" stroke="currentColor" stroke-width="2"/><path d="M10 21h28M24 5v16M16 35l-5 8m21-8 5 8M15 40h18" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="28" r="2" fill="currentColor"/><circle cx="31" cy="28" r="2" fill="currentColor"/></svg>
+        </div>
+        <div class="partner-banner__copy">
+          <p class="partner-banner__brand">Omio</p>
+          <h3 class="partner-banner__title">Билеты для путешествий</h3>
+          <p class="partner-banner__description">Сравните поезда, автобусы, самолёты и паромы. Скидка 10% новым клиентам при сумме заказа до 80 €.</p>
+        </div>
+        <p class="partner-banner__disclosure">Партнёрская ссылка · получаем комиссию</p>
       </div>
-      <p class="marquee__geo">Avtoshkola.ge — автошкола на русском языке в Тбилиси, пр-т Важа Пшавела 9</p>
-    </div>
+      <div class="partner-banner__stub">
+        <div class="partner-banner__deal">
+          <span class="partner-banner__discount">−10%</span>
+          <span class="partner-banner__code">по коду <strong>NEW10</strong></span>
+        </div>
+        <a class="partner-banner__cta" href="https://omio.sjv.io/c/7837896/4029327/7385"
+           rel="sponsored noopener" target="_blank" data-affiliate="omio"
+           data-placement="home_banner">Найти билеты <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
   </section>
 
   <div class="road" aria-hidden="true">

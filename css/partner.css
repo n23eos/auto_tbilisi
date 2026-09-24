@@ -1,10 +1,20 @@
-/* Билет в потоке: при крупном шрифте корешок не перекрывает запись в школу. */
-.marquee {
-  height: auto;
-  min-height: clamp(30rem, 50vw, 88svh);
-  padding-top: 7rem;
-  gap: var(--space-xl);
+.partners {
+  display: grid;
+  gap: 1.25rem;
+  padding: 2.5rem max(1rem, calc((100% - 64rem) / 2));
+  background: var(--color-paper-2);
 }
+.partners__heading h2 {
+  margin-top: 0.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+.partner-banner--omio .partner-banner__title {
+  background-image: linear-gradient(105deg, #173f79, #31789a, #31498a, #173f79);
+}
+.partner-banner--omio .partner-banner__brand,
+.partner-banner--omio .partner-banner__icon,
+.partner-banner--omio .partner-banner__discount { color: #173f79; }
 
 .partner-banner {
   --ticket-seam: calc(100% - 19rem);
@@ -14,12 +24,12 @@
   grid-template-columns: minmax(0, 1fr) 19rem;
   width: 100%;
   max-width: 64rem;
-  margin-bottom: auto;
+  margin: 0;
   color: var(--color-ink);
   background: var(--color-paper);
   border-radius: 16px;
-  box-shadow: 0 16px 36px var(--color-scrim);
-  /* Два прозрачных надреза совпадают с линией отрыва и пропускают фон первого экрана. */
+  box-shadow: 0 8px 24px rgb(24 30 40 / 10%);
+  /* Два прозрачных надреза совпадают с линией отрыва и пропускают фон раздела. */
   -webkit-mask-image: radial-gradient(circle at var(--ticket-seam) 0, transparent 10px, #000 11px), radial-gradient(circle at var(--ticket-seam) 100%, transparent 10px, #000 11px);
   -webkit-mask-composite: source-in;
   mask-image: radial-gradient(circle at var(--ticket-seam) 0, transparent 10px, #000 11px), radial-gradient(circle at var(--ticket-seam) 100%, transparent 10px, #000 11px);
@@ -75,8 +85,9 @@
   min-width: 0;
   padding: 1rem 1.25rem;
   border-left: 2px dashed var(--color-line-strong);
-  background: var(--color-paper-2);
+  background: #e7e3d9;
 }
+.partner-banner--omio .partner-banner__stub { background: #e5ecf3; }
 .partner-banner__deal { min-width: 0; text-align: center; }
 .partner-banner__discount { display: block; font-family: var(--font-display); font-size: 1.55rem; font-weight: 700; line-height: 1.2; color: var(--color-accent-deep); }
 .partner-banner__code { display: block; margin-top: 0.3rem; font-size: 0.6875rem; }
@@ -110,7 +121,6 @@
 }
 
 @media (max-width: 40rem) {
-  .marquee { padding-top: 8rem; }
   .partner-banner { --ticket-seam: 0px; grid-template-columns: minmax(0, 1fr); background: transparent; -webkit-mask-image: none; mask-image: none; }
   .partner-banner__main { padding: var(--space-md); background: var(--color-paper); border-radius: 16px 16px 0 0; }
   .partner-banner__title { font-size: 1.5rem; }
@@ -133,4 +143,4 @@
   .partner-banner__cta { transition: none; }
   .partner-banner__title { animation: none; background-position: 0 50%; }
 }
-@media print { .partner-banner { display: none; } }
+@media print { .partners { display: none; } }
