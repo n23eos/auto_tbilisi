@@ -139,8 +139,79 @@
   .partner-banner__code strong { display: inline; }
 }
 
+/* Оба купона видны без прокрутки, включая узкие экраны. */
+.partners { padding-block: 1.75rem; gap: 1rem; }
+.partners__heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.5rem; }
+.partners__heading h2 { margin: 0; font-size: clamp(1.1rem, 2vw, 1.5rem); }
+.partners__track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.partners__track .partner-banner {
+  grid-template-columns: minmax(0, 1fr) 8rem;
+  --ticket-seam: calc(100% - 8rem);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.partners__track .partner-banner__main { grid-template-columns: minmax(0, 1fr); padding: 0.8rem; gap: 0.4rem; }
+.partners__track .partner-banner__icon { display: none; }
+.partners__track .partner-banner__title { font-size: clamp(1rem, 1.5vw, 1.2rem); }
+.partners__track .partner-banner__description { font-size: 0.75rem; }
+.partners__track .partner-banner__disclosure { grid-column: 1; font-size: 0.625rem; }
+.partners__track .partner-banner__stub { flex-direction: column; justify-content: center; gap: 0.5rem; padding: 0.6rem; }
+.partners__track .partner-banner__cta { font-size: 0.7rem; }
+@media (max-width: 56rem) {
+  .partners__track { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 40rem) {
+  .partners__track .partner-banner {
+    grid-template-columns: minmax(0, 1fr) 7rem;
+    background: var(--color-paper);
+  }
+  .partners__track .partner-banner__main { padding: 0.65rem; border-radius: 0; }
+  .partners__track .partner-banner__stub {
+    border-top: 0;
+    border-left: 2px dashed var(--color-line-strong);
+    border-radius: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    padding: 0.5rem;
+  }
+  .partners__track .partner-banner__title { font-size: 0.95rem; }
+  .partners__track .partner-banner__description { font-size: 0.7rem; line-height: 1.35; }
+  .partners__track .partner-banner__code strong { display: block; }
+  .partners__track .partner-banner__cta { padding: 0.4rem; font-size: 0.65rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .partner-banner__cta { transition: none; }
   .partner-banner__title { animation: none; background-position: 0 50%; }
 }
 @media print { .partners { display: none; } }
+
+/* Купоны участвуют в потоке шапки, чтобы не перекрывать заголовок и кнопки. */
+.marquee {
+  height: auto;
+  min-height: clamp(30rem, 50vw, 88svh);
+  padding-top: 7rem;
+  gap: 2rem;
+}
+.marquee > .partners {
+  position: relative;
+  z-index: var(--z-raised);
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto auto;
+  padding: 0;
+  background: transparent;
+  gap: 0.5rem;
+}
+.marquee .partners__heading {
+  width: fit-content;
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  background: rgb(15 22 30 / 82%);
+  color: #fff;
+}
+.marquee .partners__heading .section-kicker { margin: 0; font-size: 0.625rem; color: #f3c568; }
+.marquee .partners__heading h2 { margin: 0; font-size: 0.8rem; line-height: 1.4; }
+@media (max-width: 40rem) {
+  .marquee { padding-top: 8rem; gap: 1.5rem; }
+}
