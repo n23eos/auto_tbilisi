@@ -513,3 +513,71 @@
   .training-result--complete:not([hidden]) .training-result__mark { animation: none; }
   .training-mission progress::-webkit-progress-value { transition: none; }
 }
+
+/* Выбор раздела остаётся видимым на телефоне, отдельно от меню шапки. */
+.learning-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .6rem;
+  margin-bottom: 1.5rem;
+}
+.learning-nav__link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  min-height: 3.5rem;
+  padding: .75rem .5rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+}
+.learning-nav__link[aria-current="page"] { background: var(--color-ink); color: var(--color-ink-invert); border-color: var(--color-ink); }
+.learning-nav__link:hover { border-color: var(--color-accent); }
+.learning-nav__link:focus-visible, .ticket-tile:focus-visible, .question-tile:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.exam:has(> .learning-nav) { padding-top: 6rem; }
+.catalog { max-width: 72rem; }
+.catalog .exam__title { font-size: clamp(1.5rem, 3vw, 2.5rem); }
+.catalog-note { color: var(--color-ink-muted); max-width: 46rem; margin: .75rem 0; }
+.catalog-status { margin: 1.25rem 0; font-weight: 600; }
+.ticket-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; }
+.ticket-tile, .question-tile { display: flex; flex-direction: column; gap: .65rem; padding: 1.15rem; border: 1px solid var(--color-line); border-radius: var(--radius-md); text-decoration: none; color: var(--color-ink); background: var(--color-paper); }
+.ticket-tile:hover, .question-tile:hover { border-color: var(--color-accent); background: var(--color-paper-2); }
+.ticket-tile__title { font: 700 var(--text-lg) var(--font-display); }
+.ticket-tile__count, .ticket-tile__progress { font-size: var(--text-sm); color: var(--color-ink-muted); }
+.ticket-tile__action { margin-top: auto; color: var(--color-accent-deep); font-weight: 700; }
+.catalog-badge { font-size: var(--text-xs); font-weight: 600; margin-top: auto; }
+.catalog-badge--mistake { color: var(--color-error); }
+.catalog-badge--solved { color: var(--color-success); }
+.question-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.question-tile__head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.question-tile__head strong { font-size: 1.1rem; }
+.question-tile__head > span { color: var(--color-ink-muted); font-size: var(--text-xs); }
+.question-tile__text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: var(--text-sm); line-height: 1.5; }
+.catalog-search { display: grid; gap: .5rem; max-width: 46rem; margin-block: 1rem; }
+.catalog-search label { font-weight: 600; }
+.catalog-search input, .catalog-search select { min-width: 0; width: 100%; min-height: 2.75rem; padding: .65rem; border: 1px solid var(--color-line-strong); border-radius: var(--radius-sm); background: var(--color-paper); color: var(--color-ink); font: inherit; }
+.catalog-search__row { display: grid; grid-template-columns: 1fr auto; gap: .5rem; }
+.catalog-search > button { justify-self: start; margin-top: .5rem; }
+.learning-question-nav { margin-block: 1.25rem; }
+.learning-question-nav__title { font-size: var(--text-md); margin-bottom: .75rem; }
+.learning-question-nav__grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: .4rem; }
+.learning-question-nav__button { min-height: 2.75rem; padding: .4rem; }
+.learning-question-nav__button.is-answered:not(.is-active) { background: var(--color-paper-3); }
+@media (max-width: 700px) {
+  .learning-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ticket-grid, .question-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .learning-question-nav__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .learning-nav__link { font-size: .9rem; }
+  .ticket-tile { padding: .85rem; }
+  .ticket-tile__title { font-size: .9rem; }
+  .question-grid { grid-template-columns: 1fr; }
+  .catalog-search__row { grid-template-columns: 1fr; }
+  .learning-question-nav__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}

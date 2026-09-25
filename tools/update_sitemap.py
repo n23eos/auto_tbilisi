@@ -25,6 +25,8 @@ PAGES = {
     "https://avtoshkola.ge/": "index.html",
     "https://avtoshkola.ge/voprosy/": "voprosy/index.html",
     "https://avtoshkola.ge/bilety/": "bilety/index.html",
+    "https://avtoshkola.ge/bilety/voprosy/": "bilety/voprosy/index.html",
+    "https://avtoshkola.ge/bilety/ekzamen/": "bilety/ekzamen/index.html",
     "https://avtoshkola.ge/bilety/trenirovka/": "bilety/trenirovka/index.html",
 }
 

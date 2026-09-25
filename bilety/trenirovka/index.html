@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
   <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=25">
+  <link rel="stylesheet" href="../../css/exam.css?v=26">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -89,10 +89,18 @@
   </header>
 
   <main class="exam" id="training">
-    <h1 class="exam__title">Тренировка по билетам ПДД</h1>
-    <p class="exam__lead">
+    <nav class="learning-nav" aria-label="Разделы билетов ПДД">
+      <a class="learning-nav__link" href="../"><span aria-hidden="true">▦</span>Все билеты</a>
+      <a class="learning-nav__link" href="../voprosy/"><span aria-hidden="true">▤</span>Все вопросы</a>
+      <a class="learning-nav__link" href="./" aria-current="page"><span aria-hidden="true">▶</span>Тренировка</a>
+      <a class="learning-nav__link" href="../ekzamen/"><span aria-hidden="true">◷</span>Экзамен</a>
+    </nav>
+
+    <h1 class="exam__title" id="t-page-title">Тренировка по билетам ПДД</h1>
+    <p class="exam__lead" id="t-set-note" hidden></p>
+    <p class="exam__lead" id="t-general-note">
       Учитесь короткими сессиями, возвращайтесь к ошибкам и закрепляйте уже решённые
-      билеты. Доступен <a href="#bank-coverage"><b id="t-available-count">921</b> вопрос на русском</a>.
+      вопросы. Доступен <a href="#bank-coverage"><b id="t-available-count">921</b> вопрос на русском</a>.
       Регистрация не нужна, прогресс хранится в этом браузере.
     </p>
 
@@ -103,7 +111,7 @@
           <h2 id="t-dashboard-title">Миссия на сегодня</h2>
           <p class="training-dashboard__note" id="t-plan-note"></p>
         </div>
-        <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 билетов</button>
+        <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 вопросов</button>
       </div>
       <dl class="training-stats">
         <div><dt>Верно решено</dt><dd id="t-stat-solved">0</dd></div>
@@ -121,38 +129,42 @@
           <button class="exam__btn exam__btn--primary" type="submit">Найти</button>
         </div>
       </form>
-      <div class="training-options">
-        <label id="t-topic-field" for="t-topic">
-          Тема
-          <select id="t-topic" disabled>
-            <option value="">Все темы</option>
-          </select>
-        </label>
-        <label for="t-limit">
-          В сессии «На сегодня»
-          <select id="t-limit">
-            <option value="10">10 билетов</option>
-            <option value="20" selected>20 билетов</option>
-          </select>
-        </label>
-      </div>
-      <p class="training-tools__status" id="t-topics-status" role="status">Загружаем темы...</p>
+      <details class="training-tools__optional">
+        <summary>Тема и длина сессии</summary>
+        <div class="training-options">
+          <label id="t-topic-field" for="t-topic">
+            Тема
+            <select id="t-topic" disabled>
+              <option value="">Все темы</option>
+            </select>
+          </label>
+          <label for="t-limit">
+            В сессии «На сегодня»
+            <select id="t-limit">
+              <option value="10">10 вопросов</option>
+              <option value="20" selected>20 вопросов</option>
+            </select>
+          </label>
+        </div>
+        <p class="training-tools__status" id="t-topics-status" role="status">Загружаем темы...</p>
+      </details>
       <button class="training-clear" id="t-clear-filters" type="button" hidden>Сбросить поиск и тему</button>
     </section>
 
     <h2 class="sr-only">Режим тренировки</h2>
     <div class="exam__filters" role="group" aria-label="Что показывать">
       <button class="exam__filter is-active" id="filter-today" type="button" aria-pressed="true" data-filter="today">На сегодня</button>
-      <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Все билеты</button>
+      <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Вся база</button>
+      <button class="exam__filter" id="t-exit-set" type="button" hidden>Вся база (921)</button>
       <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
       <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
       <button class="exam__filter" id="filter-favorites" type="button" aria-pressed="false" data-filter="favorites">Избранное</button>
     </div>
 
-      <p class="exam__hint">Готовы проверить себя — <a href="../">пройти экзамен</a>.</p>
+      <p class="exam__hint">Готовы проверить себя? <a href="../ekzamen/">Пройти экзамен</a>.</p>
 
       <div class="exam__bar">
-      <span class="exam__counter">Билет <b id="t-index">1</b> из <b id="t-total">0</b></span>
+      <span class="exam__counter">Вопрос <b id="t-index">1</b> из <b id="t-total">0</b></span>
       <span class="exam__counter">Решено верно: <b id="t-solved">0</b> из <b id="t-pool">0</b></span>
     </div>
     <div class="exam__progress"><div class="exam__progress-fill" id="t-progress"></div></div>
@@ -171,6 +183,11 @@
       <progress id="t-mission-progress" max="10" value="0" aria-label="Вопросов с ответом"></progress>
       <p class="exam__note">В итогах учитывается первый ответ. Пропущенные вопросы можно повторить.</p>
     </section>
+
+    <nav class="learning-question-nav" id="t-question-nav" aria-label="Вопросы текущей подборки" hidden>
+      <p class="learning-question-nav__title">Вопросы подборки</p>
+      <div class="learning-question-nav__grid" id="t-question-nav-grid"></div>
+    </nav>
 
     <section class="training-result" id="t-result" aria-labelledby="t-result-title" hidden>
       <span class="training-result__mark" id="t-result-mark" aria-hidden="true">✓</span>
@@ -202,9 +219,10 @@
       <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
       <p class="training-reward" id="t-answer-reward" role="status" hidden></p>
       <p class="exam__ticket-meta" id="t-ticket-meta">
+        <span>№ <b id="t-catalog-number"></b> в общем каталоге</span>
         <span>ID в источнике: <b id="t-source-id"></b></span>
         <button class="exam__favorite" id="t-favorite" type="button" aria-pressed="false">☆ В избранное</button>
-        <a id="t-permalink">Ссылка на билет</a>
+        <a id="t-permalink">Ссылка на вопрос</a>
         <a id="t-source-link" rel="nofollow noopener" target="_blank">Открыть первоисточник ↗</a>
       </p>
       <div class="exam__actions">
@@ -221,7 +239,7 @@
 
     <dialog class="exam__image-dialog" id="t-image-dialog" aria-labelledby="t-image-dialog-title">
       <div class="exam__image-dialog-head">
-        <h2 id="t-image-dialog-title">Схема к билету</h2>
+        <h2 id="t-image-dialog-title">Схема к вопросу</h2>
         <button class="exam__image-close" id="t-image-close" type="button" aria-label="Закрыть увеличенное изображение">Закрыть</button>
       </div>
       <div class="exam__image-pan" tabindex="0" role="region" aria-label="Увеличенная схема, прокручивайте для просмотра">
@@ -232,8 +250,8 @@
 
     <aside class="learning-next" id="t-help" aria-labelledby="training-help-title" hidden>
       <p class="section-kicker">Если хочется разобраться вместе</p>
-      <h2 id="training-help-title">Сложный билет? Обсудим.</h2>
-      <p>Сообщите преподавателю ID вопроса: <b id="t-help-id"></b>. Поможем разобрать билет и выбрать занятия по теории, если они нужны.</p>
+      <h2 id="training-help-title">Сложный вопрос? Обсудим.</h2>
+      <p>Сообщите преподавателю ID вопроса: <b id="t-help-id"></b>. Поможем разобрать вопрос и выбрать занятия по теории, если они нужны.</p>
       <a class="learning-button" id="t-help-link" href="../../?from=training&goal=theory#callback-form" data-learning-cta="theory">Задать вопрос о теории</a>
       <p class="learning-next__note">Консультация бесплатная. Можно продолжить тренировку самостоятельно.</p>
     </aside>
@@ -246,7 +264,7 @@
     </div>
 
     <p class="exam__source" id="bank-coverage">
-      Источник содержит 921 билет для категории B/B1:
+      Источник содержит 921 вопрос для категории B/B1:
       <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>.
       В источнике нет русского текста для 51 вопроса по эко-вождению: здесь доступен наш перевод.
       Все 921 вопроса источника доступны в тренировке, включая 23 вопроса,
@@ -268,6 +286,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=9"></script>
+  <script type="module" src="../../js/training.js?v=10"></script>
 </body>
 </html>

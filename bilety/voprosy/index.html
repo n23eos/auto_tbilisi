@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Все билеты ПДД Грузии | Автошкола Тбилиси</title>
-  <meta name="description" content="Все 921 вопрос на русском, распределённые по учебным билетам. Выберите билет из сетки, откройте все вопросы или начните тренировку.">
-  <link rel="canonical" href="https://avtoshkola.ge/bilety/">
+  <title>Все вопросы ПДД | Автошкола Тбилиси</title>
+  <meta name="description" content="Полная сетка 921 вопроса ПДД Грузии на русском. Поиск по тексту или ID и выбор темы.">
+  <link rel="canonical" href="https://avtoshkola.ge/bilety/voprosy/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#faf9f6">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Все билеты ПДД Грузии">
-  <meta property="og:description" content="Все 921 вопрос на русском, распределённые по учебным билетам. Выберите билет из сетки, откройте все вопросы или начните тренировку.">
-  <meta property="og:url" content="https://avtoshkola.ge/bilety/">
+  <meta property="og:title" content="Все вопросы ПДД">
+  <meta property="og:description" content="Полная сетка 921 вопроса ПДД Грузии на русском. Поиск по тексту или ID и выбор темы.">
+  <meta property="og:url" content="https://avtoshkola.ge/bilety/voprosy/">
   <meta property="og:image" content="https://avtoshkola.ge/media/og-image.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,18 +26,24 @@
     <a class="nav__brand" href="/">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
     <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
   </header>
-  <main class="exam catalog" data-catalog="sets">
+  <main class="exam catalog" data-catalog="questions">
     <nav class="learning-nav" aria-label="Учебные разделы">
-  <a class="learning-nav__link" href="/bilety/" aria-current="page"><span aria-hidden="true">▦</span>Все билеты</a>
-  <a class="learning-nav__link" href="/bilety/voprosy/"><span aria-hidden="true">▤</span>Все вопросы</a>
+  <a class="learning-nav__link" href="/bilety/"><span aria-hidden="true">▦</span>Все билеты</a>
+  <a class="learning-nav__link" href="/bilety/voprosy/" aria-current="page"><span aria-hidden="true">▤</span>Все вопросы</a>
   <a class="learning-nav__link" href="/bilety/trenirovka/"><span aria-hidden="true">▶</span>Тренировка</a>
   <a class="learning-nav__link" href="/bilety/ekzamen/"><span aria-hidden="true">◷</span>Экзамен</a>
 </nav>
-    <h1 class="exam__title">Все билеты ПДД Грузии</h1>
-    <p class="exam__lead">Выберите билет и решайте в своём темпе.</p>
-    <p class="catalog-note">Учебные подборки сайта по 30 вопросов, в последней 21. Это не официальные экзаменационные варианты.</p>
-    <p id="catalog-status" class="catalog-status" role="status">Загружаем билеты...</p>
-    <div class="ticket-grid" id="catalog-grid" aria-label="Все учебные билеты"></div>
+    <h1 class="exam__title">Все вопросы ПДД</h1>
+    <p class="exam__lead">Откройте любой вопрос. Все 921 доступны в сетке ниже.</p>
+    <form class="catalog-search" id="catalog-search" role="search">
+      <label for="catalog-query">Текст вопроса или ID источника</label>
+      <div class="catalog-search__row"><input id="catalog-query" name="query" type="search" placeholder="Например, перекрёсток или 337"><button class="exam__btn exam__btn--primary" type="submit">Найти</button></div>
+      <label for="catalog-topic">Тема</label>
+      <select id="catalog-topic" name="topic"><option value="">Все темы</option></select>
+      <button id="catalog-clear" class="exam__btn exam__btn--ghost" type="button">Сбросить поиск и тему</button>
+    </form>
+    <p id="catalog-status" class="catalog-status" role="status">Загружаем вопросы...</p>
+    <div class="question-grid" id="catalog-grid" aria-label="Все вопросы"></div>
     <p class="exam__source">База: 921 вопрос категории B/B1 из <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>. Для 51 вопроса по эко-вождению подготовлен наш русский перевод. Соответствие актуальному официальному банку пока не подтверждено.</p>
     <noscript><p>Для загрузки сетки включите JavaScript. <a href="/bilety/trenirovka/">Перейти к тренировке</a>.</p></noscript>
   </main>

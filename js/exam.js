@@ -20,8 +20,8 @@ import { markAnswerButtons } from "./answer-marking.js";
 import { learningNextStep } from "./learning-next-step.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 
-const DATA_URL = "../data/tickets-b-ru.json?v=2";
-const IMAGES_BASE = "../data/";
+const DATA_URL = new URL("../data/tickets-b-ru.json?v=2", import.meta.url);
+const IMAGES_BASE = new URL("../data/", import.meta.url).href;
 const URGENT_SEC = 60;
 // Все картинки билетов одного размера — источник отдаёт 800×503.
 const IMAGE_WIDTH = 800;
@@ -340,7 +340,7 @@ function finish(timeUp) {
   el('r-next-text').textContent = recommendation.text;
   const nextLink = el('r-next-link');
   nextLink.textContent = recommendation.label;
-  nextLink.href = `../?from=exam&goal=${recommendation.goal}#callback-form`;
+  nextLink.href = `/?from=exam&goal=${recommendation.goal}#callback-form`;
   nextLink.dataset.learningCta = recommendation.goal;
   if (typeof window.gtag === 'function') {
     window.gtag('event', 'exam_complete', {

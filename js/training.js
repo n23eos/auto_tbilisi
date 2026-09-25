@@ -17,16 +17,21 @@ import {
 } from "./training-logic.js?v=4";
 import { markAnswerButtons } from "./answer-marking.js";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
+import { buildTicketSets } from "./ticket-catalog-logic.js?v=1";
 
 const DATA_URL = "../../data/tickets-b-ru.json?v=2";
 const TOPICS_URL = "../../data/ticket-topics.json";
 const IMAGES_BASE = "../../data/";
+const QUESTION_NAV_LIMIT = 40;
 
 const el = (id) => document.getElementById(id);
 
 const state = {
   all: [],
   list: [],
+  sets: [],
+  ordinals: new Map(),
+  selectedSet: null,
   topics: [],
   progress: { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] },
   filter: FILTERS.TODAY,
@@ -43,19 +48,19 @@ const state = {
 
 const EMPTY_TEXT = {
   [FILTERS.TODAY]: "На сегодня всё готово. Возвращайтесь завтра или выберите другой режим.",
-  [FILTERS.ALL]: "Доступных билетов нет.",
-  [FILTERS.UNSOLVED]: "Нерешённых билетов не осталось. Вы прошли все доступные вопросы.",
+  [FILTERS.ALL]: "Доступных вопросов нет.",
+  [FILTERS.UNSOLVED]: "Нерешённых вопросов не осталось. Вы прошли все доступные вопросы.",
   [FILTERS.MISTAKES]: "Ошибок пока нет. Они появятся здесь после экзамена или тренировки.",
-  [FILTERS.FAVORITES]: "В избранном пока ничего нет. Добавьте билет кнопкой со звездой.",
+  [FILTERS.FAVORITES]: "В избранном пока ничего нет. Добавьте вопрос кнопкой со звездой.",
 };
 
-function ticketWord(count) {
+function questionWord(count) {
   const mod100 = count % 100;
   const mod10 = count % 10;
-  if (mod100 >= 11 && mod100 <= 14) return "билетов";
-  if (mod10 === 1) return "билет";
-  if (mod10 >= 2 && mod10 <= 4) return "билета";
-  return "билетов";
+  if (mod100 >= 11 && mod100 <= 14) return "вопросов";
+  if (mod10 === 1) return "вопрос";
+  if (mod10 >= 2 && mod10 <= 4) return "вопроса";
+  return "вопросов";
 }
 
 function store() {
@@ -83,19 +88,41 @@ function selectionOptions() {
   };
 }
 
+function selectionPool() {
+  return state.selectedSet?.tickets || state.all;
+}
+
+function renderSetContext() {
+  const note = el("t-set-note");
+  el("filter-all").textContent = state.selectedSet ? "Весь билет" : "Вся база";
+  el("t-exit-set").hidden = !state.selectedSet;
+  el("t-general-note").hidden = Boolean(state.selectedSet);
+  if (!state.selectedSet) {
+    el("t-page-title").textContent = "Тренировка по билетам ПДД";
+    note.hidden = true;
+    note.textContent = "";
+    return;
+  }
+  el("t-page-title").textContent = `Билет ${state.selectedSet.number}`;
+  note.textContent = `Учебная подборка: ${state.selectedSet.tickets.length} ${questionWord(state.selectedSet.tickets.length)}.`;
+  note.hidden = false;
+}
+
 function renderCounters() {
-  const summary = progressSummary(state.all, state.progress);
+  const summary = progressSummary(selectionPool(), state.progress);
+  const bankSummary = progressSummary(state.all, state.progress);
   el("t-total").textContent = String(state.list.length);
   el("t-index").textContent = String(state.list.length && !state.completed ? state.progress.position + 1 : 0);
   el("t-solved").textContent = String(summary.solved);
   el("t-pool").textContent = String(summary.total);
-  el("t-available-count").textContent = String(summary.total);
+  el("t-available-count").textContent = String(bankSummary.total);
   el("t-progress").style.width = summary.total ? `${(summary.solved / summary.total) * 100}%` : "0";
 }
 
 function renderDashboard() {
-  const summary = progressSummary(state.all, state.progress);
-  const today = selectTrainingTickets(state.all, state.progress, {
+  const pool = selectionPool();
+  const summary = progressSummary(pool, state.progress);
+  const today = selectTrainingTickets(pool, state.progress, {
     ...selectionOptions(),
     filter: FILTERS.TODAY,
   });
@@ -103,22 +130,22 @@ function renderDashboard() {
   el("t-stat-due").textContent = String(summary.due);
   el("t-stat-remaining").textContent = String(summary.remaining);
 
-  if (state.query || state.topicId) {
+  if (state.query || state.topicId || state.selectedSet) {
     el("t-plan-note").textContent = today.length
-      ? `В выбранной подборке на сегодня: ${today.length} ${ticketWord(today.length)}.`
+      ? `В выбранной подборке на сегодня: ${today.length} ${questionWord(today.length)}.`
       : "В выбранной подборке на сегодня нет вопросов.";
   } else if (summary.due > 0) {
-    el("t-plan-note").textContent = `Сначала повторите ${summary.due} ${ticketWord(summary.due)}, затем переходите к новым.`;
+    el("t-plan-note").textContent = `Сначала повторите ${summary.due} ${questionWord(summary.due)}, затем переходите к новым.`;
   } else if (summary.remaining > 0) {
-    el("t-plan-note").textContent = "Повторений пока нет. Начните с короткой подборки новых билетов.";
+    el("t-plan-note").textContent = "Повторений пока нет. Начните с короткой подборки новых вопросов.";
   } else {
-    el("t-plan-note").textContent = "Все доступные билеты решены, срочных повторений нет.";
+    el("t-plan-note").textContent = "Все доступные вопросы решены, срочных повторений нет.";
   }
   el("t-start-today").textContent = today.length
-    ? `Начать ${today.length} ${ticketWord(today.length)}`
+    ? `Начать ${today.length} ${questionWord(today.length)}`
     : "Нет вопросов на сегодня";
   el("t-start-today").disabled = today.length === 0;
-  el("t-dashboard").hidden = false;
+  el("t-dashboard").hidden = Boolean(state.selectedSet);
 }
 
 function track(event, values = {}) {
@@ -136,7 +163,7 @@ function renderMission() {
   el("t-mission").hidden = !summary.total || state.completed;
   el("t-mission-title").textContent = state.filter === FILTERS.TODAY ? "Миссия на сегодня" : "Ваша подборка";
   el("t-mission-count").textContent = `${summary.answered} / ${summary.total}`;
-  el("t-mission-note").textContent = `В подборке: ${summary.total} ${ticketWord(summary.total)}. Прошлых ошибок: ${state.session.originalMistakeIds.length}.`;
+  el("t-mission-note").textContent = `В подборке: ${summary.total} ${questionWord(summary.total)}. Прошлых ошибок: ${state.session.originalMistakeIds.length}.`;
   el("t-mission-progress").max = Math.max(1, summary.total);
   el("t-mission-progress").value = summary.answered;
 }
@@ -182,7 +209,7 @@ function renderResult() {
 }
 
 function renderFilterState() {
-  document.querySelectorAll(".exam__filter").forEach((button) => {
+  document.querySelectorAll(".exam__filters [data-filter]").forEach((button) => {
     const isActive = button.dataset.filter === state.filter;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
@@ -205,7 +232,7 @@ function renderEmpty() {
   }
 
   if (state.query || state.topicId) {
-    el("t-empty-text").textContent = "По выбранным условиям билетов не найдено. Попробуйте другой запрос или сбросьте поиск и тему.";
+    el("t-empty-text").textContent = "По выбранным условиям вопросов не найдено. Попробуйте другой запрос или сбросьте поиск и тему.";
     action.textContent = "Сбросить поиск и тему";
     action.hidden = false;
     return;
@@ -219,6 +246,7 @@ function ticketPermalink(ticketId) {
   const url = new URL(window.location.href);
   url.search = "";
   url.hash = "";
+  if (state.selectedSet) url.searchParams.set("set", String(state.selectedSet.number));
   url.searchParams.set("ticket", String(ticketId));
   return url.href;
 }
@@ -239,6 +267,37 @@ function renderFavoriteButton(ticketId) {
   favorite.setAttribute("aria-pressed", String(isFavorite));
 }
 
+function jumpToQuestion(position) {
+  if (state.completed || position < 0 || position >= state.list.length) return;
+  state.progress = { ...state.progress, position };
+  save();
+  renderCard({ focusQuestion: true });
+}
+
+function renderQuestionNavigator() {
+  const nav = el("t-question-nav");
+  const grid = el("t-question-nav-grid");
+  const visible = !state.completed && state.list.length > 1 && state.list.length <= QUESTION_NAV_LIMIT;
+  nav.hidden = !visible;
+  grid.textContent = "";
+  if (!visible) return;
+
+  state.list.forEach((ticket, index) => {
+    const current = index === state.progress.position;
+    const answered = Object.prototype.hasOwnProperty.call(state.selectedAnswers, ticket.id);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "exam__filter learning-question-nav__button";
+    button.classList.toggle("is-active", current);
+    button.classList.toggle("is-answered", answered);
+    button.textContent = `${index + 1}${answered ? " ✓" : ""}`;
+    button.setAttribute("aria-label", `Вопрос ${index + 1}${current ? ", текущий" : ""}${answered ? ", отвечен" : ""}`);
+    if (current) button.setAttribute("aria-current", "step");
+    button.addEventListener("click", () => jumpToQuestion(index));
+    grid.append(button);
+  });
+}
+
 function renderCard({ focusQuestion = false } = {}) {
   const ticket = state.completed ? null : state.list[state.progress.position];
   state.answered = false;
@@ -250,6 +309,7 @@ function renderCard({ focusQuestion = false } = {}) {
   el("t-card").hidden = !ticket;
   el("t-help").hidden = !ticket;
   renderCounters();
+  renderQuestionNavigator();
 
   if (state.completed) {
     el("t-empty").hidden = true;
@@ -278,6 +338,7 @@ function renderCard({ focusQuestion = false } = {}) {
   }
 
   el("t-source-id").textContent = String(ticket.id);
+  el("t-catalog-number").textContent = String(state.ordinals.get(ticket.id));
   el("t-help-id").textContent = String(ticket.id);
   el("t-permalink").href = ticketPermalink(ticket.id);
   el("t-help-link").href = helpLink(ticket.id);
@@ -352,6 +413,7 @@ function answer(index) {
   state.progress = markAnswer(state.progress, ticket.id, correct, now);
   showAnswer(ticket, index, outcome);
   renderMission();
+  renderQuestionNavigator();
   if (outcome.reinforced) track("training_reinforced");
   save();
   renderCounters();
@@ -388,7 +450,7 @@ function go(delta) {
 }
 
 function applySelection({ resetPosition = true, focusQuestion = false } = {}) {
-  state.list = selectTrainingTickets(state.all, state.progress, selectionOptions());
+  state.list = selectTrainingTickets(selectionPool(), state.progress, selectionOptions());
   state.completed = false;
   startSession();
   state.progress = {
@@ -406,6 +468,16 @@ function applyFilter(filter) {
   applySelection();
 }
 
+function clearSelectedSet() {
+  if (!state.selectedSet) return;
+  state.selectedSet = null;
+  const url = new URL(window.location.href);
+  url.searchParams.delete("set");
+  window.history.replaceState(null, "", url);
+  renderSetContext();
+  if (state.topics.length) populateTopics(state.topics);
+}
+
 function clearSearchAndTopic() {
   state.query = "";
   state.topicId = "";
@@ -419,7 +491,7 @@ function populateTopics(topics) {
   const selected = state.topicId;
   select.textContent = "";
   select.append(new Option("Все темы", ""));
-  const activeIds = new Set(state.all.filter((ticket) => ticket.lang === "ru").map((ticket) => ticket.id));
+  const activeIds = new Set(selectionPool().filter((ticket) => ticket.lang === "ru").map((ticket) => ticket.id));
   const solvedIds = new Set((state.progress.solved || []).filter((id) => activeIds.has(id)));
   topics.forEach((topic) => {
     const availableIds = topic.ticket_ids.filter((id) => activeIds.has(id));
@@ -446,14 +518,24 @@ function topicsUnavailable() {
   el("t-topics-status").hidden = false;
 }
 
-document.querySelectorAll(".exam__filter").forEach((button) => {
+document.querySelectorAll(".exam__filters [data-filter]").forEach((button) => {
   button.addEventListener("click", () => {
     const filter = button.dataset.filter;
+    if (!filter) return;
     applyFilter(filter);
     if (typeof window.gtag === "function") {
       window.gtag("event", "training_mode_select", { mode: filter });
     }
   });
+});
+
+el("t-exit-set").addEventListener("click", () => {
+  clearSelectedSet();
+  const url = new URL(window.location.href);
+  url.searchParams.delete("ticket");
+  window.history.replaceState(null, "", url);
+  state.filter = FILTERS.ALL;
+  clearSearchAndTopic();
 });
 
 el("t-search-form").addEventListener("submit", (event) => {
@@ -606,9 +688,19 @@ async function loadTopics() {
   const status = el("t-status");
   try {
     state.all = await loadTicketBank(DATA_URL);
+    state.sets = buildTicketSets(state.all);
+    state.ordinals = new Map(state.sets.flatMap(set => set.tickets).map((ticket, index) => [ticket.id, index + 1]));
     state.progress = readProgress(store());
 
-    const requestedTicket = new URLSearchParams(window.location.search).get("ticket");
+    const parameters = new URLSearchParams(window.location.search);
+    const requestedSet = parameters.get("set");
+    if (requestedSet && /^[1-9]\d*$/.test(requestedSet)) {
+      state.selectedSet = state.sets.find((set) => set.number === Number(requestedSet)) || null;
+      if (state.selectedSet) state.filter = FILTERS.ALL;
+    }
+    renderSetContext();
+
+    const requestedTicket = parameters.get("ticket");
     if (requestedTicket && /^\d+$/.test(requestedTicket)) {
       state.filter = FILTERS.ALL;
       state.query = requestedTicket;
