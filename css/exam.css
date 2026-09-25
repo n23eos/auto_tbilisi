@@ -3,9 +3,7 @@
 .exam {
   max-width: 52rem;
   margin: 0 auto;
-  /* Сверху с запасом: шапка position: fixed и перекрыла бы заголовок.
-     Отступ задан отдельным свойством, чтобы медиазапрос ниже его не затирал. */
-  padding-block: calc(var(--space-3xl) + 2rem) var(--space-3xl);
+  padding-block: 1.5rem var(--space-3xl);
   padding-inline: var(--space-md);
 }
 
@@ -539,7 +537,7 @@
 .learning-nav__link[aria-current="page"] { background: var(--color-ink); color: var(--color-ink-invert); border-color: var(--color-ink); }
 .learning-nav__link:hover { border-color: var(--color-accent); }
 .learning-nav__link:focus-visible, .ticket-tile:focus-visible, .question-tile:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.exam:has(> .learning-nav) { padding-top: 6rem; }
+.exam:has(> .learning-nav) { padding-top: 1.5rem; }
 .catalog { max-width: 72rem; }
 .catalog .exam__title { font-size: clamp(1.5rem, 3vw, 2.5rem); }
 .catalog-note { color: var(--color-ink-muted); max-width: 46rem; margin: .75rem 0; }
@@ -581,3 +579,11 @@
   .catalog-search__row { grid-template-columns: 1fr; }
   .learning-question-nav__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
+
+.training-resume { padding: 1.25rem; margin-block: 1rem; border: 2px solid var(--color-accent); border-radius: var(--radius-sm); background: var(--color-paper-2); }
+.training-resume[hidden] { display: none; }
+.training-resume h2 { font-size: var(--text-lg); margin-bottom: .5rem; }
+.training-resume p { margin-bottom: 1rem; }
+.topic-shortcuts { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
+.topic-shortcuts a { display: inline-flex; align-items: center; min-height: 44px; padding: .6rem .9rem; border: 1px solid var(--color-line-strong); border-radius: var(--radius-sm); color: var(--color-ink); font-weight: 600; }
+.topic-shortcuts a:hover { background: var(--color-paper-3); }

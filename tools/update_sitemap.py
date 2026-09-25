@@ -28,6 +28,9 @@ PAGES = {
     "https://avtoshkola.ge/bilety/voprosy/": "bilety/voprosy/index.html",
     "https://avtoshkola.ge/bilety/ekzamen/": "bilety/ekzamen/index.html",
     "https://avtoshkola.ge/bilety/trenirovka/": "bilety/trenirovka/index.html",
+    "https://avtoshkola.ge/bilety/temy/dorozhnye-znaki/": "bilety/temy/dorozhnye-znaki/index.html",
+    "https://avtoshkola.ge/bilety/temy/perekrestki/": "bilety/temy/perekrestki/index.html",
+    "https://avtoshkola.ge/bilety/temy/ostanovka-stoyanka/": "bilety/temy/ostanovka-stoyanka/index.html",
 }
 
 

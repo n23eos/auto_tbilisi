@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
-  <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=26">
+  <link rel="stylesheet" href="../../css/style.css?v=29">
+  <link rel="stylesheet" href="../../css/exam.css?v=27">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей - три последовательных раундтрипа впустую. -->
@@ -93,11 +93,14 @@
 </head>
 <body>
   <header class="nav is-solid">
-    <a class="nav__brand" href="../../">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
-    <nav class="nav__links" aria-label="Разделы билетов">
-      <a class="nav__link" href="../trenirovka/">Тренировка</a>
+    <a class="nav__brand" href="/" aria-label="Автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <nav class="nav__links" aria-label="Разделы сайта">
+      <a class="nav__link" href="/#prices">Цены</a>
+      <a class="nav__link nav__tickets" href="/bilety/">Билеты ПДД</a>
+      <a class="nav__link" href="/voprosy/">Вопросы</a>
+      <a class="nav__link" href="/#contact">Контакты</a>
     </nav>
-    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+    <a class="nav__cta" href="tel:+995599987707" aria-label="Позвонить: +995 599 98 77 07">599 98 77 07</a>
   </header>
 
   <main class="exam" id="exam">

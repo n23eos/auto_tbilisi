@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
-  <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=26">
+  <link rel="stylesheet" href="../../css/style.css?v=29">
+  <link rel="stylesheet" href="../../css/exam.css?v=27">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -84,8 +84,14 @@
 </head>
 <body>
   <header class="nav is-solid">
-    <a class="nav__brand" href="../../">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
-    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+    <a class="nav__brand" href="/" aria-label="Автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <nav class="nav__links" aria-label="Разделы сайта">
+      <a class="nav__link" href="/#prices">Цены</a>
+      <a class="nav__link nav__tickets" href="/bilety/">Билеты ПДД</a>
+      <a class="nav__link" href="/voprosy/">Вопросы</a>
+      <a class="nav__link" href="/#contact">Контакты</a>
+    </nav>
+    <a class="nav__cta" href="tel:+995599987707" aria-label="Позвонить: +995 599 98 77 07">599 98 77 07</a>
   </header>
 
   <main class="exam" id="training">
@@ -103,6 +109,17 @@
       вопросы. Доступен <a href="#bank-coverage"><b id="t-available-count">921</b> вопрос на русском</a>.
       Регистрация не нужна, прогресс хранится в этом браузере.
     </p>
+
+    <section class="training-resume" id="t-resume" aria-labelledby="t-resume-title" hidden>
+      <p class="section-kicker">Незавершённое занятие</p>
+      <h2 id="t-resume-title"></h2>
+      <p id="t-resume-note"></p>
+      <div class="exam__actions">
+        <button class="exam__btn exam__btn--primary" id="t-resume-action" type="button">Продолжить</button>
+        <button class="exam__btn exam__btn--ghost" id="t-resume-discard" type="button">Начать заново</button>
+      </div>
+    </section>
+    <p class="exam__status" id="t-session-status" role="status" aria-live="polite"></p>
 
     <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
       <div class="training-dashboard__head">
@@ -171,7 +188,7 @@
 
     <p class="exam__status" id="t-status" role="status">Загружаем билеты…</p>
     <p class="exam__status exam__status--error" id="t-storage-status" role="status" hidden>
-      Прогресс не сохраняется: хранилище браузера недоступно.
+      Прогресс и занятие не сохраняются: хранилище браузера недоступно.
     </p>
 
     <section class="training-mission" id="t-mission" aria-labelledby="t-mission-title" hidden>
@@ -286,6 +303,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=10"></script>
+  <script type="module" src="../../js/training.js?v=11"></script>
 </body>
 </html>

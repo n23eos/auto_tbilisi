@@ -18,6 +18,7 @@ import {
 import { markAnswerButtons } from "./answer-marking.js";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 import { buildTicketSets } from "./ticket-catalog-logic.js?v=1";
+import { discardSession, makeSessionSnapshot, readSession, shouldRestoreSession, writeSession } from "./training-session.js?v=1";
 
 const DATA_URL = "../../data/tickets-b-ru.json?v=2";
 const TOPICS_URL = "../../data/ticket-topics.json";
@@ -41,9 +42,11 @@ const state = {
   answered: false,
   completed: false,
   storageAvailable: true,
+  sessionStorageAvailable: true,
   session: null,
   selectedAnswers: {},
   sessionStarted: false,
+  savedSession: null,
 };
 
 const EMPTY_TEXT = {
@@ -69,13 +72,97 @@ function store() {
     return window.localStorage;
   } catch {
     state.storageAvailable = false;
-    return { getItem: () => null, setItem: () => { throw new Error("хранилище недоступно"); } };
+    state.sessionStorageAvailable = false;
+    return { getItem: () => null, setItem: () => { throw new Error("хранилище недоступно"); }, removeItem: () => { throw new Error("хранилище недоступно"); } };
   }
+}
+
+function renderStorageStatus() {
+  const status = el("t-storage-status");
+  status.hidden = state.storageAvailable && state.sessionStorageAvailable;
+  if (status.hidden) return;
+  status.textContent = !state.storageAvailable && !state.sessionStorageAvailable
+    ? "Прогресс и занятие не сохраняются: хранилище браузера недоступно."
+    : state.storageAvailable
+      ? "Занятие не сохраняется: хранилище браузера недоступно или заполнено."
+      : "Прогресс не сохраняется: хранилище браузера недоступно или заполнено.";
 }
 
 function save() {
   if (!writeProgress(store(), state.progress)) state.storageAvailable = false;
-  el("t-storage-status").hidden = state.storageAvailable;
+  renderStorageStatus();
+}
+
+function snapshot() {
+  return makeSessionSnapshot({
+    list: state.list,
+    position: state.progress.position,
+    selectedAnswers: state.selectedAnswers,
+    session: state.session,
+    sessionStarted: state.sessionStarted,
+    filter: state.filter,
+    query: state.query,
+    topicId: state.topicId,
+    limit: state.limit,
+    set: state.selectedSet?.number ?? null,
+  });
+}
+
+function saveSession() {
+  if (!state.list.length || state.completed) return false;
+  const saved = writeSession(store(), snapshot());
+  if (!saved) state.sessionStorageAvailable = false;
+  state.savedSession = null;
+  el("t-resume").hidden = true;
+  renderStorageStatus();
+  return saved;
+}
+
+function clearSavedSession() {
+  if (!discardSession(store())) state.sessionStorageAvailable = false;
+  state.savedSession = null;
+  el("t-resume").hidden = true;
+  renderStorageStatus();
+}
+
+function sessionLabel(context) {
+  if (context.set !== null) return `Билет ${context.set}`;
+  if (context.topicId) return state.topics.find((topic) => String(topic.id) === context.topicId)?.name || "Тема";
+  if (context.query) return `Поиск: ${context.query}`;
+  return context.filter === FILTERS.TODAY ? "Миссия на сегодня" : "Тренировка";
+}
+
+function showResumeOffer() {
+  const saved = state.savedSession;
+  el("t-resume").hidden = !saved;
+  if (!saved) return;
+  const { snapshot: previous } = saved;
+  el("t-resume-title").textContent = sessionLabel(previous.context);
+  el("t-resume-note").textContent = `Продолжить: вопрос ${previous.position + 1} из ${previous.ticketIds.length}. Прежние ответы останутся на месте.`;
+}
+
+function restoreSession(saved) {
+  const previous = saved.snapshot;
+  state.selectedSet = saved.selectedSet;
+  state.filter = previous.context.filter;
+  state.query = previous.context.query;
+  state.topicId = previous.context.topicId;
+  state.limit = previous.context.limit;
+  state.list = saved.tickets;
+  state.session = previous.session;
+  state.selectedAnswers = previous.selectedAnswers;
+  state.sessionStarted = previous.sessionStarted;
+  state.completed = false;
+  state.progress = { ...state.progress, position: previous.position };
+  el("t-search").value = state.query;
+  if (state.topics.length) populateTopics(state.topics);
+  el("t-limit").value = String(state.limit);
+  renderSetContext();
+  renderFilterState();
+  renderDashboard();
+  renderCard();
+  el("t-resume").hidden = true;
+  el("t-session-status").textContent = `Занятие восстановлено: вопрос ${previous.position + 1} из ${previous.ticketIds.length}.`;
 }
 
 function selectionOptions() {
@@ -271,6 +358,7 @@ function jumpToQuestion(position) {
   if (state.completed || position < 0 || position >= state.list.length) return;
   state.progress = { ...state.progress, position };
   save();
+  saveSession();
   renderCard({ focusQuestion: true });
 }
 
@@ -416,6 +504,7 @@ function answer(index) {
   renderQuestionNavigator();
   if (outcome.reinforced) track("training_reinforced");
   save();
+  saveSession();
   renderCounters();
   renderDashboard();
   if (state.topics.length) populateTopics(state.topics);
@@ -427,6 +516,7 @@ function answer(index) {
 function finishSession() {
   if (state.completed || !state.list.length) return;
   state.completed = true;
+  clearSavedSession();
   const summary = sessionSummary(state.session);
   track(summary.complete ? "training_session_complete" : "training_session_reviewed", summary);
   renderCard();
@@ -446,10 +536,11 @@ function go(delta) {
     position: movePosition(state.progress.position, delta, state.list.length),
   };
   save();
+  saveSession();
   renderCard({ focusQuestion: true });
 }
 
-function applySelection({ resetPosition = true, focusQuestion = false } = {}) {
+function applySelection({ resetPosition = true, focusQuestion = false, persist = true } = {}) {
   state.list = selectTrainingTickets(selectionPool(), state.progress, selectionOptions());
   state.completed = false;
   startSession();
@@ -460,6 +551,15 @@ function applySelection({ resetPosition = true, focusQuestion = false } = {}) {
   renderFilterState();
   renderDashboard();
   save();
+  if (persist) {
+    state.savedSession = null;
+    el("t-resume").hidden = true;
+    if (saveSession()) {
+      const url = new URL(window.location.href);
+      url.search = "?resume=1";
+      window.history.replaceState(null, "", url);
+    }
+  }
   renderCard({ focusQuestion });
 }
 
@@ -556,12 +656,26 @@ el("t-limit").addEventListener("change", () => {
 });
 
 el("t-clear-filters").addEventListener("click", clearSearchAndTopic);
+el("t-resume-action").addEventListener("click", () => {
+  if (!state.savedSession) return;
+  restoreSession(state.savedSession);
+  const url = new URL(window.location.href);
+  url.search = "?resume=1";
+  window.history.replaceState(null, "", url);
+  el("t-text").focus();
+});
+el("t-resume-discard").addEventListener("click", () => {
+  clearSavedSession();
+  applySelection({ persist: false });
+  el("t-session-status").textContent = "Начали новую подборку. Прежнее занятие удалено.";
+});
 el("t-empty-action").addEventListener("click", () => {
   if (state.completed) {
     state.completed = false;
     startSession();
     state.progress = { ...state.progress, position: 0 };
     save();
+    saveSession();
     renderCard({ focusQuestion: true });
   } else {
     clearSearchAndTopic();
@@ -596,6 +710,7 @@ el("t-result-retry").addEventListener("click", () => {
   startSession();
   state.progress = { ...state.progress, position: 0 };
   save();
+  saveSession();
   renderCard({ focusQuestion: true });
 });
 
@@ -648,10 +763,11 @@ imageDialog.addEventListener("keydown", (event) => {
 el("t-reset").addEventListener("click", () => {
   if (!window.confirm("Стереть весь прогресс тренировки, включая избранное? Отменить это будет нельзя.")) return;
   state.progress = { solved: [], mistakes: [], position: 0, reviews: {}, favorites: [] };
+  clearSavedSession();
   save();
   renderDashboard();
   if (state.topics.length) populateTopics(state.topics);
-  applySelection();
+  applySelection({ persist: false });
 });
 
 document.addEventListener("keydown", (event) => {
@@ -677,10 +793,11 @@ async function loadTopics() {
       throw new Error("неверный формат");
     }
     state.topics = data.topics;
-    populateTopics(state.topics);
+    return true;
   } catch {
     state.topics = [];
     topicsUnavailable();
+    return false;
   }
 }
 
@@ -691,6 +808,7 @@ async function loadTopics() {
     state.sets = buildTicketSets(state.all);
     state.ordinals = new Map(state.sets.flatMap(set => set.tickets).map((ticket, index) => [ticket.id, index + 1]));
     state.progress = readProgress(store());
+    const topicsLoaded = await loadTopics();
 
     const parameters = new URLSearchParams(window.location.search);
     const requestedSet = parameters.get("set");
@@ -707,10 +825,47 @@ async function loadTopics() {
       el("t-search").value = requestedTicket;
     }
 
+    const requestedTopic = parameters.get("topic");
+    if (requestedTopic && topicsLoaded) {
+      const topic = state.topics.find((item) => String(item.id) === requestedTopic);
+      if (topic) {
+        state.topicId = requestedTopic;
+        state.filter = FILTERS.ALL;
+      } else {
+        el("t-session-status").textContent = "Эта тема не найдена. Показываем обычную тренировку.";
+      }
+    } else if (requestedTopic) {
+      el("t-session-status").textContent = "Темы сейчас недоступны. Показываем обычную тренировку.";
+    }
+    if (topicsLoaded) populateTopics(state.topics);
+
+    const saved = readSession(store(), state.all, state.sets, state.topics, { discardInvalid: topicsLoaded });
+    if (saved.status === "ok") state.savedSession = saved.value;
+    if (saved.status === "unavailable") {
+      state.sessionStorageAvailable = false;
+      renderStorageStatus();
+    }
+    if (saved.status === "invalid" && topicsLoaded) {
+      if (!saved.cleared) {
+        state.sessionStorageAvailable = false;
+        renderStorageStatus();
+      }
+      el("t-session-status").textContent = "Прежнее занятие устарело или повреждено. Можно начать новую подборку.";
+    }
+
     status.hidden = true;
-    renderDashboard();
-    applySelection({ resetPosition: true, focusQuestion: false });
-    loadTopics();
+    const explicit = parameters.has("set") || parameters.has("ticket") || parameters.has("topic");
+    const canRestore = shouldRestoreSession(parameters, state.savedSession?.snapshot.context, {
+      filter: state.filter,
+      query: state.query,
+      topicId: state.topicId,
+      set: state.selectedSet?.number ?? null,
+    });
+    if (canRestore) restoreSession(state.savedSession);
+    else {
+      applySelection({ resetPosition: true, focusQuestion: false, persist: false });
+      if (!explicit) showResumeOffer();
+    }
   } catch (error) {
     status.textContent = `Не удалось загрузить билеты: ${error.message}. Обновите страницу.`;
     status.classList.add("exam__status--error");

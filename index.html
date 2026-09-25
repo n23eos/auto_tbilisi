@@ -29,7 +29,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
-  <link rel="stylesheet" href="css/style.css?v=28">
+  <link rel="stylesheet" href="css/style.css?v=29">
   <link rel="stylesheet" href="css/partner.css?v=11">
   <link rel="stylesheet" href="css/chat.css?v=3">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
@@ -313,15 +313,15 @@
 <body>
 
   <!-- Nav · N9 edge-aligned minimal -->
-  <header class="nav">
-    <a class="nav__brand" href="#top" aria-label="Avtoshkola.ge — автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+  <header class="nav is-solid">
+    <a class="nav__brand" href="/" aria-label="Автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
     <nav class="nav__links" aria-label="Разделы сайта">
-      <a class="nav__link" href="#prices">Цены</a>
-      <a class="nav__link" href="bilety/">Билеты ПДД</a>
-      <a class="nav__link" href="voprosy/">Вопросы</a>
-      <a class="nav__link" href="#contact">Контакты</a>
+      <a class="nav__link" href="/#prices">Цены</a>
+      <a class="nav__link nav__tickets" href="/bilety/">Билеты ПДД</a>
+      <a class="nav__link" href="/voprosy/">Вопросы</a>
+      <a class="nav__link" href="/#contact">Контакты</a>
     </nav>
-    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+    <a class="nav__cta" href="tel:+995599987707" aria-label="Позвонить: +995 599 98 77 07">599 98 77 07</a>
   </header>
 
   <!-- Hero · Marquee поверх видео 2:1 -->
@@ -784,7 +784,7 @@
   </div>
 
   <script src="js/analytics.js?v=25" defer></script>
-  <script src="js/main.js?v=28" defer></script>
+  <script src="js/main.js?v=29" defer></script>
   <script type="module" src="js/chat.js?v=3" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
 </body>
 </html>

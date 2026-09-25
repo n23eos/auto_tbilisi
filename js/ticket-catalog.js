@@ -1,3 +1,4 @@
+import { readSessionSummary } from "./training-session.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 import { readProgress } from "./training-logic.js?v=4";
 import { buildTicketSets, filterCatalog, questionStatus } from "./ticket-catalog-logic.js?v=1";
@@ -24,7 +25,20 @@ function readSavedProgress() {
   catch { return readProgress({ getItem: () => null }); }
 }
 
+function renderResume() {
+  const panel = document.getElementById("catalog-resume");
+  if (!panel) return;
+  let summary;
+  try { summary = readSessionSummary(window.localStorage); } catch { summary = null; }
+  panel.hidden = !summary;
+  if (summary) {
+    const label = Number.isInteger(summary.context.set) ? `Билет ${summary.context.set}` : "Тренировка";
+    document.getElementById("catalog-resume-label").textContent = `${label}: вопрос ${summary.position} из ${summary.total}. Ответы сохранены в этом браузере.`;
+  }
+}
+
 function render() {
+  renderResume();
   const fragment = document.createDocumentFragment();
   if (page.dataset.catalog === "sets") {
     const sets = buildTicketSets(tickets);

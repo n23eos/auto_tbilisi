@@ -17,14 +17,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css?v=23">
-  <link rel="stylesheet" href="/css/style.css?v=28">
-  <link rel="stylesheet" href="/css/exam.css?v=26">
+  <link rel="stylesheet" href="/css/style.css?v=29">
+  <link rel="stylesheet" href="/css/exam.css?v=27">
   <link rel="icon" href="/favicon.ico" sizes="any">
 </head>
 <body>
   <header class="nav is-solid">
-    <a class="nav__brand" href="/">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
-    <a class="nav__cta" href="tel:+995599987707">599 98 77 07</a>
+    <a class="nav__brand" href="/" aria-label="Автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
+    <nav class="nav__links" aria-label="Разделы сайта">
+      <a class="nav__link" href="/#prices">Цены</a>
+      <a class="nav__link nav__tickets" href="/bilety/" aria-current="page">Билеты ПДД</a>
+      <a class="nav__link" href="/voprosy/">Вопросы</a>
+      <a class="nav__link" href="/#contact">Контакты</a>
+    </nav>
+    <a class="nav__cta" href="tel:+995599987707" aria-label="Позвонить: +995 599 98 77 07">599 98 77 07</a>
   </header>
   <main class="exam catalog" data-catalog="sets">
     <nav class="learning-nav" aria-label="Учебные разделы">
@@ -36,6 +42,16 @@
     <h1 class="exam__title">Все билеты ПДД Грузии</h1>
     <p class="exam__lead">Выберите билет и решайте в своём темпе.</p>
     <p class="catalog-note">Учебные подборки сайта по 30 вопросов, в последней 21. Это не официальные экзаменационные варианты.</p>
+    <section class="training-resume" id="catalog-resume" hidden aria-label="Незавершённая тренировка">
+      <h2>Продолжить тренировку</h2>
+      <p id="catalog-resume-label"></p>
+      <a class="exam__btn exam__btn--primary" href="/bilety/trenirovka/?resume=1">Продолжить</a>
+    </section>
+    <nav class="topic-shortcuts" aria-label="Тренировка по темам">
+      <a href="/bilety/temy/dorozhnye-znaki/">Дорожные знаки</a>
+      <a href="/bilety/temy/perekrestki/">Проезд перекрёстков</a>
+      <a href="/bilety/temy/ostanovka-stoyanka/">Остановка и стоянка</a>
+    </nav>
     <p id="catalog-status" class="catalog-status" role="status">Загружаем билеты...</p>
     <div class="ticket-grid" id="catalog-grid" aria-label="Все учебные билеты"></div>
     <p class="exam__source">База: 921 вопрос категории B/B1 из <a href="https://teoria.on.ge" rel="nofollow noopener" target="_blank">teoria.on.ge</a>. Для 51 вопроса по эко-вождению подготовлен наш русский перевод. Соответствие актуальному официальному банку пока не подтверждено.</p>
@@ -43,6 +59,6 @@
   </main>
   <footer class="footer"><p class="footer__mark">Автошкола на русском языке</p><p class="footer__meta"><a href="/">На главную</a> · <a href="tel:+995599987707">+995 599 98 77 07</a></p></footer>
   <script src="/js/analytics.js?v=25" defer></script>
-  <script type="module" src="/js/ticket-catalog.js?v=1"></script>
+  <script type="module" src="/js/ticket-catalog.js?v=2"></script>
 </body>
 </html>

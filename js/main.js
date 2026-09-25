@@ -72,25 +72,6 @@ document.documentElement.classList.add('has-js');
   });
 })();
 
-// Шапка становится светлой, когда видео уходит вверх
-(function () {
-  const nav = document.querySelector('.nav');
-  const hero = document.querySelector('.marquee');
-  if (!nav || !hero) return;
-
-  if (!('IntersectionObserver' in window)) {
-    nav.classList.add('is-solid');
-    return;
-  }
-
-  const observer = new IntersectionObserver(function (entries) {
-    // Пока видно хотя бы кусочек видео — шапка прозрачная
-    nav.classList.toggle('is-solid', !entries[0].isIntersecting);
-  }, { rootMargin: '-72px 0px 0px 0px', threshold: 0 });
-
-  observer.observe(hero);
-})();
-
 // Форма «Заказать звонок»: валидация + отправка через FormSubmit (AJAX)
 (function () {
   const form = document.getElementById('callback-form');
