@@ -4,13 +4,17 @@ import assert from "node:assert/strict";
 import {
   FILTERS,
   STORAGE_KEY,
+  answerOutcome,
   buildDailySession,
   clampPosition,
+  createSession,
   filterTickets,
   markAnswer,
   movePosition,
   progressSummary,
   readProgress,
+  recordSessionAnswer,
+  sessionSummary,
   writeProgress,
   selectTrainingTickets,
   toggleFavorite,
@@ -105,14 +109,81 @@ test("старый сохранённый прогресс получает пу
   assert.deepEqual(progress.solved, [2]);
 });
 
-test("верный ответ назначает повторение, а серия увеличивает интервал", () => {
+test("старое повторение получает пустую историю закрепления ошибки", () => {
+  const progress = readProgress(fakeStorage(JSON.stringify({
+    reviews: { 1: { attempts: 2, streak: 1, lastAnsweredAt: 10, nextReviewAt: 20 } },
+  })));
+  assert.deepEqual(progress.reviews[1], {
+    attempts: 2,
+    streak: 1,
+    lastAnsweredAt: 10,
+    nextReviewAt: 20,
+    lastWrongAt: 0,
+    reinforcedAt: 0,
+  });
+});
+
+test("некорректные поля повторения безопасно сбрасываются", () => {
+  const progress = readProgress(fakeStorage(JSON.stringify({
+    reviews: {
+      1: {
+        attempts: -1,
+        streak: "2",
+        lastAnsweredAt: -10,
+        nextReviewAt: "20",
+        lastWrongAt: null,
+        reinforcedAt: Infinity,
+      },
+      bad: { attempts: 3 },
+      2: null,
+    },
+  })));
+  assert.deepEqual(progress.reviews, {
+    1: {
+      attempts: 0,
+      streak: 0,
+      lastAnsweredAt: 0,
+      nextReviewAt: 0,
+      lastWrongAt: 0,
+      reinforcedAt: 0,
+    },
+  });
+});
+
+test("поля закрепления сохраняются после чтения, ответа и записи", () => {
+  const storage = fakeStorage(JSON.stringify({
+    solved: [],
+    mistakes: [1],
+    reviews: {
+      1: {
+        attempts: 1,
+        streak: 0,
+        lastAnsweredAt: 100,
+        nextReviewAt: 100,
+        lastWrongAt: 100,
+        reinforcedAt: 0,
+      },
+    },
+  }));
+  const progress = markAnswer(readProgress(storage), 2, true, 200);
+  writeProgress(storage, progress);
+  const restored = readProgress(storage);
+  assert.equal(restored.reviews[1].lastWrongAt, 100);
+  assert.equal(restored.reviews[1].reinforcedAt, 0);
+});
+
+test("досрочный правильный ответ не увеличивает серию и не переносит срок", () => {
   const day = 24 * 60 * 60 * 1000;
   const first = markAnswer({ solved: [], mistakes: [], position: 0, reviews: {} }, 1, true, 1000);
   const second = markAnswer(first, 1, true, 2000);
   assert.equal(first.reviews[1].nextReviewAt, 1000 + day);
-  assert.equal(second.reviews[1].nextReviewAt, 2000 + 3 * day);
+  assert.equal(second.reviews[1].nextReviewAt, first.reviews[1].nextReviewAt);
   assert.equal(second.reviews[1].attempts, 2);
-  assert.equal(second.reviews[1].streak, 2);
+  assert.equal(second.reviews[1].streak, 1);
+
+  const due = markAnswer(second, 1, true, first.reviews[1].nextReviewAt);
+  assert.equal(due.reviews[1].streak, 2);
+  assert.equal(due.reviews[1].nextReviewAt, first.reviews[1].nextReviewAt + 3 * day);
 });
 
 test("ошибка сбрасывает серию и назначает повторение сразу", () => {
@@ -120,6 +191,114 @@ test("ошибка сбрасывает серию и назначает пов�
   const after = markAnswer(before, 1, false, 2000);
   assert.equal(after.reviews[1].streak, 0);
   assert.equal(after.reviews[1].nextReviewAt, 2000);
+});
+
+test("закрепление после быстрого исправления требует ещё сутки без показа билета", () => {
+  const day = 24 * 60 * 60 * 1000;
+  const wrongAt = 1000;
+  const wrong = markAnswer({ solved: [], mistakes: [], position: 0, reviews: {} }, 1, false, wrongAt);
+  assert.deepEqual(answerOutcome(wrong, 1, true, wrongAt + day - 1), {
+    corrected: true,
+    reinforced: false,
+  });
+
+  const immediateOutcome = answerOutcome(wrong, 1, true, wrongAt + 100);
+  const corrected = markAnswer(wrong, 1, true, wrongAt + 100);
+  assert.deepEqual(immediateOutcome, { corrected: true, reinforced: false });
+  assert.deepEqual(answerOutcome(corrected, 1, true, wrongAt + day), {
+    corrected: false,
+    reinforced: false,
+  });
+  assert.deepEqual(answerOutcome(corrected, 1, true, wrongAt + day + 99), {
+    corrected: false,
+    reinforced: false,
+  });
+  assert.deepEqual(answerOutcome(corrected, 1, true, wrongAt + day + 100), {
+    corrected: false,
+    reinforced: true,
+  });
+});
+
+test("ответ перед границей суток не позволяет получить награду немедленным повтором", () => {
+  const day = 24 * 60 * 60 * 1000;
+  const minute = 60 * 1000;
+  const wrongAt = 1000;
+  const wrong = markAnswer({ solved: [], mistakes: [], position: 0, reviews: {} }, 1, false, wrongAt);
+  const almostDayLater = markAnswer(wrong, 1, true, wrongAt + day - minute);
+
+  assert.equal(answerOutcome(almostDayLater, 1, true, wrongAt + day).reinforced, false);
+  assert.equal(answerOutcome(almostDayLater, 1, true, wrongAt + 2 * day - minute).reinforced, true);
+});
+
+test("закрепление выдаётся один раз до следующей ошибки", () => {
+  const day = 24 * 60 * 60 * 1000;
+  const wrong = markAnswer({ solved: [], mistakes: [], position: 0, reviews: {} }, 1, false, 1000);
+  const reinforced = markAnswer(wrong, 1, true, 1000 + day);
+  assert.equal(reinforced.reviews[1].reinforcedAt, 1000 + day);
+  assert.equal(answerOutcome(reinforced, 1, true, 1000 + 2 * day).reinforced, false);
+
+  const wrongAgain = markAnswer(reinforced, 1, false, 1000 + 3 * day);
+  assert.equal(answerOutcome(wrongAgain, 1, true, 1000 + 4 * day).reinforced, true);
+});
+
+test("срок закрепления считается от самой свежей ошибки", () => {
+  const day = 24 * 60 * 60 * 1000;
+  const first = markAnswer({ solved: [], mistakes: [], position: 0, reviews: {} }, 1, false, 1000);
+  const latest = markAnswer(first, 1, false, 1000 + day - 100);
+  assert.equal(answerOutcome(latest, 1, true, 1000 + day).reinforced, false);
+  assert.equal(answerOutcome(latest, 1, true, 1000 + 2 * day - 100).reinforced, true);
+});
+
+test("сессия фиксирует исходные билеты и ошибки", () => {
+  const sourceTickets = [{ id: 1 }, { id: 2 }];
+  const sourceProgress = { mistakes: [2] };
+  const session = createSession(sourceTickets, sourceProgress);
+  sourceTickets.push({ id: 3 });
+  sourceProgress.mistakes.push(1);
+
+  assert.deepEqual(session.ticketIds, [1, 2]);
+  assert.deepEqual(session.originalMistakeIds, [2]);
+  assert.throws(() => session.ticketIds.push(3), TypeError);
+
+  const answered = recordSessionAnswer(session, 2, true, { corrected: true, reinforced: true });
+  assert.deepEqual(session.answers, {});
+  assert.deepEqual(answered.answers[2], { correct: true, corrected: true, reinforced: true });
+});
+
+test("сессия игнорирует неизвестные и повторные ответы", () => {
+  const initial = createSession([{ id: 1 }, { id: 2 }, { id: 3 }], { mistakes: [] });
+  const unknown = recordSessionAnswer(initial, 99, true, { reinforced: true });
+  assert.equal(unknown, initial);
+
+  const first = recordSessionAnswer(initial, 1, false);
+  const duplicate = recordSessionAnswer(first, 1, true, { reinforced: true });
+  assert.equal(duplicate, first);
+  assert.deepEqual(sessionSummary(duplicate), {
+    total: 3,
+    answered: 1,
+    correct: 0,
+    incorrect: 1,
+    skipped: 2,
+    corrected: 0,
+    reinforced: 0,
+    complete: false,
+  });
+});
+
+test("сводка сессии считает только первые ответы, исправления и закрепления", () => {
+  let session = createSession([{ id: 1 }, { id: 2 }], { mistakes: [1] });
+  session = recordSessionAnswer(session, 1, true, { corrected: true, reinforced: false });
+  session = recordSessionAnswer(session, 2, true, { corrected: false, reinforced: true });
+  assert.deepEqual(sessionSummary(session), {
+    total: 2,
+    answered: 2,
+    correct: 2,
+    incorrect: 0,
+    skipped: 0,
+    corrected: 1,
+    reinforced: 1,
+    complete: true,
+  });
 });
 
 test("сессия на сегодня ставит ошибки и просроченные повторения перед нерешёнными", () => {

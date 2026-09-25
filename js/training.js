@@ -2,6 +2,10 @@
 
 import {
   FILTERS,
+  answerOutcome,
+  createSession,
+  recordSessionAnswer,
+  sessionSummary,
   clampPosition,
   markAnswer,
   movePosition,
@@ -10,7 +14,7 @@ import {
   selectTrainingTickets,
   toggleFavorite,
   writeProgress,
-} from "./training-logic.js?v=3";
+} from "./training-logic.js?v=4";
 import { markAnswerButtons } from "./answer-marking.js";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 
@@ -32,6 +36,9 @@ const state = {
   answered: false,
   completed: false,
   storageAvailable: true,
+  session: null,
+  selectedAnswers: {},
+  sessionStarted: false,
 };
 
 const EMPTY_TEXT = {
@@ -114,6 +121,66 @@ function renderDashboard() {
   el("t-dashboard").hidden = false;
 }
 
+function track(event, values = {}) {
+  if (typeof window.gtag === "function") window.gtag("event", event, { mode: state.filter, ...values });
+}
+
+function startSession() {
+  state.session = createSession(state.list, state.progress);
+  state.selectedAnswers = {};
+  state.sessionStarted = false;
+}
+
+function renderMission() {
+  const summary = sessionSummary(state.session);
+  el("t-mission").hidden = !summary.total || state.completed;
+  el("t-mission-title").textContent = state.filter === FILTERS.TODAY ? "Миссия на сегодня" : "Ваша подборка";
+  el("t-mission-count").textContent = `${summary.answered} / ${summary.total}`;
+  el("t-mission-note").textContent = `В подборке: ${summary.total} ${ticketWord(summary.total)}. Прошлых ошибок: ${state.session.originalMistakeIds.length}.`;
+  el("t-mission-progress").max = Math.max(1, summary.total);
+  el("t-mission-progress").value = summary.answered;
+}
+
+function showAnswer(ticket, index, outcome = {}) {
+  const correct = ticket.correct === index;
+  markAnswerButtons(el("t-answers"), ticket.correct, index);
+  const feedback = el("t-feedback");
+  feedback.textContent = correct ? `Верно: ${ticket.answers[ticket.correct]}` : `Неверно. Правильный ответ: ${ticket.answers[ticket.correct]}`;
+  feedback.className = `exam__feedback ${correct ? "exam__feedback--ok" : "exam__feedback--bad"}`;
+  const reward = el("t-answer-reward");
+  reward.hidden = !outcome.corrected && !outcome.reinforced;
+  reward.textContent = outcome.reinforced
+    ? "★ Вспомнили после паузы! Верный ответ на прежнюю ошибку после паузы минимум сутки."
+    : "✓ Исправили прошлую ошибку. Повторим после паузы, чтобы закрепить.";
+}
+
+function renderResult() {
+  const summary = sessionSummary(state.session);
+  el("t-result").hidden = false;
+  el("t-result-done").textContent = "На сегодня хватит";
+  el("t-result-next").removeAttribute("role");
+  el("t-result-title").textContent = summary.complete ? "Миссия выполнена" : "Подборка просмотрена";
+  el("t-result-mark").textContent = summary.complete ? "✓" : "→";
+  el("t-result").classList.toggle("training-result--complete", summary.complete);
+  el("t-result-note").textContent = state.storageAvailable
+    ? `Ответили на ${summary.answered} из ${summary.total}. Прогресс сохранён в этом браузере.`
+    : `Ответили на ${summary.answered} из ${summary.total}. Прогресс доступен только до закрытия страницы.`;
+  for (const key of ["correct", "incorrect", "skipped"]) el(`t-result-${key}`).textContent = summary[key];
+  el("t-result-corrections").textContent = summary.corrected
+    ? `Исправлено прошлых ошибок: ${summary.corrected}. Это шаг вперёд.`
+    : summary.incorrect
+      ? "Ошибки помогают выбрать, что повторить. Верный ответ сразу после подсказки ещё нужно закрепить."
+      : summary.answered
+        ? "Верные ответы - хороший результат. Повторение после паузы поможет сохранить его."
+        : "В этот раз вы только просмотрели вопросы. Можно вернуться к ним, когда будете готовы.";
+  el("t-result-reward").hidden = summary.reinforced === 0;
+  el("t-result-reward").textContent = `★ Вспомнили после паузы: ${summary.reinforced}. Вы верно ответили на прежние ошибки спустя минимум сутки.`;
+  el("t-result-next").textContent = summary.incorrect || summary.skipped
+    ? "Можно закончить сейчас или отдельно разобрать ошибки и пропуски."
+    : "Хорошая точка для паузы. Возвращайтесь завтра: подборка предложит вопросы на повторение.";
+  el("t-result-retry").hidden = !summary.incorrect && !summary.skipped;
+}
+
 function renderFilterState() {
   document.querySelectorAll(".exam__filter").forEach((button) => {
     const isActive = button.dataset.filter === state.filter;
@@ -175,11 +242,20 @@ function renderFavoriteButton(ticketId) {
 function renderCard({ focusQuestion = false } = {}) {
   const ticket = state.completed ? null : state.list[state.progress.position];
   state.answered = false;
+  el("t-result").hidden = true;
+  el("t-answer-reward").hidden = true;
+  renderMission();
 
   el("t-empty").hidden = Boolean(ticket);
   el("t-card").hidden = !ticket;
   el("t-help").hidden = !ticket;
   renderCounters();
+
+  if (state.completed) {
+    el("t-empty").hidden = true;
+    renderResult();
+    return;
+  }
 
   if (!ticket) {
     renderEmpty();
@@ -250,6 +326,11 @@ function renderCard({ focusQuestion = false } = {}) {
   el("t-next").textContent = atEnd
     ? (state.filter === FILTERS.TODAY ? "Завершить сессию" : "Завершить просмотр")
     : "Дальше →";
+  const previous = state.selectedAnswers[ticket.id];
+  if (previous) {
+    state.answered = true;
+    showAnswer(ticket, previous.index, previous.outcome);
+  }
   if (focusQuestion) question.focus();
 }
 
@@ -260,14 +341,18 @@ function answer(index) {
   const ticket = state.list[state.progress.position];
   const correct = ticket.correct === index;
 
-  markAnswerButtons(el("t-answers"), ticket.correct, index);
-
-  const feedback = el("t-feedback");
-  const correctText = ticket.answers[ticket.correct];
-  feedback.textContent = correct ? `Верно: ${correctText}` : `Неверно. Правильный ответ: ${correctText}`;
-  feedback.className = `exam__feedback ${correct ? "exam__feedback--ok" : "exam__feedback--bad"}`;
-
-  state.progress = markAnswer(state.progress, ticket.id, correct);
+  const now = Date.now();
+  const outcome = answerOutcome(state.progress, ticket.id, correct, now);
+  if (!state.sessionStarted) {
+    state.sessionStarted = true;
+    track("training_session_start", { total: state.list.length });
+  }
+  state.selectedAnswers[ticket.id] = { index, outcome };
+  state.session = recordSessionAnswer(state.session, ticket.id, correct, outcome);
+  state.progress = markAnswer(state.progress, ticket.id, correct, now);
+  showAnswer(ticket, index, outcome);
+  renderMission();
+  if (outcome.reinforced) track("training_reinforced");
   save();
   renderCounters();
   renderDashboard();
@@ -278,11 +363,17 @@ function answer(index) {
 }
 
 function finishSession() {
+  if (state.completed || !state.list.length) return;
   state.completed = true;
+  const summary = sessionSummary(state.session);
+  track(summary.complete ? "training_session_complete" : "training_session_reviewed", summary);
   renderCard();
+  el("t-result-title").focus({ preventScroll: true });
+  el("t-result").scrollIntoView({ block: "start" });
 }
 
 function go(delta) {
+  if (state.completed || !state.list.length) return;
   const atEnd = state.progress.position >= state.list.length - 1;
   if (delta > 0 && atEnd) {
     finishSession();
@@ -299,6 +390,7 @@ function go(delta) {
 function applySelection({ resetPosition = true, focusQuestion = false } = {}) {
   state.list = selectTrainingTickets(state.all, state.progress, selectionOptions());
   state.completed = false;
+  startSession();
   state.progress = {
     ...state.progress,
     position: resetPosition ? 0 : clampPosition(state.progress.position, state.list.length),
@@ -385,6 +477,7 @@ el("t-clear-filters").addEventListener("click", clearSearchAndTopic);
 el("t-empty-action").addEventListener("click", () => {
   if (state.completed) {
     state.completed = false;
+    startSession();
     state.progress = { ...state.progress, position: 0 };
     save();
     renderCard({ focusQuestion: true });
@@ -402,6 +495,26 @@ el("t-start-today").addEventListener("click", () => {
     behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
     block: "start",
   });
+});
+
+el("t-result-done").addEventListener("click", () => {
+  el("t-result-next").textContent = state.storageAvailable
+    ? "На сегодня всё. Можно закрыть страницу. Ваш прогресс сохранён, продолжим в следующий раз."
+    : "На сегодня всё. Сохранение недоступно: после закрытия страницы прогресс будет потерян.";
+  el("t-result-next").setAttribute("role", "status");
+  el("t-result-done").textContent = "До следующего занятия";
+});
+
+el("t-result-retry").addEventListener("click", () => {
+  state.list = state.list.filter((ticket) => {
+    const answer = state.selectedAnswers[ticket.id];
+    return !answer || answer.index !== ticket.correct;
+  });
+  state.completed = false;
+  startSession();
+  state.progress = { ...state.progress, position: 0 };
+  save();
+  renderCard({ focusQuestion: true });
 });
 
 el("t-prev").addEventListener("click", () => go(-1));

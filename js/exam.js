@@ -15,7 +15,7 @@ import {
   recordExamAnswer,
   selectExamTickets,
 } from "./exam-logic.js?v=3";
-import { markAnswer, readProgress, writeProgress } from "./training-logic.js?v=3";
+import { answerOutcome, markAnswer, readProgress, writeProgress } from "./training-logic.js?v=4";
 import { markAnswerButtons } from "./answer-marking.js";
 import { learningNextStep } from "./learning-next-step.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
@@ -169,24 +169,33 @@ function answer(answerIndex) {
   state.mistakes = progress.mistakes;
   markAnswerButtons(el("q-answers"), ticket.correct, answerIndex);
 
+  let reinforced = false;
+  let learningSaved = false;
   // Ошибки экзамена попадают в общий прогресс, чтобы их можно было
   // отработать в разделе тренировки.
   try {
     const storage = window.localStorage;
-    writeProgress(storage, markAnswer(readProgress(storage), ticket.id, correct));
+    const learningProgress = readProgress(storage);
+    const now = Date.now();
+    reinforced = answerOutcome(learningProgress, ticket.id, correct, now).reinforced;
+    learningSaved = writeProgress(storage, markAnswer(learningProgress, ticket.id, correct, now));
+    reinforced = reinforced && learningSaved;
   } catch {
     // Хранилище недоступно — экзамену это не мешает.
   }
 
   const feedback = el("q-feedback");
   if (correct) {
-    feedback.textContent = "Верно";
+    feedback.textContent = reinforced
+      ? "Верно. ★ Вспомнили прошлую ошибку после паузы минимум сутки!"
+      : "Верно";
     feedback.className = "exam__feedback exam__feedback--ok";
   } else {
     state.wrong.push({ ticket, chosen: answerIndex });
     feedback.textContent = `Неверно. Правильный ответ - ${ticket.correct + 1}`;
     feedback.className = "exam__feedback exam__feedback--bad";
   }
+  if (!learningSaved) feedback.textContent += " Прогресс не сохранён: хранилище браузера недоступно.";
   el("q-mistakes").textContent = String(state.mistakes);
   el("q-progress").style.width = `${(state.answered / QUESTION_COUNT) * 100}%`;
   renderNavigation();

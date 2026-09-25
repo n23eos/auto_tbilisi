@@ -23,6 +23,14 @@ function intList(value) {
   return Array.isArray(value) ? value.filter(Number.isInteger) : [];
 }
 
+function nonNegativeInteger(value) {
+  return Number.isInteger(value) && value >= 0 ? value : 0;
+}
+
+function nonNegativeTime(value) {
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
 function reviewMap(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   const reviews = {};
@@ -30,10 +38,12 @@ function reviewMap(value) {
     const id = Number(key);
     if (!Number.isInteger(id) || !review || typeof review !== "object") return;
     reviews[id] = {
-      attempts: Number.isInteger(review.attempts) && review.attempts >= 0 ? review.attempts : 0,
-      streak: Number.isInteger(review.streak) && review.streak >= 0 ? review.streak : 0,
-      lastAnsweredAt: Number.isFinite(review.lastAnsweredAt) ? review.lastAnsweredAt : 0,
-      nextReviewAt: Number.isFinite(review.nextReviewAt) ? review.nextReviewAt : 0,
+      attempts: nonNegativeInteger(review.attempts),
+      streak: nonNegativeInteger(review.streak),
+      lastAnsweredAt: nonNegativeTime(review.lastAnsweredAt),
+      nextReviewAt: nonNegativeTime(review.nextReviewAt),
+      lastWrongAt: nonNegativeTime(review.lastWrongAt),
+      reinforcedAt: nonNegativeTime(review.reinforcedAt),
     };
   });
   return reviews;
@@ -70,11 +80,30 @@ export function writeProgress(storage, progress) {
   }
 }
 
+export function answerOutcome(progress, ticketId, wasCorrect, now = Date.now()) {
+  if (!wasCorrect) return { corrected: false, reinforced: false };
+
+  const review = progress.reviews?.[ticketId];
+  const lastWrongAt = nonNegativeTime(review?.lastWrongAt);
+  const lastAnsweredAt = nonNegativeTime(review?.lastAnsweredAt);
+  const reinforcedAt = nonNegativeTime(review?.reinforcedAt);
+  const corrected = intList(progress.mistakes).includes(ticketId);
+  const reinforced = lastWrongAt > 0
+    && now - lastWrongAt >= DAY_MS
+    && now - lastAnsweredAt >= DAY_MS
+    && reinforcedAt < lastWrongAt;
+  return { corrected, reinforced };
+}
+
 export function markAnswer(progress, ticketId, wasCorrect, now = Date.now()) {
   const solved = new Set(progress.solved);
   const mistakes = new Set(progress.mistakes);
   const reviews = { ...(progress.reviews || {}) };
-  const previous = reviews[ticketId] || { attempts: 0, streak: 0 };
+  const previous = reviews[ticketId] || {};
+  const attempts = nonNegativeInteger(previous.attempts);
+  const previousStreak = nonNegativeInteger(previous.streak);
+  const previousReviewAt = nonNegativeTime(previous.nextReviewAt);
+  const outcome = answerOutcome(progress, ticketId, wasCorrect, now);
 
   if (wasCorrect) {
     solved.add(ticketId);
@@ -84,17 +113,79 @@ export function markAnswer(progress, ticketId, wasCorrect, now = Date.now()) {
     solved.delete(ticketId);
   }
 
-  const streak = wasCorrect ? previous.streak + 1 : 0;
+  const beforeDue = wasCorrect && previousReviewAt > now;
+  const streak = wasCorrect && !beforeDue ? previousStreak + 1 : wasCorrect ? previousStreak : 0;
   const intervalIndex = Math.min(Math.max(streak - 1, 0), REVIEW_INTERVAL_DAYS.length - 1);
   reviews[ticketId] = {
-    attempts: previous.attempts + 1,
+    ...previous,
+    attempts: attempts + 1,
     streak,
     lastAnsweredAt: now,
-    nextReviewAt: wasCorrect ? now + REVIEW_INTERVAL_DAYS[intervalIndex] * DAY_MS : now,
+    nextReviewAt: wasCorrect && !beforeDue
+      ? now + REVIEW_INTERVAL_DAYS[intervalIndex] * DAY_MS
+      : wasCorrect ? previousReviewAt : now,
+    lastWrongAt: wasCorrect ? nonNegativeTime(previous.lastWrongAt) : now,
+    reinforcedAt: outcome.reinforced ? now : nonNegativeTime(previous.reinforcedAt),
   };
 
   const asSortedList = (set) => [...set].sort((a, b) => a - b);
   return { ...progress, solved: asSortedList(solved), mistakes: asSortedList(mistakes), reviews };
+}
+
+function freezeSession(session) {
+  Object.freeze(session.ticketIds);
+  Object.freeze(session.originalMistakeIds);
+  Object.values(session.answers).forEach(Object.freeze);
+  Object.freeze(session.answers);
+  return Object.freeze(session);
+}
+
+export function createSession(tickets, progress) {
+  const ticketIds = [...new Set(tickets.map((ticket) => ticket.id).filter(Number.isInteger))];
+  const mistakes = new Set(intList(progress.mistakes));
+  return freezeSession({
+    ticketIds,
+    originalMistakeIds: ticketIds.filter((id) => mistakes.has(id)),
+    answers: {},
+  });
+}
+
+export function recordSessionAnswer(session, ticketId, wasCorrect, outcome = {}) {
+  if (!session.ticketIds.includes(ticketId)
+      || Object.prototype.hasOwnProperty.call(session.answers, ticketId)) {
+    return session;
+  }
+
+  const originalMistake = session.originalMistakeIds.includes(ticketId);
+  return freezeSession({
+    ticketIds: [...session.ticketIds],
+    originalMistakeIds: [...session.originalMistakeIds],
+    answers: {
+      ...session.answers,
+      [ticketId]: {
+        correct: wasCorrect === true,
+        corrected: wasCorrect === true && originalMistake,
+        reinforced: wasCorrect === true && outcome.reinforced === true,
+      },
+    },
+  });
+}
+
+export function sessionSummary(session) {
+  const answers = Object.values(session.answers);
+  const correct = answers.filter((answer) => answer.correct).length;
+  const answered = answers.length;
+  const total = session.ticketIds.length;
+  return {
+    total,
+    answered,
+    correct,
+    incorrect: answered - correct,
+    skipped: total - answered,
+    corrected: answers.filter((answer) => answer.corrected).length,
+    reinforced: answers.filter((answer) => answer.reinforced).length,
+    complete: answered === total,
+  };
 }
 
 function activeTickets(tickets) {

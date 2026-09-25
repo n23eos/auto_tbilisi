@@ -478,3 +478,38 @@
   .training-tools .exam__btn { width: 100%; }
   .training-stats dt { font-size: 0.68rem; }
 }
+
+
+/* Миссия учитывает ответы, поэтому не повторяет общий прогресс банка. */
+.training-mission, .training-result {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  margin: var(--space-lg) 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.training-mission__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.training-mission h2, .training-result h2 { font-family: var(--font-display); font-size: var(--text-xl); }
+.training-mission__count { font: 700 var(--text-xl) var(--font-display); white-space: nowrap; }
+.training-mission p, .training-result p { margin-block: .65rem; }
+.training-mission progress { width: 100%; height: .65rem; border: 0; border-radius: 1rem; overflow: hidden; accent-color: var(--color-accent); }
+.training-mission progress::-webkit-progress-bar { background: var(--color-line); }
+.training-mission progress::-webkit-progress-value { background: var(--color-accent); transition: width .25s ease; }
+.training-result { scroll-margin-top: 5rem; background: var(--color-ink); color: var(--color-ink-invert); }
+.training-result .section-kicker { color: var(--color-accent-bright); }
+.training-result__mark { display: inline-grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--color-accent-bright); color: var(--color-ink); font-size: 1.7rem; }
+.training-result--complete:not([hidden]) .training-result__mark { animation: mission-arrive .45s ease-out; }
+.training-result__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding-block: 1rem; margin-block: 1rem; border-block: 1px solid var(--color-ink-muted); }
+.training-result__stats dt { font-size: var(--text-xs); color: var(--color-line); }
+.training-result__stats dd { margin: .5rem 0 0; font: 700 var(--text-2xl) var(--font-display); color: var(--color-accent-bright); }
+.training-reward { border-left: 3px solid var(--color-accent); padding: .75rem 1rem; font-weight: 600; }
+.training-result .training-reward { border-color: var(--color-accent-bright); }
+.training-result .exam__btn--ghost { color: var(--color-ink-invert); border-color: var(--color-line); }
+@keyframes mission-arrive { from { transform: scale(.75); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+@media (max-width: 400px) {
+  .training-mission__head { align-items: flex-start; }
+  .training-result__stats { gap: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .training-result--complete:not([hidden]) .training-result__mark { animation: none; }
+  .training-mission progress::-webkit-progress-value { transition: none; }
+}

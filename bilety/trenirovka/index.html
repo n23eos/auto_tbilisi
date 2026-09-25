@@ -27,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
   <link rel="stylesheet" href="../../css/style.css?v=28">
-  <link rel="stylesheet" href="../../css/exam.css?v=24">
+  <link rel="stylesheet" href="../../css/exam.css?v=25">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -100,7 +100,7 @@
       <div class="training-dashboard__head">
         <div>
           <p class="section-kicker">Ваш прогресс</p>
-          <h2 id="t-dashboard-title">На сегодня</h2>
+          <h2 id="t-dashboard-title">Миссия на сегодня</h2>
           <p class="training-dashboard__note" id="t-plan-note"></p>
         </div>
         <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 билетов</button>
@@ -162,6 +162,35 @@
       Прогресс не сохраняется: хранилище браузера недоступно.
     </p>
 
+    <section class="training-mission" id="t-mission" aria-labelledby="t-mission-title" hidden>
+      <div class="training-mission__head">
+        <div><p class="section-kicker">Маленький шаг к уверенности</p><h2 id="t-mission-title">Ваше занятие</h2></div>
+        <span class="training-mission__count" id="t-mission-count" aria-live="polite"></span>
+      </div>
+      <p id="t-mission-note"></p>
+      <progress id="t-mission-progress" max="10" value="0" aria-label="Вопросов с ответом"></progress>
+      <p class="exam__note">В итогах учитывается первый ответ. Пропущенные вопросы можно повторить.</p>
+    </section>
+
+    <section class="training-result" id="t-result" aria-labelledby="t-result-title" hidden>
+      <span class="training-result__mark" id="t-result-mark" aria-hidden="true">✓</span>
+      <p class="section-kicker">Ваш результат</p>
+      <h2 id="t-result-title" tabindex="-1">Занятие завершено</h2>
+      <p id="t-result-note"></p>
+      <dl class="training-result__stats">
+        <div><dt>Верно с первого раза</dt><dd id="t-result-correct">0</dd></div>
+        <div><dt>Ошибки</dt><dd id="t-result-incorrect">0</dd></div>
+        <div><dt>Без ответа</dt><dd id="t-result-skipped">0</dd></div>
+      </dl>
+      <p id="t-result-corrections"></p>
+      <p class="training-reward" id="t-result-reward" hidden></p>
+      <p id="t-result-next"></p>
+      <div class="exam__actions">
+        <button class="exam__btn exam__btn--primary" id="t-result-done" type="button">На сегодня хватит</button>
+        <button class="exam__btn exam__btn--ghost" id="t-result-retry" type="button">Повторить сложные</button>
+      </div>
+    </section>
+
     <section class="exam__screen" id="t-card" hidden>
       <h2 class="exam__question" id="t-text" tabindex="-1"></h2>
       <figure class="exam__figure" id="t-figure" hidden>
@@ -171,6 +200,7 @@
       </figure>
       <ul class="exam__answers" id="t-answers"></ul>
       <p class="exam__feedback" id="t-feedback" role="status" aria-live="polite"></p>
+      <p class="training-reward" id="t-answer-reward" role="status" hidden></p>
       <p class="exam__ticket-meta" id="t-ticket-meta">
         <span>ID в источнике: <b id="t-source-id"></b></span>
         <button class="exam__favorite" id="t-favorite" type="button" aria-pressed="false">☆ В избранное</button>
@@ -238,6 +268,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=8"></script>
+  <script type="module" src="../../js/training.js?v=9"></script>
 </body>
 </html>
