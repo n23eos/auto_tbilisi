@@ -54,5 +54,5 @@
 ## Страницы сайта
 - Главная — https://avtoshkola.ge/ (программа, форматы, цены, форма заявки)
 - Вопросы и ответы — https://avtoshkola.ge/voprosy/
-- Экзамен по билетам ПДД онлайн — https://avtoshkola.ge/bilety/
+- Экзамен по билетам ПДД онлайн - https://avtoshkola.ge/bilety/ekzamen/
 - Тренировка по билетам без таймера — https://avtoshkola.ge/bilety/trenirovka/

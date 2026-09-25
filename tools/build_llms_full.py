@@ -114,7 +114,7 @@ def build():
     parts.append(
         "https://avtoshkola.ge/ — школа, программа обучения, форматы, цены, заявка\n"
         "https://avtoshkola.ge/voprosy/ — полный справочник вопросов и ответов\n"
-        "https://avtoshkola.ge/bilety/ — бесплатный экзамен по билетам ПДД Грузии на русском\n"
+        "https://avtoshkola.ge/bilety/ekzamen/ - бесплатный экзамен по билетам ПДД Грузии на русском\n"
         "https://avtoshkola.ge/bilety/trenirovka/ - тренировка по доступным вопросам на русском\n"
     )
 
