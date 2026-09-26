@@ -17,6 +17,19 @@ jobs:
           node-version: '22'
       - run: npm test
 
+  browser:
+    name: Сайт - браузерные сценарии
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+
   bot:
     name: Бот — тесты и типы
     runs-on: ubuntu-latest

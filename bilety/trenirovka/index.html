@@ -26,8 +26,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
-  <link rel="stylesheet" href="../../css/style.css?v=29">
-  <link rel="stylesheet" href="../../css/exam.css?v=27">
+  <link rel="stylesheet" href="../../css/style.css?v=31">
+  <link rel="stylesheet" href="../../css/exam.css?v=29">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -88,7 +88,7 @@
     <nav class="nav__links" aria-label="Разделы сайта">
       <a class="nav__link" href="/#prices">Цены</a>
       <a class="nav__link nav__tickets" href="/bilety/">Билеты ПДД</a>
-      <a class="nav__link" href="/voprosy/">Вопросы</a>
+      <a class="nav__link" href="/voprosy/">Частые вопросы</a>
       <a class="nav__link" href="/#contact">Контакты</a>
     </nav>
     <a class="nav__cta" href="tel:+995599987707" aria-label="Позвонить: +995 599 98 77 07">599 98 77 07</a>
@@ -121,66 +121,74 @@
     </section>
     <p class="exam__status" id="t-session-status" role="status" aria-live="polite"></p>
 
-    <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
-      <div class="training-dashboard__head">
-        <div>
-          <p class="section-kicker">Ваш прогресс</p>
-          <h2 id="t-dashboard-title">Миссия на сегодня</h2>
-          <p class="training-dashboard__note" id="t-plan-note"></p>
+    <details class="training-controls" id="t-settings" open>
+      <summary>
+        <span class="training-controls__title">Подборка и настройки</span>
+        <span class="training-controls__summary">Режим, поиск, тема и общий прогресс</span>
+      </summary>
+      <div class="training-controls__body">
+        <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
+          <div class="training-dashboard__head">
+            <div>
+              <p class="section-kicker">Ваш прогресс</p>
+              <h2 id="t-dashboard-title">Миссия на сегодня</h2>
+              <p class="training-dashboard__note" id="t-plan-note"></p>
+            </div>
+            <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 вопросов</button>
+          </div>
+          <dl class="training-stats">
+            <div><dt>Верно решено</dt><dd id="t-stat-solved">0</dd></div>
+            <div><dt>Повторить сейчас</dt><dd id="t-stat-due">0</dd></div>
+            <div><dt>Ещё не освоено</dt><dd id="t-stat-remaining">0</dd></div>
+          </dl>
+        </section>
+
+        <h2 class="training-subtitle">Настройте тренировку</h2>
+        <section class="training-tools" aria-label="Поиск и настройки тренировки">
+          <form class="training-search" id="t-search-form" role="search">
+            <label for="t-search">Номер или слова из вопроса</label>
+            <div class="training-search__row">
+              <input id="t-search" name="query" type="search" inputmode="search" autocomplete="off" placeholder="Например, 125 или дорожный знак">
+              <button class="exam__btn exam__btn--primary" type="submit">Найти</button>
+            </div>
+          </form>
+          <details class="training-tools__optional">
+            <summary>Тема и длина сессии</summary>
+            <div class="training-options">
+              <label id="t-topic-field" for="t-topic">
+                Тема
+                <select id="t-topic" disabled>
+                  <option value="">Все темы</option>
+                </select>
+              </label>
+              <label for="t-limit">
+                В сессии «На сегодня»
+                <select id="t-limit">
+                  <option value="10">10 вопросов</option>
+                  <option value="20" selected>20 вопросов</option>
+                </select>
+              </label>
+            </div>
+            <p class="training-tools__status" id="t-topics-status" role="status">Загружаем темы...</p>
+          </details>
+          <button class="training-clear" id="t-clear-filters" type="button" hidden>Сбросить поиск и тему</button>
+        </section>
+
+        <h2 class="sr-only">Режим тренировки</h2>
+        <div class="exam__filters" role="group" aria-label="Что показывать">
+          <button class="exam__filter is-active" id="filter-today" type="button" aria-pressed="true" data-filter="today">На сегодня</button>
+          <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Вся база</button>
+          <button class="exam__filter" id="t-exit-set" type="button" hidden>Вся база (921)</button>
+          <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
+          <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
+          <button class="exam__filter" id="filter-favorites" type="button" aria-pressed="false" data-filter="favorites">Избранное</button>
         </div>
-        <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 вопросов</button>
+
+        <p class="exam__hint">Готовы проверить себя? <a href="../ekzamen/">Пройти экзамен</a>.</p>
       </div>
-      <dl class="training-stats">
-        <div><dt>Верно решено</dt><dd id="t-stat-solved">0</dd></div>
-        <div><dt>Повторить сейчас</dt><dd id="t-stat-due">0</dd></div>
-        <div><dt>Ещё не освоено</dt><dd id="t-stat-remaining">0</dd></div>
-      </dl>
-    </section>
+    </details>
 
-    <h2 class="training-subtitle">Настройте тренировку</h2>
-    <section class="training-tools" aria-label="Поиск и настройки тренировки">
-      <form class="training-search" id="t-search-form" role="search">
-        <label for="t-search">Номер или слова из вопроса</label>
-        <div class="training-search__row">
-          <input id="t-search" name="query" type="search" inputmode="search" autocomplete="off" placeholder="Например, 125 или дорожный знак">
-          <button class="exam__btn exam__btn--primary" type="submit">Найти</button>
-        </div>
-      </form>
-      <details class="training-tools__optional">
-        <summary>Тема и длина сессии</summary>
-        <div class="training-options">
-          <label id="t-topic-field" for="t-topic">
-            Тема
-            <select id="t-topic" disabled>
-              <option value="">Все темы</option>
-            </select>
-          </label>
-          <label for="t-limit">
-            В сессии «На сегодня»
-            <select id="t-limit">
-              <option value="10">10 вопросов</option>
-              <option value="20" selected>20 вопросов</option>
-            </select>
-          </label>
-        </div>
-        <p class="training-tools__status" id="t-topics-status" role="status">Загружаем темы...</p>
-      </details>
-      <button class="training-clear" id="t-clear-filters" type="button" hidden>Сбросить поиск и тему</button>
-    </section>
-
-    <h2 class="sr-only">Режим тренировки</h2>
-    <div class="exam__filters" role="group" aria-label="Что показывать">
-      <button class="exam__filter is-active" id="filter-today" type="button" aria-pressed="true" data-filter="today">На сегодня</button>
-      <button class="exam__filter" id="filter-all" type="button" aria-pressed="false" data-filter="all">Вся база</button>
-      <button class="exam__filter" id="t-exit-set" type="button" hidden>Вся база (921)</button>
-      <button class="exam__filter" id="filter-unsolved" type="button" aria-pressed="false" data-filter="unsolved">Нерешённые</button>
-      <button class="exam__filter" id="filter-mistakes" type="button" aria-pressed="false" data-filter="mistakes">Мои ошибки</button>
-      <button class="exam__filter" id="filter-favorites" type="button" aria-pressed="false" data-filter="favorites">Избранное</button>
-    </div>
-
-      <p class="exam__hint">Готовы проверить себя? <a href="../ekzamen/">Пройти экзамен</a>.</p>
-
-      <div class="exam__bar">
+    <div class="exam__bar">
       <span class="exam__counter">Вопрос <b id="t-index">1</b> из <b id="t-total">0</b></span>
       <span class="exam__counter">Решено верно: <b id="t-solved">0</b> из <b id="t-pool">0</b></span>
     </div>
@@ -191,20 +199,26 @@
       Прогресс и занятие не сохраняются: хранилище браузера недоступно.
     </p>
 
-    <section class="training-mission" id="t-mission" aria-labelledby="t-mission-title" hidden>
-      <div class="training-mission__head">
-        <div><p class="section-kicker">Маленький шаг к уверенности</p><h2 id="t-mission-title">Ваше занятие</h2></div>
-        <span class="training-mission__count" id="t-mission-count" aria-live="polite"></span>
+    <details class="training-mission" id="t-mission" hidden>
+      <summary>
+        <span class="training-mission__head">
+          <span class="training-mission__title" id="t-mission-title">Ваше занятие</span>
+          <span class="training-mission__count" id="t-mission-count" aria-live="polite"></span>
+        </span>
+      </summary>
+      <div class="training-mission__body">
+        <p id="t-mission-note"></p>
+        <progress id="t-mission-progress" max="10" value="0" aria-label="Вопросов с ответом"></progress>
+        <p class="exam__note">В итогах учитывается первый ответ. Пропущенные вопросы можно повторить.</p>
       </div>
-      <p id="t-mission-note"></p>
-      <progress id="t-mission-progress" max="10" value="0" aria-label="Вопросов с ответом"></progress>
-      <p class="exam__note">В итогах учитывается первый ответ. Пропущенные вопросы можно повторить.</p>
-    </section>
+    </details>
 
-    <nav class="learning-question-nav" id="t-question-nav" aria-label="Вопросы текущей подборки" hidden>
-      <p class="learning-question-nav__title">Вопросы подборки</p>
-      <div class="learning-question-nav__grid" id="t-question-nav-grid"></div>
-    </nav>
+    <details class="learning-question-nav" id="t-question-nav" hidden>
+      <summary class="learning-question-nav__title">Перейти к вопросу подборки</summary>
+      <nav aria-label="Вопросы текущей подборки">
+        <div class="learning-question-nav__grid" id="t-question-nav-grid"></div>
+      </nav>
+    </details>
 
     <section class="training-result" id="t-result" aria-labelledby="t-result-title" hidden>
       <span class="training-result__mark" id="t-result-mark" aria-hidden="true">✓</span>
@@ -303,6 +317,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=11"></script>
+  <script type="module" src="../../js/training.js?v=13"></script>
 </body>
 </html>

@@ -9,6 +9,31 @@
 const CORRECT_NOTE = "Правильный ответ";
 const WRONG_NOTE = "Ваш ответ, неверный";
 
+// Одинаковая структура нужна обеим страницам для подсветки и клавиатурного ответа.
+export function renderAnswerButtons(container, answers, onSelect) {
+  const document = container.ownerDocument;
+  const fragment = document.createDocumentFragment();
+  answers.forEach((text, index) => {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "exam__answer";
+    button.dataset.index = String(index);
+
+    const number = document.createElement("span");
+    number.className = "exam__answer-num";
+    number.textContent = String(index + 1);
+    const label = document.createElement("span");
+    label.textContent = text;
+
+    button.append(number, label);
+    button.addEventListener("click", () => onSelect(index));
+    item.append(button);
+    fragment.append(item);
+  });
+  container.replaceChildren(fragment);
+}
+
 /**
  * Пометить варианты ответа после выбора.
  *

@@ -187,19 +187,23 @@
 }
 @media print { .partners { display: none; } }
 
-/* Купоны участвуют в потоке шапки, чтобы не перекрывать заголовок и кнопки. */
+/* На широком экране купоны занимают боковую колонку, а в узкой раскладке идут после основных действий. */
 .marquee {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(22rem, 0.9fr);
+  align-content: end;
+  align-items: end;
   height: auto;
   min-height: clamp(30rem, 50vw, 88svh);
-  padding-top: 7rem;
-  gap: 2rem;
+  padding-top: clamp(2rem, 6vw, 5rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
 }
 .marquee > .partners {
   position: relative;
   z-index: var(--z-raised);
   width: 100%;
   max-width: 32rem;
-  margin: 0 auto auto 0;
+  margin: 0;
   padding: 0;
   background: transparent;
   gap: 0.5rem;
@@ -213,6 +217,14 @@
 }
 .marquee .partners__heading .section-kicker { margin: 0; font-size: 0.625rem; color: #f3c568; }
 .marquee .partners__heading h2 { margin: 0; font-size: 0.8rem; line-height: 1.4; }
+@media (min-width: 56.001rem) {
+  /* Размер прежнего заголовка рассчитан на всю ширину и дробит слова в боковой колонке. */
+  .marquee__display { font-size: clamp(2.4rem, 4.4vw, 4.8rem); line-height: 1.1; max-width: none; }
+}
+@media (max-width: 56rem) {
+  .marquee { grid-template-columns: minmax(0, 1fr); }
+  .marquee > .partners { max-width: 48rem; }
+}
 @media (max-width: 40rem) {
-  .marquee { padding-top: 8rem; gap: 1.5rem; }
+  .marquee { padding-top: var(--space-xl); gap: 1.5rem; }
 }

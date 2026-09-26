@@ -15,9 +15,9 @@ import {
   toggleFavorite,
   writeProgress,
 } from "./training-logic.js?v=4";
-import { markAnswerButtons } from "./answer-marking.js";
+import { markAnswerButtons, renderAnswerButtons } from "./answer-marking.js?v=2";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
-import { buildTicketSets } from "./ticket-catalog-logic.js?v=1";
+import { buildTicketSets } from "./ticket-catalog-logic.js?v=2";
 import { discardSession, makeSessionSnapshot, readSession, shouldRestoreSession, writeSession } from "./training-session.js?v=1";
 
 const DATA_URL = "../../data/tickets-b-ru.json?v=2";
@@ -135,6 +135,7 @@ function sessionLabel(context) {
 function showResumeOffer() {
   const saved = state.savedSession;
   el("t-resume").hidden = !saved;
+  el("t-settings").open = !saved;
   if (!saved) return;
   const { snapshot: previous } = saved;
   el("t-resume-title").textContent = sessionLabel(previous.context);
@@ -161,6 +162,7 @@ function restoreSession(saved) {
   renderFilterState();
   renderDashboard();
   renderCard();
+  compactTrainingPanels();
   el("t-resume").hidden = true;
   el("t-session-status").textContent = `Занятие восстановлено: вопрос ${previous.position + 1} из ${previous.ticketIds.length}.`;
 }
@@ -233,6 +235,11 @@ function renderDashboard() {
     : "Нет вопросов на сегодня";
   el("t-start-today").disabled = today.length === 0;
   el("t-dashboard").hidden = Boolean(state.selectedSet);
+}
+
+function compactTrainingPanels() {
+  el("t-settings").open = false;
+  el("t-mission").open = false;
 }
 
 function track(event, values = {}) {
@@ -359,6 +366,7 @@ function jumpToQuestion(position) {
   state.progress = { ...state.progress, position };
   save();
   saveSession();
+  el("t-question-nav").open = false;
   renderCard({ focusQuestion: true });
 }
 
@@ -443,27 +451,7 @@ function renderCard({ focusQuestion = false } = {}) {
 
   renderFavoriteButton(ticket.id);
 
-  const list = el("t-answers");
-  list.textContent = "";
-  ticket.answers.forEach((text, index) => {
-    const item = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "exam__answer";
-    button.dataset.index = String(index);
-
-    const num = document.createElement("span");
-    num.className = "exam__answer-num";
-    num.textContent = String(index + 1);
-
-    const label = document.createElement("span");
-    label.textContent = text;
-
-    button.append(num, label);
-    button.addEventListener("click", () => answer(index));
-    item.append(button);
-    list.append(item);
-  });
+  renderAnswerButtons(el("t-answers"), ticket.answers, answer);
 
   const feedback = el("t-feedback");
   feedback.textContent = "";
@@ -494,6 +482,7 @@ function answer(index) {
   const outcome = answerOutcome(state.progress, ticket.id, correct, now);
   if (!state.sessionStarted) {
     state.sessionStarted = true;
+    compactTrainingPanels();
     track("training_session_start", { total: state.list.length });
   }
   state.selectedAnswers[ticket.id] = { index, outcome };
@@ -560,7 +549,8 @@ function applySelection({ resetPosition = true, focusQuestion = false, persist =
       window.history.replaceState(null, "", url);
     }
   }
-  renderCard({ focusQuestion });
+  renderCard({ focusQuestion: focusQuestion || persist });
+  if (persist) compactTrainingPanels();
 }
 
 function applyFilter(filter) {
@@ -667,6 +657,8 @@ el("t-resume-action").addEventListener("click", () => {
 el("t-resume-discard").addEventListener("click", () => {
   clearSavedSession();
   applySelection({ persist: false });
+  compactTrainingPanels();
+  el("t-text").focus();
   el("t-session-status").textContent = "Начали новую подборку. Прежнее занятие удалено.";
 });
 el("t-empty-action").addEventListener("click", () => {
@@ -865,6 +857,7 @@ async function loadTopics() {
     else {
       applySelection({ resetPosition: true, focusQuestion: false, persist: false });
       if (!explicit) showResumeOffer();
+      else compactTrainingPanels();
     }
   } catch (error) {
     status.textContent = `Не удалось загрузить билеты: ${error.message}. Обновите страницу.`;

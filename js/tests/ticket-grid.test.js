@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { applyRussianTranslations } from "../ticket-bank.js";
-import { buildTicketSets, filterCatalog, questionStatus } from "../ticket-catalog-logic.js";
+import { buildTicketSets, filterCatalog, indexCatalogProgress, questionStatus } from "../ticket-catalog-logic.js";
 
 const read = name => JSON.parse(fs.readFileSync(new URL(`../../data/${name}`, import.meta.url)));
 const bank = read("tickets-b-ru.json").tickets;
@@ -36,7 +36,20 @@ test("поиск использует точный ID и пересекаетс�
 
 test("ошибки имеют приоритет над решёнными в карточке вопроса", () => {
   const ticket = { id: 337 };
-  assert.equal(questionStatus(ticket, { solved: [337], mistakes: [337] }), "Повторить");
-  assert.equal(questionStatus(ticket, { solved: [337], mistakes: [] }), "Решён");
-  assert.equal(questionStatus(ticket, { solved: [], mistakes: [] }), "Не решён");
+  assert.equal(questionStatus(ticket, indexCatalogProgress({ solved: [337], mistakes: [337] })), "Повторить");
+  assert.equal(questionStatus(ticket, indexCatalogProgress({ solved: [337], mistakes: [] })), "Решён");
+  assert.equal(questionStatus(ticket, indexCatalogProgress({ solved: [], mistakes: [] })), "Не решён");
+});
+
+// Прогресс хранится массивами; временный индекс не должен менять сохранённые данные.
+test("индекс каталога сохраняет исходный прогресс и точность числовых ID", () => {
+  const source = { solved: [1, 337, 337], mistakes: [337], position: 2 };
+  const before = structuredClone(source);
+  const index = indexCatalogProgress(source);
+  assert.deepEqual(source, before);
+  assert.equal(questionStatus({ id: 1 }, index), "Решён");
+  assert.equal(questionStatus({ id: 337 }, index), "Повторить");
+  assert.equal(questionStatus({ id: 33 }, index), "Не решён");
+  index.solved.add(9);
+  assert.deepEqual(source, before);
 });

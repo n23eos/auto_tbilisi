@@ -166,7 +166,7 @@ a:hover {
     grid-template-columns: .8fr 1.4fr 1fr 1.1fr;
     gap: .2rem;
   }
-  .nav__link { font-size: .8rem; padding: .45rem .2rem; }
+  .nav__link { font-size: .8rem; padding: .45rem .2rem; white-space: normal; text-align: center; line-height: 1.2; }
   html { scroll-padding-top: 8rem; }
 }
 

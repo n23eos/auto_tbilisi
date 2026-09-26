@@ -8,9 +8,13 @@ export function buildTicketSets(tickets) {
   return sets;
 }
 
-export function questionStatus(ticket, progress) {
-  if (progress.mistakes.includes(ticket.id)) return "Повторить";
-  if (progress.solved.includes(ticket.id)) return "Решён";
+export function indexCatalogProgress(progress) {
+  return { solved: new Set(progress.solved), mistakes: new Set(progress.mistakes) };
+}
+
+export function questionStatus(ticket, progressIndex) {
+  if (progressIndex.mistakes.has(ticket.id)) return "Повторить";
+  if (progressIndex.solved.has(ticket.id)) return "Решён";
   return "Не решён";
 }
 

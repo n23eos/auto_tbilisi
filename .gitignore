@@ -11,3 +11,6 @@ baza-znaniy.zip
 .env
 .env.*
 !.env.example
+node_modules/
+test-results/
+playwright-report/

@@ -1,4 +1,5 @@
 import {SUGGESTIONS, formatPrice, nextHistory, publicAnswer} from './chat-logic.js?v=2';
+import {fetchPriceCatalog} from './chat-api.js?v=1';
 
 const loader = document.querySelector('script[data-chat-api]');
 const api = (loader?.dataset.chatApi || '').replace(/\/$/, '');
@@ -7,7 +8,6 @@ if (!api) throw new Error('chat_api_missing');
 let history = [];
 let previousFocus = null;
 let busy = false;
-let interacted = false;
 let audioContext;
 function ping(sent = false) {
   if (!audioContext || audioContext.state !== 'running' || document.hidden) return;
@@ -61,7 +61,7 @@ heading.firstChild.id = 'school-chat-title';
 const close = make('button', 'school-chat__close', 'Закрыть');
 close.type = 'button';
 close.setAttribute('aria-label', 'Закрыть чат');
-const avatar = Object.assign(make('img', 'school-chat__avatar'), {src: new URL('../images/chat-robot.png', import.meta.url).href, alt: '', width: 44, height: 44});
+const avatar = Object.assign(make('img', 'school-chat__avatar'), {alt: '', width: 44, height: 44});
 header.append(avatar, heading, close);
 const messages = make('div', 'school-chat__messages');
 messages.setAttribute('aria-live', 'polite');
@@ -94,12 +94,14 @@ root.append(toggle, panel);
 document.body.append(root);
 document.body.classList.add('has-school-chat');
 
-function setOpen(open, automatic = false) {
+function setOpen(open) {
   panel.hidden = !open;
   toggle.setAttribute('aria-expanded', String(open));
   if (open) {
+    // Закрытая панель не должна загружать даже уменьшенную картинку заранее.
+    if (!avatar.hasAttribute('src')) avatar.src = new URL('../images/chat-robot-132.webp', import.meta.url).href;
     previousFocus = document.activeElement;
-    if (!automatic) input.focus();
+    input.focus();
   } else if (panel.contains(document.activeElement)) {
     (previousFocus || toggle).focus();
   }
@@ -143,20 +145,10 @@ async function send(question) {
   }
 }
 
-function rememberInteraction() {
-  interacted = true;
-  try { sessionStorage.setItem('school-chat-seen', '1'); } catch { /* В приватном режиме достаточно флага вкладки. */ }
-}
-toggle.addEventListener('click', () => { rememberInteraction(); setOpen(panel.hidden); });
-close.addEventListener('click', () => { rememberInteraction(); setOpen(false); });
-setTimeout(() => {
-  let seen = interacted;
-  try { seen ||= sessionStorage.getItem('school-chat-seen') === '1'; } catch { /* Хранилище может быть недоступно. */ }
-  if (seen || document.hidden || document.querySelector('dialog[open], [aria-modal="true"]')) return;
-  rememberInteraction(); setOpen(true, true); ping();
-}, 10000);
+toggle.addEventListener('click', () => setOpen(panel.hidden));
+close.addEventListener('click', () => setOpen(false));
 document.querySelector('[data-fab-toggle]')?.addEventListener('click', () => {
-  rememberInteraction(); if (!panel.hidden) setOpen(false);
+  if (!panel.hidden) setOpen(false);
 });
 input.addEventListener('keydown', event => {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -165,16 +157,14 @@ input.addEventListener('keydown', event => {
 });
 form.addEventListener('submit', event => { event.preventDefault(); send(input.value); });
 panel.addEventListener('keydown', event => {
-  if (event.key === 'Escape') { rememberInteraction(); setOpen(false); }
+  if (event.key === 'Escape') setOpen(false);
 });
 
 async function updatePrices() {
   const targets = [...document.querySelectorAll('[data-price-service]')];
   if (!targets.length) return;
   try {
-    const response = await fetch(`${api}/api/catalog`, {headers: {Accept: 'application/json'}});
-    if (!response.ok) throw new Error();
-    const data = await response.json();
+    const data = await fetchPriceCatalog(api);
     const prices = new Map(data.services.map(item => [item.service_id, formatPrice(item)]));
     targets.forEach(node => { const value = prices.get(node.dataset.priceService); if (value) node.textContent = value; });
   } catch {

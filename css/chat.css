@@ -33,6 +33,7 @@
 @media (max-width: 520px) {
   .school-chat { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
   .has-school-chat .fab { right: 80px; bottom: max(12px, env(safe-area-inset-bottom)); }
-  .school-chat__panel { bottom: 68px; border-radius: 20px; height: min(590px, calc(100dvh - 92px)); }
+  /* 100vw включает полосу прокрутки и обрезает левый край панели на узком экране. */
+  .school-chat__panel { position: fixed; left: 12px; right: 12px; width: auto; bottom: max(80px, calc(68px + env(safe-area-inset-bottom))); border-radius: 20px; height: min(590px, calc(100dvh - 92px)); }
 }
 @media (prefers-reduced-motion: reduce) { .school-chat * { animation: none !important; scroll-behavior: auto !important; } }

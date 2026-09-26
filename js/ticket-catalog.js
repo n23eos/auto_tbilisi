@@ -1,7 +1,7 @@
 import { readSessionSummary } from "./training-session.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 import { readProgress } from "./training-logic.js?v=4";
-import { buildTicketSets, filterCatalog, questionStatus } from "./ticket-catalog-logic.js?v=1";
+import { buildTicketSets, filterCatalog, indexCatalogProgress, questionStatus } from "./ticket-catalog-logic.js?v=2";
 
 const page = document.querySelector("[data-catalog]");
 const grid = document.getElementById("catalog-grid");
@@ -9,8 +9,10 @@ const status = document.getElementById("catalog-status");
 const query = document.getElementById("catalog-query");
 const topic = document.getElementById("catalog-topic");
 let tickets = [];
+let sets = [];
+let ordinals = new Map();
 let topics = [];
-let progress;
+let progressIndex;
 let topicsFailed = false;
 
 function text(tag, value, className = "") {
@@ -41,10 +43,9 @@ function render() {
   renderResume();
   const fragment = document.createDocumentFragment();
   if (page.dataset.catalog === "sets") {
-    const sets = buildTicketSets(tickets);
     for (const set of sets) {
-      const solved = set.tickets.filter(ticket => progress.solved.includes(ticket.id)).length;
-      const mistakes = set.tickets.filter(ticket => progress.mistakes.includes(ticket.id)).length;
+      const solved = set.tickets.filter(ticket => progressIndex.solved.has(ticket.id)).length;
+      const mistakes = set.tickets.filter(ticket => progressIndex.mistakes.has(ticket.id)).length;
       const link = document.createElement("a");
       link.href = `/bilety/trenirovka/?set=${set.number}`;
       link.className = "ticket-tile";
@@ -59,9 +60,8 @@ function render() {
     status.textContent = `Учебных билетов: ${sets.length} · Вопросов: ${tickets.length}`;
   } else {
     const filtered = filterCatalog(tickets, { query: query.value, topicId: topic.value, topics });
-    const ordinals = new Map(tickets.map((ticket, index) => [ticket.id, index + 1]));
     for (const ticket of filtered) {
-      const label = questionStatus(ticket, progress);
+      const label = questionStatus(ticket, progressIndex);
       const link = document.createElement("a");
       link.href = `/bilety/trenirovka/?ticket=${ticket.id}`;
       link.className = "question-tile";
@@ -94,14 +94,16 @@ document.getElementById("catalog-clear")?.addEventListener("click", () => {
 
 // При возвращении назад карточки должны показывать только что данный ответ.
 window.addEventListener("pageshow", () => {
-  if (tickets.length) { progress = readSavedProgress(); render(); }
+  if (tickets.length) { progressIndex = indexCatalogProgress(readSavedProgress()); render(); }
 });
 
 async function init() {
   try {
     const bank = await loadTicketBank(new URL("../data/tickets-b-ru.json?v=2", import.meta.url));
-    tickets = buildTicketSets(bank).flatMap(set => set.tickets);
-    progress = readSavedProgress();
+    sets = buildTicketSets(bank);
+    tickets = sets.flatMap(set => set.tickets);
+    ordinals = new Map(tickets.map((ticket, index) => [ticket.id, index + 1]));
+    progressIndex = indexCatalogProgress(readSavedProgress());
     render();
   } catch {
     status.textContent = "Не удалось загрузить вопросы. Обновите страницу, чтобы попробовать ещё раз.";

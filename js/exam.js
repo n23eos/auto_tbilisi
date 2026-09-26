@@ -16,7 +16,7 @@ import {
   selectExamTickets,
 } from "./exam-logic.js?v=3";
 import { answerOutcome, markAnswer, readProgress, writeProgress } from "./training-logic.js?v=4";
-import { markAnswerButtons } from "./answer-marking.js";
+import { markAnswerButtons, renderAnswerButtons } from "./answer-marking.js?v=2";
 import { learningNextStep } from "./learning-next-step.js?v=1";
 import { loadTicketBank } from "./ticket-bank.js?v=1";
 
@@ -109,27 +109,7 @@ function renderQuestion() {
     figure.hidden = true;
   }
 
-  const list = el("q-answers");
-  list.textContent = "";
-  ticket.answers.forEach((text, answerIndex) => {
-    const item = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "exam__answer";
-    button.dataset.index = String(answerIndex);
-
-    const num = document.createElement("span");
-    num.className = "exam__answer-num";
-    num.textContent = `${answerIndex + 1}`;
-
-    const label = document.createElement("span");
-    label.textContent = text;
-
-    button.append(num, label);
-    button.addEventListener("click", () => answer(answerIndex));
-    item.append(button);
-    list.append(item);
-  });
+  renderAnswerButtons(el("q-answers"), ticket.answers, answer);
 
   const feedback = el("q-feedback");
   feedback.textContent = "";
