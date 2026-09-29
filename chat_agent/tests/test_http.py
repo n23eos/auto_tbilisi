@@ -130,3 +130,23 @@ def test_admin_write_rejects_csrf_and_wrong_email(tmp_path):
     app=Application(AdminHarness(tmp_path/'facts'),access=Allowed())
     body={'amount_minor':17000,'valid_until':'2026-12-31','expected_revision':1}
     assert admin_request(app,'/api/admin/prices/theory_group','PUT',body,'',token='valid')[0] == 403
+
+
+def test_shared_groups_disable_legacy_writer_and_return_admin_link(tmp_path):
+    harness = AdminHarness(tmp_path/'facts')
+    harness.group_source = type('SharedGroups', (), {'is_shared': True})()
+    app = Application(harness, access=Allowed(), booking_admin_url='https://booking.example/admin/')
+    code, body, headers = admin_request(app)
+    assert code == 200
+    token = headers['Set-Cookie'].split('chat_admin_csrf=', 1)[1].split(';', 1)[0]
+    code, body, _ = admin_request(app, '/api/admin/groups/theory_group', 'PUT', {
+        'status': 'planned', 'start_date': '2026-10-05', 'expected_revision': 1}, token)
+    assert code == 410
+    assert json.loads(body) == {
+        'error': 'group_writer_disabled', 'admin_url': 'https://booking.example/admin/'}
+
+    code, body, _ = admin_request(app, '/api/admin/catalog')
+    catalog = json.loads(body)
+    assert code == 200
+    assert catalog['group_writer_enabled'] is False
+    assert catalog['groups'] == []

@@ -5,6 +5,7 @@ import { getConversation } from "../src/conversation";
 import { getFact } from "../src/facts";
 import { createLead, getLead, takeLead, closeLead } from "../src/leads";
 import type { Env } from "../src/types";
+import { insertBooking, insertGroup } from "./group-fixtures";
 
 const ADMIN_CHAT = -100500;
 const ADMIN_ID = 777;
@@ -47,6 +48,23 @@ function makeEnv(sent: any[], failMethod?: string): Env {
 
 function privateMessage(chatId: number, text: string, extra: object = {}) {
   return { update_id: Math.floor(Math.random() * 1e9), message: { chat: { id: chatId, type: "private" }, from: { id: chatId, first_name: "Вася" }, text, ...extra } };
+}
+
+async function durableRoute(update: any, e: Env): Promise<void> {
+  const chatId = update.message?.chat?.id ?? update.callback_query?.message?.chat?.id;
+  const token = `lease-${update.update_id}`;
+  await e.DB.prepare(
+    `INSERT INTO chat_leases (chat_id, lease_until, lease_token, revision, updated_at)
+     VALUES (?, datetime('now', '+1 hour'), ?, 1, datetime('now'))
+     ON CONFLICT(chat_id) DO UPDATE SET lease_until = excluded.lease_until,
+       lease_token = excluded.lease_token, revision = chat_leases.revision + 1,
+       updated_at = datetime('now')`,
+  ).bind(chatId, token).run();
+  const lease = await e.DB.prepare("SELECT revision FROM chat_leases WHERE chat_id = ?").bind(chatId).first<{ revision: number }>();
+  await routeUpdate(update, e, {
+    operationId: `telegram-update:${update.update_id}`,
+    fence: { chatId, leaseToken: token, leaseRevision: lease!.revision },
+  });
 }
 
 describe("router: ученик", () => {
@@ -198,6 +216,53 @@ describe("router: ученик", () => {
     await routeUpdate(privateMessage(5, "не скажу"), e);
     expect((await getConversation((env as any).DB, 5))!.step).toBe("phone");
   });
+
+  it("новый flow связывает выбранную группу с booking и не создает legacy lead", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    e.BOOKING_ENABLED = "true";
+    e.BOOKING_SECRET = "x".repeat(64);
+    e.ADMIN_ORIGIN = "https://admin.example.com";
+    const groupId = await insertGroup(e.DB, {
+      id: "router-group",
+      sequence: 301,
+      startDate: "2099-11-01",
+      revision: 1,
+    });
+    const callback = (updateId: number, data: string) => ({
+      update_id: updateId,
+      callback_query: {
+        id: `cb-${updateId}`,
+        from: { id: 501, first_name: "Анна" },
+        message: { chat: { id: 501, type: "private" } },
+        data,
+      },
+    });
+
+    await durableRoute(callback(50101, "menu:zapis"), e);
+    expect((await getConversation(e.DB, 501))?.data.bookingFlow).toBe(true);
+    await durableRoute(callback(50102, "bg:301:1"), e);
+    await durableRoute({ ...privateMessage(501, "Анна"), update_id: 50103 }, e);
+    await durableRoute({ ...privateMessage(501, "+995 599 00 05 01"), update_id: 50104 }, e);
+    const consent = (await getConversation(e.DB, 501))!;
+    expect(consent.step).toBe("consent");
+    await durableRoute(callback(50105, `bf:${consent.revision}:yes`), e);
+
+    const booking = await e.DB
+      .prepare("SELECT group_id, student_chat_id, source, status FROM bookings WHERE student_chat_id = 501")
+      .first<any>();
+    expect(booking).toEqual({ group_id: groupId, student_chat_id: 501, source: "telegram", status: "pending" });
+    expect(await e.DB.prepare("SELECT 1 FROM leads WHERE student_chat_id = 501").first()).toBeNull();
+    const completed = await getConversation(e.DB, 501);
+    expect(completed).toMatchObject({ step: "complete", data: {} });
+    const notifications = await e.DB
+      .prepare("SELECT recipient_role, state FROM outbox WHERE booking_id IS NOT NULL ORDER BY recipient_role")
+      .all<any>();
+    expect(notifications.results).toEqual([
+      { recipient_role: "staff", state: "pending" },
+      { recipient_role: "student", state: "pending" },
+    ]);
+  });
 });
 
 describe("router: админы", () => {
@@ -308,6 +373,50 @@ describe("router: админы", () => {
     );
     expect(sent.length).toBe(1);
     expect(sent[0].url).toContain("answerCallbackQuery");
+  });
+
+  it("при BOOKING_ENABLED команда /set только направляет в единую админку", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    e.BOOKING_ENABLED = "true";
+    e.ADMIN_ORIGIN = "https://admin.example.com";
+    await routeUpdate(
+      { update_id: 801, message: { chat: { id: ADMIN_CHAT, type: "supergroup" }, from: { id: ADMIN_ID }, text: "/set дата_группы 1 января" } },
+      e,
+    );
+    expect(sent[0].body.text).toContain("https://admin.example.com/admin/");
+    expect(await getFact(e.DB, "next_group_date")).toBeNull();
+  });
+
+  it("booking callback требует одновременно staff actor, staff chat и актуальную revision", async () => {
+    const sent: any[] = [];
+    const e = makeEnv(sent);
+    e.BOOKING_ENABLED = "true";
+    e.BOOKING_SECRET = "x".repeat(64);
+    const groupId = await insertGroup(e.DB, { id: "admin-callback-group", sequence: 302, startDate: "2099-11-15" });
+    const created = await insertBooking(e.DB, { groupId, source: "site_form" });
+    const data = `bk:${created.result.reference}:1:c`;
+    const callback = (updateId: number, chatId: number, actorId: number) => ({
+      update_id: updateId,
+      callback_query: {
+        id: `admin-cb-${updateId}`,
+        from: { id: actorId, first_name: "Нина" },
+        message: { chat: { id: chatId, type: "supergroup" } },
+        data,
+      },
+    });
+
+    await routeUpdate(callback(802, ADMIN_CHAT, 999), e);
+    await routeUpdate(callback(803, -100999, ADMIN_ID), e);
+    expect((await e.DB.prepare("SELECT status FROM bookings WHERE id = ?").bind(created.result.id).first<any>())?.status).toBe("pending");
+
+    await durableRoute(callback(804, ADMIN_CHAT, ADMIN_ID), e);
+    expect((await e.DB.prepare("SELECT status, revision FROM bookings WHERE id = ?").bind(created.result.id).first<any>()))
+      .toEqual({ status: "confirmed", revision: 2 });
+
+    await durableRoute(callback(805, ADMIN_CHAT, ADMIN_ID), e);
+    expect((await e.DB.prepare("SELECT status, revision FROM bookings WHERE id = ?").bind(created.result.id).first<any>()))
+      .toEqual({ status: "confirmed", revision: 2 });
   });
 });
 

@@ -1,9 +1,13 @@
 import {SUGGESTIONS, formatPrice, nextHistory, publicAnswer} from './chat-logic.js?v=2';
 import {fetchPriceCatalog} from './chat-api.js?v=1';
+import {createChatBookingForm, mountBookingForm} from './booking-form.js?v=1';
+import {currentGroupsSnapshot} from './groups.js?v=2';
 
 const loader = document.querySelector('script[data-chat-api]');
 const api = (loader?.dataset.chatApi || '').replace(/\/$/, '');
-if (!api) throw new Error('chat_api_missing');
+const bookingLoader = document.querySelector('script[data-booking-api]');
+const bookingApi = (bookingLoader?.dataset.bookingApi || '').replace(/\/$/, '');
+const turnstileSitekey = bookingLoader?.dataset.turnstileSitekey || '';
 
 let history = [];
 let previousFocus = null;
@@ -67,6 +71,13 @@ const messages = make('div', 'school-chat__messages');
 messages.setAttribute('aria-live', 'polite');
 messages.append(make('p', 'school-chat__message school-chat__message--bot', 'Здравствуйте! Что вы хотели узнать? Выберите вопрос ниже или напишите свой 👋'));
 const suggestions = make('div', 'school-chat__suggestions');
+let bookingView = null;
+if (bookingApi) {
+  const bookingButton = make('button', 'school-chat__booking-open', 'Записаться в группу');
+  bookingButton.type = 'button';
+  bookingButton.addEventListener('click', () => showBooking(true));
+  suggestions.append(bookingButton);
+}
 SUGGESTIONS.forEach(question => {
   const button = make('button', '', question);
   button.type = 'button';
@@ -89,7 +100,20 @@ submit.type = 'submit';
 form.append(label, input, submit);
 const contacts = make('p', 'school-chat__contacts');
 contacts.append('Нужен человек? ', Object.assign(make('a', '', 'Позвонить'), {href: 'tel:+995599987707'}), ' · ', Object.assign(make('a', '', 'WhatsApp'), {href: 'https://wa.me/995599987707', target: '_blank', rel: 'noopener'}));
-panel.append(header, messages, suggestions, form, contacts);
+if (bookingApi) {
+  bookingView = createChatBookingForm();
+  bookingView.querySelector('[data-booking-close]').addEventListener('click', () => showBooking(false));
+  mountBookingForm(bookingView.querySelector('form'), {
+    api: bookingApi,
+    sitekey: turnstileSitekey,
+    source: 'site_chat',
+    initialSnapshot: currentGroupsSnapshot(),
+    respondToGroupSelection: false,
+  });
+}
+panel.append(header, messages, suggestions, form);
+if (bookingView) panel.append(bookingView);
+panel.append(contacts);
 root.append(toggle, panel);
 document.body.append(root);
 document.body.classList.add('has-school-chat');
@@ -101,10 +125,24 @@ function setOpen(open) {
     // Закрытая панель не должна загружать даже уменьшенную картинку заранее.
     if (!avatar.hasAttribute('src')) avatar.src = new URL('../images/chat-robot-132.webp', import.meta.url).href;
     previousFocus = document.activeElement;
-    input.focus();
+    if (bookingView && !bookingView.hidden) {
+      bookingView.querySelector('[data-booking-group]')?.focus();
+    } else {
+      input.focus();
+    }
   } else if (panel.contains(document.activeElement)) {
     (previousFocus || toggle).focus();
   }
+}
+
+function showBooking(open) {
+  if (!bookingView) return;
+  bookingView.hidden = !open;
+  messages.hidden = open;
+  suggestions.hidden = open;
+  form.hidden = open;
+  if (open) bookingView.querySelector('[data-booking-group]')?.focus();
+  else input.focus();
 }
 
 function addMessage(text, type) {
@@ -113,9 +151,21 @@ function addMessage(text, type) {
   messages.scrollTop = messages.scrollHeight;
 }
 
+function isGroupBookingIntent(text) {
+  if (/экзамен/i.test(text)) return false;
+  return /(?:хочу\s+записаться|запиш(?:ите|и)\s+меня|записаться\s+(?:в\s+группу|на\s+(?:курс|теори)))/i.test(text);
+}
+
 async function send(question) {
   const clean = question.trim();
   if (!clean || clean.length > 2000 || busy) return;
+  if (bookingView && isGroupBookingIntent(clean)) {
+    input.value = '';
+    addMessage(clean, 'user');
+    addMessage('Выберите актуальную группу и заполните форму. Заявка будет принята только после ответа сервера.', 'bot');
+    showBooking(true);
+    return;
+  }
   busy = true;
   input.value = '';
   input.disabled = submit.disabled = true;
@@ -126,6 +176,7 @@ async function send(question) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 32000);
   try {
+    if (!api) throw new Error('chat_api_missing');
     const response = await fetch(`${api}/api/chat`, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({message: clean, history}), signal: controller.signal
@@ -163,6 +214,7 @@ panel.addEventListener('keydown', event => {
 async function updatePrices() {
   const targets = [...document.querySelectorAll('[data-price-service]')];
   if (!targets.length) return;
+  if (!api) return;
   try {
     const data = await fetchPriceCatalog(api);
     const prices = new Map(data.services.map(item => [item.service_id, formatPrice(item)]));

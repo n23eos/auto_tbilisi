@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { applyRussianTranslations } from '../../js/ticket-bank.js';
 
 const read = name => JSON.parse(readFileSync(new URL(`../../data/${name}`, import.meta.url)));
+const indexSource = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
 const translations = Object.assign({}, ...['1742-1758', '1759-1775', '1776-1792'].map(range => read(`eco-ru-${range}.json`)));
 const tickets = applyRussianTranslations(read('tickets-b-ru.json').tickets, translations);
 
@@ -37,6 +38,12 @@ async function noHorizontalOverflow(page) {
 }
 
 test('главная: действия перед купонами, форма показывает ошибки без отправки', async ({ page, externalPosts }) => {
+  await page.route('http://127.0.0.1:8881/', route => route.fulfill({
+    contentType: 'text/html; charset=utf-8',
+    body: indexSource
+      .replace(/data-booking-api="[^"]*"/, 'data-booking-api=""')
+      .replace(/data-turnstile-sitekey="[^"]*"/, 'data-turnstile-sitekey=""'),
+  }));
   await page.goto('/');
   const signup = page.getByRole('link', { name: 'Записаться на обучение', exact: true });
   const coupon = page.getByRole('region', { name: 'Для ваших путешествий' });

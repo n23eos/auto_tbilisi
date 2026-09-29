@@ -77,6 +77,29 @@ document.documentElement.classList.add('has-js');
   const form = document.getElementById('callback-form');
   if (!form) return;
 
+  const bookingLoader = document.querySelector('script[data-booking-api]');
+  const bookingApi = (bookingLoader?.dataset.bookingApi || '').replace(/\/$/, '');
+  if (bookingApi) {
+    Promise.all([
+      import('./booking-form.js?v=1'),
+      import('./groups.js?v=2'),
+    ]).then(([booking, groups]) => {
+      booking.mountBookingForm(form, {
+        api: bookingApi,
+        sitekey: bookingLoader.dataset.turnstileSitekey || '',
+        source: 'site_form',
+        initialSnapshot: groups.currentGroupsSnapshot(),
+      });
+    }).catch(function () {
+      const failure = form.querySelector('.callback__fail');
+      if (failure) {
+        failure.textContent = 'Запись на выбранную группу временно недоступна. Позвоните: +995 599 98 77 07.';
+        failure.hidden = false;
+      }
+    });
+    return;
+  }
+
   const nameInput = form.querySelector('#cb-name');
   const phoneInput = form.querySelector('#cb-phone');
   const submitBtn = form.querySelector('.callback__submit');

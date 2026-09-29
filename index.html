@@ -31,7 +31,8 @@
   <link rel="stylesheet" href="css/tokens.css?v=23">
   <link rel="stylesheet" href="css/style.css?v=31">
   <link rel="stylesheet" href="css/partner.css?v=13">
-  <link rel="stylesheet" href="css/chat.css?v=4">
+  <link rel="stylesheet" href="css/groups.css?v=1">
+  <link rel="stylesheet" href="css/chat.css?v=5">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -513,6 +514,16 @@
     <p class="formats__note">Цены на все форматы — <a href="#prices">в таблице ниже</a>. Расписание подбираем под вас.</p>
   </section>
 
+  <section class="groups" id="groups" aria-labelledby="groups-title" data-groups-root>
+    <p class="section-kicker">Ближайшие группы</p>
+    <div class="groups__heading">
+      <h2 class="section-title" id="groups-title">Выберите дату старта</h2>
+      <p data-groups-status aria-live="polite">Дату ближайшей группы уточняем. Позвоните или напишите в WhatsApp.</p>
+    </div>
+    <div class="groups__list" data-groups-list></div>
+    <button class="groups__retry" type="button" data-groups-retry hidden>Обновить расписание</button>
+  </section>
+
   <!-- Цены -->
   <section class="practice-invite" aria-labelledby="practice-title">
     <div data-reveal>
@@ -697,30 +708,44 @@
 
       <h3 class="callback__title">Заказать звонок</h3>
 
+      <div class="callback__field" data-booking-only hidden>
+        <label for="cb-group">Группа</label>
+        <select id="cb-group" data-booking-group required disabled>
+          <option value="">Расписание недоступно</option>
+        </select>
+      </div>
+
       <div class="callback__field">
         <label for="cb-name">Ваше имя</label>
-        <input id="cb-name" name="Имя" type="text" autocomplete="name" required minlength="2" placeholder="Как к вам обращаться" aria-describedby="cb-name-error">
+        <input id="cb-name" name="Имя" data-booking-name type="text" autocomplete="name" required minlength="2" maxlength="100" placeholder="Как к вам обращаться" aria-describedby="cb-name-error">
         <p class="callback__error" id="cb-name-error" data-error-for="cb-name">Напишите имя — хотя бы пару букв.</p>
       </div>
 
       <div class="callback__field">
         <label for="cb-phone">Телефон</label>
-        <input id="cb-phone" name="Телефон" type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX" aria-describedby="cb-phone-error">
+        <input id="cb-phone" name="Телефон" data-booking-phone type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX" aria-describedby="cb-phone-error">
         <p class="callback__error" id="cb-phone-error" data-error-for="cb-phone">Проверьте номер — минимум 9 цифр.</p>
       </div>
 
-      <div class="callback__field">
+      <div class="callback__field" data-callback-only>
         <label for="cb-comment">Комментарий <span class="callback__optional">(необязательно)</span></label>
         <textarea id="cb-comment" name="Комментарий" rows="2" placeholder="Например: удобно говорить после 18:00"></textarea>
       </div>
 
-      <button class="callback__submit" type="submit">
+      <label class="callback__consent" data-booking-only hidden>
+        <input type="checkbox" data-booking-consent required>
+        <span>Согласен на обработку имени и телефона для этой заявки</span>
+      </label>
+
+      <div class="callback__captcha" data-booking-captcha data-booking-only tabindex="-1" hidden></div>
+
+      <button class="callback__submit" data-booking-submit type="submit">
         <span class="callback__submit-label">Перезвоните мне</span>
         <span class="callback__submit-loading" aria-hidden="true">Отправляем…</span>
       </button>
 
-      <p class="callback__success" role="status" hidden>Заявка отправлена. Перезвоним в ближайшее время!</p>
-      <p class="callback__fail" role="alert" hidden>Не получилось отправить. Позвоните нам: <a href="tel:+995599987707">+995 599 98 77 07</a></p>
+      <p class="callback__success" data-booking-success role="status" hidden>Заявка отправлена. Перезвоним в ближайшее время!</p>
+      <p class="callback__fail" data-booking-fail role="alert" hidden>Не получилось отправить. Позвоните нам: <a href="tel:+995599987707">+995 599 98 77 07</a></p>
     </form>
   </section>
 
@@ -784,7 +809,8 @@
   </div>
 
   <script src="js/analytics.js?v=25" defer></script>
-  <script src="js/main.js?v=29" defer></script>
-  <script type="module" src="js/chat.js?v=5" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
+  <script src="js/main.js?v=31" defer data-booking-api="https://booking.avtoshkola.ge" data-turnstile-sitekey="0x4AAAAAAFI6Us-SkuRj4Bvt"></script>
+  <script type="module" src="js/groups.js?v=2"></script>
+  <script type="module" src="js/chat.js?v=7" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
 </body>
 </html>

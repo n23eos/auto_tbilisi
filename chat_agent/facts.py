@@ -179,6 +179,26 @@ def render_price(source):
 
 def render_group(source):
     status = source.get('status')
+    if status == 'unavailable':
+        return 'Расписание временно недоступно. ' + CONTACT
+    if status == 'success':
+        groups = source.get('groups')
+        if not groups:
+            return 'Дату ближайшей группы уточняем. ' + CONTACT
+        parts = []
+        for group in groups:
+            day = date.fromisoformat(group['start_date']).strftime('%d.%m.%Y')
+            when = f"{day} в {group['start_time']} по Тбилиси"
+            if group['availability'] == 'full':
+                note = 'мест нет'
+            elif group['availability'] == 'closed' or not group['enrollment_open']:
+                note = 'набор закрыт'
+            elif group['date_status'] == 'confirmed':
+                note = 'старт подтвержден, запись открыта'
+            else:
+                note = 'дата предварительная, запись открыта'
+            parts.append(f'{when} - {note}')
+        return 'Ближайшие группы:\n' + '\n'.join(f'- {part}' for part in parts)
     if status not in ('planned', 'confirmed', 'full'):
         return 'Дату ближайшей группы уточняем. ' + CONTACT
     day = date.fromisoformat(source['data']['start_date']).strftime('%d.%m.%Y')

@@ -13,11 +13,28 @@ await applyD1Migrations(db, (env as any).TEST_MIGRATIONS);
 // Порядок таблиц важен: lead_events ссылается на leads(id).
 // sqlite_sequence обнуляем, чтобы номера заявок в каждом тесте начинались с 1
 // и ожидаемые в проверках id не зависели от предыдущих тестов.
-const TABLES_CHILD_FIRST = ["lead_events", "leads", "conversations", "facts", "processed_updates"];
+const TABLES_CHILD_FIRST = [
+  "outbox",
+  "audit_events",
+  "command_guards",
+  "command_results",
+  "booking_rate_limits",
+  "inbox",
+  "chat_leases",
+  "bookings",
+  "groups",
+  "schedule_state",
+  "lead_events",
+  "leads",
+  "conversations",
+  "facts",
+  "processed_updates",
+];
 
 beforeEach(async () => {
   await db.batch([
     ...TABLES_CHILD_FIRST.map((table) => db.prepare(`DELETE FROM ${table}`)),
+    db.prepare("INSERT INTO schedule_state (service_id) VALUES ('theory_group')"),
     db.prepare("DELETE FROM sqlite_sequence"),
   ]);
 });
