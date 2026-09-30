@@ -19,7 +19,7 @@ Telegram-бот приёма заявок. Живой сайт: https://avtoshko
 
 ```bash
 npm test                              # сайт: логика экзамена и тренировки
-cd bot && npm test && npm run typecheck   # бот: 141 тест + типы
+cd bot && npm test && npm run typecheck   # бот: домен, webhook, очереди, auth + типы
 .venv/bin/python -m pytest tools -q   # инструменты
 ```
 
@@ -50,9 +50,10 @@ Pages. Меняете файл — поднимаете версию во все
 ```
 
 **У бота нет `[vars]` в `wrangler.toml`.** Все настройки — через
-`wrangler secret put`, иначе деплой затирает значения из дашборда. Если не
-задан хоть один из четырёх секретов, бот отвечает 404 на всё и пишет причину
-в `wrangler tail`.
+`wrangler secret put`, иначе деплой затирает значения из дашборда. Telegram webhook требует все четыре прежних секрета. Public groups/API не
+зависят от TG secrets; включаются отдельным BOOKING_ENABLED с BOOKING_SECRET.
+Админка дополнительно требует Access JWT/allowlist/ADMIN_ORIGIN и CSRF.
+Отсутствие конфигурации закрывает соответствующий контур.
 
 **Схема D1 меняется только миграцией.** SQLite не умеет `ALTER TABLE ADD
 CONSTRAINT`, поэтому изменение ограничений — это пересборка таблицы
@@ -75,3 +76,29 @@ CONSTRAINT`, поэтому изменение ограничений — это
 
 Планы работ лежат в `.plan-*.md` в корне. Известные дефекты данных билетов —
 в `docs/tickets-known-issues.md`.
+
+## Группы и запись
+
+Спецификация и состояние: `specs/010-group-booking/`. Группы и заявки имеют
+единственный источник в Worker+D1. Мобильная админка `bot/admin/` доступна
+только после проверки Access внутри Worker; run_worker_first обязателен.
+Сайт читает `/api/v1/groups`, общий модуль `js/booking-form.js` принимает
+заявки со страницы и чата. Python с BOOKING_API_URL только читает группы,
+его прежний writer возвращает 410. Без cutover конфигурации сохраняется
+legacy режим; реальные даты и production hostname не подставлять по догадке.
+
+Webhook сначала сохраняет inbox, отправка идет через outbox и минутный
+cron. Ночная очистка остается отдельно. Все изменения групп, заявок,
+audit/outbox и replay результата атомарны; не добавлять прямые writers.
+Поиск имени/телефона в админке использует защищенный POST JSON,
+персональные данные нельзя помещать в URL или логи.
+
+Дополнительные проверки перед выпуском:
+
+```bash
+.venv/bin/python -m pytest chat_agent/tests -q
+npm run test:browser
+```
+
+Порядок настройки, backup/restore и cutover описан в `bot/README.md`.
+Локальные fixtures не подтверждают живую доставку, Access или Turnstile.

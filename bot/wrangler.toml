@@ -2,14 +2,22 @@ name = "avtoshkola-bot"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+routes = [{ pattern = "booking.avtoshkola.ge", custom_domain = true }]
 
 [triggers]
-crons = ["0 3 * * *"]
+crons = ["* * * * *", "0 3 * * *"]
+
+[assets]
+directory = "./admin"
+binding = "ASSETS"
+run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"
 database_name = "avtoshkola-bot"
-database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
+database_id = "eba176b3-3ecf-48b4-9d72-ac189c03ee3e"
 
 # Блока [vars] здесь СОЗНАТЕЛЬНО нет.
 #

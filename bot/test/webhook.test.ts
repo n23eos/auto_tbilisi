@@ -1,7 +1,6 @@
 import { env, createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
-import { resetAlertThrottle } from "../src/alert";
 
 // Два разных секрета: путь и заголовок больше не совпадают.
 const PATH_SECRET = "put-sekret";
@@ -42,6 +41,23 @@ const update = (id: number) => ({
 });
 
 describe("webhook", () => {
+  it("public booking route работает до проверки Telegram secrets", async () => {
+    const e = makeEnv() as any;
+    e.BOOKING_ENABLED = "true";
+    e.BOOKING_SECRET = "x".repeat(64);
+    e.WEBHOOK_PATH_SECRET = undefined;
+    e.WEBHOOK_HEADER_SECRET = undefined;
+    e.ADMIN_CHAT_ID = undefined;
+    e.ADMIN_IDS = undefined;
+    const response = await worker.fetch(
+      new Request("https://bot.example/api/v1/groups?service_id=theory_group"),
+      e,
+      createExecutionContext(),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+  });
+
   it("верный путь и верный заголовок — 200, апдейт обработан", async () => {
     const e = makeEnv() as any;
     const ctx = createExecutionContext();
@@ -175,6 +191,20 @@ describe("webhook", () => {
     expect(e.__fetch.mock.calls.length).toBe(0);
   });
 
+  it("ошибка durable insert возвращает 503, чтобы Telegram повторил update", async () => {
+    const e = makeEnv() as any;
+    e.DB = {
+      prepare: () => ({
+        bind: () => ({ run: async () => { throw new Error("D1 unavailable"); } }),
+      }),
+    };
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = await worker.fetch(webhookRequest(update(32_001)), e, createExecutionContext());
+    spy.mockRestore();
+    expect(response.status).toBe(503);
+    expect(e.__fetch).not.toHaveBeenCalled();
+  });
+
   it("валидный update обрабатывается, повторный — игнорируется", async () => {
     const e = makeEnv() as any;
     const ctx1 = createExecutionContext();
@@ -191,7 +221,7 @@ describe("webhook", () => {
     expect(e.__fetch.mock.calls.length).toBe(callsAfterFirst);
   });
 
-  it("падение обработчика: 200 Telegram, но в лог уходит update_id и чат ученика", async () => {
+  it("падение обработчика: 200 Telegram, update остается в durable retry без chat_id в логе", async () => {
     const boom = vi.fn(async () => {
       throw new Error("Telegram недоступен");
     }) as unknown as typeof fetch;
@@ -209,17 +239,19 @@ describe("webhook", () => {
     expect(res.status).toBe(200);
     const line = errors.join("\n");
     expect(line).toContain("44"); // update_id — чтобы найти апдейт
-    expect(line).toContain("9"); // chat_id ученика — чтобы понять, кому не ответили
-    expect(line).toContain("Telegram недоступен");
+    expect(line).not.toContain("chat_id=9");
+    expect(line).toContain("Error");
+    expect(line).not.toContain("Telegram недоступен");
+    const inbox = await (e.DB as D1Database)
+      .prepare("SELECT state, attempts, payload, retry_at FROM inbox WHERE update_id = 44")
+      .first<any>();
+    expect(inbox).toMatchObject({ state: "failed", attempts: 1 });
+    expect(inbox.payload).toContain('"update_id":44');
+    expect(inbox.retry_at).toBeTruthy();
   });
 
-  // `wrangler tail` показывает ошибку, только пока его кто-то держит открытым.
-  // Без сообщения в чат админов школа узнаёт о молчащем боте от самого ученика.
-  it("упавший апдейт уходит оповещением в чат админов", async () => {
-    resetAlertThrottle();
+  it("минутный cron повторяет упавший update и завершает его без ручной команды", async () => {
     const calls: any[] = [];
-    // Первый вызов — работа роутера, он падает. Дальше идёт уже оповещение,
-    // и оно должно дойти: иначе сбой останется никому не виден.
     const fetchFn = vi.fn(async (_url: string, init: RequestInit) => {
       const body = JSON.parse(init.body as string);
       calls.push(body);
@@ -233,12 +265,15 @@ describe("webhook", () => {
     const ctx = createExecutionContext();
     await worker.fetch(webhookRequest(update(45)), e, ctx);
     await waitOnExecutionContext(ctx);
+    await e.DB.prepare("UPDATE inbox SET retry_at = datetime('now') WHERE update_id = 45").run();
+    await worker.scheduled!({ cron: "* * * * *", scheduledTime: Date.now() } as any, e);
     spy.mockRestore();
 
-    const alert = calls.find((c) => c.chat_id === -100777);
-    expect(alert).toBeDefined();
-    expect(alert.text).toContain("45");
-    expect(alert.text).toContain("Telegram недоступен");
+    expect(calls).toHaveLength(2);
+    const inbox = await (e.DB as D1Database)
+      .prepare("SELECT state, payload, chat_id FROM inbox WHERE update_id = 45")
+      .first<any>();
+    expect(inbox).toEqual({ state: "done", payload: null, chat_id: null });
   });
 
   it("cron запускает чистку", async () => {

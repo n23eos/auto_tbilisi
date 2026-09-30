@@ -1,0 +1,57 @@
+{
+  "checked_on": "2026-09-28",
+  "scope": "Unauthenticated read-only requests; no candidate identifiers, cookies or booking operations",
+  "official_client": {
+    "url": "https://my.sa.gov.ge/main.d8f385ae2bc5ea88.js",
+    "http_status": 200,
+    "sha256": "78101f3a661d22c07df6329ba4ba19cbd0d1b860ebe23c838b99e429cf60bcba"
+  },
+  "observed_results": [
+    {
+      "url": "https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams/DrivingLicenseExamsCategories",
+      "method": "GET",
+      "http_status": 401
+    },
+    {
+      "url": "https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams/DrivingLicenseExamsDates",
+      "method": "GET",
+      "http_status": 401
+    },
+    {
+      "url": "https://api-my.sa.gov.ge/api/v1/DrivingLicenseTheoryExams/Dates",
+      "method": "GET",
+      "http_status": 401
+    },
+    {
+      "host": "api-bookings.sa.gov.ge",
+      "result": "Local DNS resolution failed; Google DNS JSON Status 3 (NXDOMAIN)"
+    },
+    {
+      "url": "https://exam-booking.sa.gov.ge/practical-exam",
+      "result": "TLS handshake timeout from current environment"
+    },
+    {
+      "url": "https://sa.gov.ge/TheoryExam/GetFreeSlots?start=1790553600&end=1791158400&officeId=1&lang=ka",
+      "method": "GET",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "page_title": "სააგენტო | შეცდომა",
+      "result": "Error HTML; not slot JSON"
+    }
+  ],
+  "client_read_methods": {
+    "base": "https://api-my.sa.gov.ge/api/v1/",
+    "practical_dates": "DrivingLicensePracticalExams/DrivingLicenseExamsDates",
+    "practical_times": "DrivingLicensePracticalExams/DrivingLicenseExamsDateFrames",
+    "theory_dates": "DrivingLicenseTheoryExams/Dates",
+    "theory_times": "DrivingLicenseTheoryExams/DateFrames",
+    "dates_parameters": [
+      "CategoryCode",
+      "CenterId"
+    ],
+    "practical_extra_parameter": "isFirstAttempt",
+    "times_extra_parameter": "ExamDate",
+    "parameter_evidence": "Call sites in official JavaScript, not successful API responses"
+  },
+  "conclusion": "Official client endpoint names confirmed; usable unauthenticated slot feed and Starti upstream not confirmed."
+}

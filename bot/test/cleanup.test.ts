@@ -1,6 +1,7 @@
 import { env } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { runCleanup } from "../src/cleanup";
+import { insertGroup } from "./group-fixtures";
 
 const db = () => (env as any).DB as D1Database;
 
@@ -8,7 +9,12 @@ describe("runCleanup", () => {
   it("удаляет старые processed_updates и истёкшие анкеты", async () => {
     await db().prepare("INSERT INTO processed_updates (update_id, seen_at) VALUES (1, datetime('now', '-8 days'))").run();
     await db().prepare("INSERT INTO processed_updates (update_id) VALUES (2)").run();
-    await db().prepare("INSERT INTO conversations (chat_id, step, submission_id, expires_at) VALUES (1, 'name', 'x', datetime('now', '-1 hour'))").run();
+    await db().prepare(
+      `INSERT INTO conversations (
+         id, chat_id, step, submission_id, revision, created_at, updated_at, expires_at
+       ) VALUES ('expired-conversation', 1, 'name', 'x', 1,
+                 datetime('now', '-2 hours'), datetime('now', '-2 hours'), datetime('now', '-1 hour'))`,
+    ).run();
 
     await runCleanup(db());
 
@@ -131,5 +137,113 @@ describe("runCleanup", () => {
 
     expect(afterFirst!.phone).toBe("удалён");
     expect(afterSecond).toEqual(afterFirst);
+  });
+
+  it("удаляет booking PII по ранней границе terminal+90 или created+180", async () => {
+    const groupId = await insertGroup(db(), { id: "cleanup-group", sequence: 91, startDate: "2099-12-01" });
+    await db().prepare(
+      `INSERT INTO bookings (
+         id, public_reference, group_id, name, phone, student_chat_id, source,
+         status, revision, consent_version, consent_at, created_at, updated_at, terminal_at
+       ) VALUES
+       ('terminal-old', 'BK-CLEAN-1', ?, 'Имя 1', '+995599000101', 101, 'telegram',
+        'declined', 1, 'v1', datetime('now', '-100 days'), datetime('now', '-100 days'), datetime('now', '-100 days'), datetime('now', '-91 days')),
+       ('created-old', 'BK-CLEAN-2', ?, 'Имя 2', '+995599000102', 102, 'telegram',
+        'pending', 1, 'v1', datetime('now', '-181 days'), datetime('now', '-181 days'), datetime('now', '-181 days'), NULL),
+       ('fresh-booking', 'BK-CLEAN-3', ?, 'Имя 3', '+995599000103', 103, 'telegram',
+        'pending', 1, 'v1', datetime('now', '-10 days'), datetime('now', '-10 days'), datetime('now', '-10 days'), NULL)`,
+    ).bind(groupId, groupId, groupId).run();
+
+    await runCleanup(db());
+
+    const rows = await db().prepare(
+      "SELECT id, name, phone, student_chat_id, pii_erased_at FROM bookings WHERE id LIKE '%old' OR id = 'fresh-booking' ORDER BY id",
+    ).all<any>();
+    const byId = Object.fromEntries(rows.results.map((row) => [row.id, row]));
+    for (const id of ["terminal-old", "created-old"]) {
+      expect(byId[id].name).toBeNull();
+      expect(byId[id].phone).toBeNull();
+      expect(byId[id].student_chat_id).toBeNull();
+      expect(byId[id].pii_erased_at).toBeTruthy();
+    }
+    expect(byId["fresh-booking"].phone).toBe("+995599000103");
+  });
+
+  it("очищает inbox payload за 24 часа, marker за 7 дней и служебные TTL", async () => {
+    await db().prepare(
+      `INSERT INTO inbox (
+         update_id, chat_id, payload, state, attempts, created_at, updated_at,
+         payload_expires_at, expires_at
+       ) VALUES
+       (8801, 88, '{"update_id":8801}', 'failed', 1,
+        datetime('now', '-25 hours'), datetime('now', '-25 hours'), datetime('now', '-1 hour'), datetime('now', '+5 days', '+23 hours')),
+       (8802, NULL, NULL, 'done', 1,
+        datetime('now', '-8 days'), datetime('now', '-8 days'), datetime('now', '-7 days'), datetime('now', '-1 day'))`,
+    ).run();
+    await db().prepare(
+      `INSERT INTO command_results (
+         operation_id, scope, payload_digest, result_code, result_json, created_at, expires_at
+       ) VALUES ('cleanup-command-key', 'test', 'digest', 'ok', '{}', datetime('now', '-25 hours'), datetime('now', '-1 hour'))`,
+    ).run();
+    await db().prepare(
+      `INSERT INTO audit_events (
+         id, entity_type, entity_id, operation_id, actor_id, action, created_at
+       ) VALUES ('old-audit', 'booking', 'b', 'op', 'staff', 'test', datetime('now', '-181 days'))`,
+    ).run();
+
+    await runCleanup(db());
+
+    const marker = await db().prepare("SELECT chat_id, payload, state, last_error_code FROM inbox WHERE update_id = 8801").first<any>();
+    expect(marker).toEqual({ chat_id: null, payload: null, state: "failed", last_error_code: "payload_expired" });
+    expect(await db().prepare("SELECT 1 FROM inbox WHERE update_id = 8802").first()).toBeNull();
+    expect(await db().prepare("SELECT 1 FROM command_results WHERE operation_id = 'cleanup-command-key'").first()).toBeNull();
+    expect(await db().prepare("SELECT 1 FROM audit_events WHERE id = 'old-audit'").first()).toBeNull();
+  });
+
+  it("отменяет prompt истекшей сессии до удаления conversation", async () => {
+    await db().prepare(
+      `INSERT INTO conversations (
+         id, chat_id, step, data, submission_id, revision, created_at, updated_at, expires_at
+       ) VALUES ('cleanup-conversation', 9901, 'name', '{}', 'sub', 1,
+                 datetime('now', '-25 hours'), datetime('now', '-25 hours'), datetime('now', '-1 hour'))`,
+    ).run();
+    await db().prepare(
+      `INSERT INTO outbox (
+         id, event_id, conversation_id, event_type, safe_template_id,
+         conversation_revision, recipient_key, recipient_role, state,
+         created_at, updated_at
+       ) VALUES ('cleanup-prompt', 'cleanup-event', 'cleanup-conversation',
+                 'conversation_prompt', 'ask_name', 1, 'cleanup-conversation',
+                 'student', 'pending', datetime('now', '-25 hours'), datetime('now', '-25 hours'))`,
+    ).run();
+
+    await runCleanup(db());
+
+    expect(await db().prepare("SELECT 1 FROM conversations WHERE id = 'cleanup-conversation'").first()).toBeNull();
+    const prompt = await db().prepare("SELECT state, terminal_at, last_error_code FROM outbox WHERE id = 'cleanup-prompt'").first<any>();
+    expect(prompt.state).toBe("superseded");
+    expect(prompt.terminal_at).toBeTruthy();
+    expect(prompt.last_error_code).toBe("conversation_expired");
+  });
+
+  it("не удаляет unresolved manual-contact по старому failed terminal_at", async () => {
+    await db().prepare(
+      `INSERT INTO outbox (
+         id, event_id, event_type, safe_template_id, recipient_key, recipient_role,
+         state, created_at, updated_at, terminal_at, resolved_at, resolved_by_actor, last_error_code
+       ) VALUES
+       ('manual-open', 'manual-open-event', 'booking_confirmed', 'student_booking_confirmed',
+        'booking-open', 'student', 'manual_contact', datetime('now', '-40 days'),
+        datetime('now', '-40 days'), datetime('now', '-40 days'), NULL, NULL, 'telegram_forbidden'),
+       ('resolved-old', 'resolved-old-event', 'booking_confirmed', 'student_booking_confirmed',
+        'booking-resolved', 'student', 'resolved', datetime('now', '-40 days'),
+        datetime('now', '-40 days'), datetime('now', '-31 days'), datetime('now', '-31 days'), 'staff', 'contacted')`,
+    ).run();
+
+    await runCleanup(db());
+
+    expect(await db().prepare("SELECT state FROM outbox WHERE id = 'manual-open'").first<any>())
+      .toEqual({ state: "manual_contact" });
+    expect(await db().prepare("SELECT 1 FROM outbox WHERE id = 'resolved-old'").first()).toBeNull();
   });
 });

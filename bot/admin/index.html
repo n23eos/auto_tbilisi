@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Группы и записи | Avtoshkola.ge</title><link rel="stylesheet" href="/admin/admin.css"><script src="/admin/admin.js" defer></script></head>
+<body>
+<header><a href="https://avtoshkola.ge">Avtoshkola.ge</a><h1>Группы и записи</h1><p id="actor">Проверяем доступ…</p></header>
+<main>
+<p class="notice">Измените дату здесь один раз. Сайт и боты используют это расписание. Предварительная дата не означает подтвержденный старт.</p>
+<p id="status" role="status" aria-live="polite"></p>
+<nav aria-label="Разделы"><a href="#groups-section">Группы</a><a href="#bookings-section">Записи</a><a href="#notifications-section">Нужно связаться</a><a href="#legacy-section">Старые заявки</a></nav>
+<section id="groups-section"><h2>Группы</h2>
+<form id="create-schedule"><h3>Первое расписание</h3><div class="fields"><label>Первая дата<input name="first_date" type="date" required></label><label>Время по Тбилиси<input name="start_time" type="time" value="19:00" required></label><label>Число групп<select name="count"><option>3</option><option>2</option><option>1</option></select></label><label>Мест в группе<input name="capacity" type="number" min="1" max="100" value="12" required></label></div><p>Интервал 14 дней. Даты будут предварительными.</p><button type="submit">Посмотреть даты</button></form>
+<div class="toolbar"><button id="reload" type="button">Обновить</button><label><input id="history" type="checkbox"> Показать архив</label></div>
+<div id="groups"></div><button id="append" type="button" hidden>Добавить следующую через 14 дней</button><button id="group-next" type="button" hidden>Следующие группы</button>
+<section id="preview" hidden aria-labelledby="preview-title"><h3 id="preview-title">Проверьте изменение</h3><div id="preview-dates"></div><p id="preview-count"></p><p id="preview-warnings"></p><button id="commit" type="button">Сохранить изменение</button><button id="cancel-preview" type="button" class="secondary">Закрыть</button></section>
+</section>
+<section id="bookings-section"><h2>Записи учеников</h2><form id="filters" class="fields"><label>Группа<select name="group_id" id="filter-group"><option value="">Все группы</option></select></label><label>Статус<select name="status"><option value="">Все</option><option value="pending">Ожидают</option><option value="confirmed">Подтверждены</option><option value="cancelled">Отменены</option><option value="declined">Отклонены</option><option value="completed">Завершены</option></select></label><label>Имя или телефон<input name="q" type="search" maxlength="100"></label><button type="submit">Найти</button></form><div id="bookings"></div><button id="booking-next" type="button" hidden>Следующие записи</button></section>
+<section id="notifications-section"><h2>Нужно связаться</h2><p>Успешная отправка сообщения не подтверждает его прочтение. Для ученика без Telegram свяжитесь по телефону из карточки записи.</p><button id="notification-refresh" type="button">Обновить задачи</button><div id="notifications"></div><button id="notification-next" type="button" hidden>Следующие задачи</button></section>
+<section id="legacy-section"><h2>Старые заявки</h2><p>Группа для этих заявок неизвестна. Они сохранены отдельно.</p><button id="legacy-refresh" type="button">Показать старые заявки</button><div id="legacy"></div><button id="legacy-next" type="button" hidden>Следующие старые заявки</button></section>
+</main>
+</body></html>

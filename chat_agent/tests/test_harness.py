@@ -98,6 +98,74 @@ def test_price_correction(tmp_path):
     assert [v['result'] for v in result['trace']['validation']] == ['FAIL', 'PASS']
 
 
+def test_group_tool_reads_configured_shared_source_without_catalog_fallback(tmp_path):
+    catalog = Catalog(tmp_path/'facts')
+    catalog.save_group('theory_group', '2026-10-19', 'confirmed',
+                       expected_revision=0, actor='fixture')
+
+    class SharedGroups:
+        is_shared = True
+
+        def __init__(self):
+            self.calls = 0
+            self.snapshot = {'status': 'success', 'schedule_revision': 3,
+                'fetched_at': '2026-09-29T12:00:00Z', 'timezone': 'Asia/Tbilisi',
+                'groups': [{'id': 'group-1', 'revision': 2,
+                            'start_date': '2026-10-05', 'start_time': '19:00',
+                            'date_status': 'planned', 'enrollment_open': True,
+                            'availability': 'open'}]}
+
+        def get_available_dates(self, service_id):
+            self.calls += 1
+            assert service_id == 'theory_group'
+            return self.snapshot
+
+    groups = SharedGroups()
+    class SnapshotModel(Fake):
+        evidence = None
+
+        def complete(self, messages, *args, **kwargs):
+            if self.count == 1:
+                self.evidence = json.loads(messages[-1]['content'])
+                groups.snapshot['schedule_revision'] = 4
+                groups.snapshot['groups'][0].update(
+                    revision=3, start_date='2026-10-19')
+            return super().complete(messages, *args, **kwargs)
+
+    model = SnapshotModel([call('get_available_dates', {'service_id': 'theory_group'}),
+                           answer(groups=['theory_group']), approved()])
+    result = Harness(model, catalog, Knowledge(KB), group_source=groups).run('Когда группа?')
+    assert result['status'] == 'success'
+    assert '05.10.2026' in result['answer']
+    assert '19.10.2026' not in result['answer']
+    assert model.evidence['schedule_revision'] == 3
+    assert model.evidence['groups'][0]['revision'] == 2
+    assert groups.calls == 1
+
+
+def test_repeated_group_tool_call_reuses_first_unavailable_snapshot(tmp_path):
+    class TransientGroups:
+        calls = 0
+
+        def get_available_dates(self, service_id):
+            self.calls += 1
+            if self.calls == 1:
+                return {'status': 'unavailable'}
+            return {'status': 'success', 'schedule_revision': 4,
+                    'fetched_at': '2026-09-29T12:00:01Z', 'timezone': 'Asia/Tbilisi',
+                    'groups': []}
+
+    groups = TransientGroups()
+    model = Fake([call('get_available_dates', {'service_id': 'theory_group'}),
+                  call('get_available_dates', {'service_id': 'theory_group'}),
+                  answer(groups=['theory_group']), approved()])
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=groups).run('Когда группа?')
+    assert result['status'] == 'success'
+    assert 'Расписание временно недоступно' in result['answer']
+    assert groups.calls == 1
+
+
 def test_atomic_budget_and_restart(tmp_path):
     path = tmp_path/'budget'
     budget = Budget(path, limit_micro=100)

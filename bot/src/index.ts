@@ -1,29 +1,16 @@
 import { routeUpdate } from "./router";
 import { runCleanup } from "./cleanup";
 import { alertAdmins } from "./alert";
+import { routeBookingRequest } from "./booking-api";
+import { acceptInboxUpdate, drainInbox } from "./inbox";
+import { dispatchOutbox } from "./outbox";
 import type { Env } from "./types";
 
-/** true — обновление новое; false — уже видели (Telegram ретраит). */
-async function isFreshUpdate(db: D1Database, updateId: number): Promise<boolean> {
-  const res = await db
-    .prepare("INSERT OR IGNORE INTO processed_updates (update_id) VALUES (?)")
-    .bind(updateId)
-    .run();
-  return res.meta.changes > 0;
-}
-
-/**
- * Опознавательные знаки апдейта для лога. Апдейт помечается обработанным ДО вызова
- * роутера, поэтому упавший апдейт больше не повторится — в `wrangler tail` должно быть
- * видно, какой это был апдейт и какому ученику не ответили, чтобы написать ему руками.
- */
-function describeUpdate(update: any): string {
-  const chatId = update?.message?.chat?.id ?? update?.callback_query?.message?.chat?.id ?? "?";
-  const userId = update?.message?.from?.id ?? update?.callback_query?.from?.id ?? "?";
-  return `update_id=${update?.update_id} chat_id=${chatId} user_id=${userId}`;
-}
-
 const encoder = new TextEncoder();
+
+function errorClass(error: unknown): string {
+  return error instanceof Error && error.name ? error.name : "UnknownError";
+}
 
 /**
  * Сравнение секрета за постоянное время: время ответа не зависит от того, сколько первых
@@ -56,9 +43,19 @@ function missingSecrets(env: Env): string[] {
     .filter((name) => !env[name]);
 }
 
+async function drainAcceptedWork(env: Env): Promise<void> {
+  await drainInbox(env, routeUpdate);
+  if (env.BOOKING_ENABLED === "true") await dispatchOutbox(env);
+}
+
 export default {
-  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const notFound = new Response("Not found", { status: 404 });
+
+    // Публичные и административные маршруты имеют отдельную закрытую по
+    // умолчанию конфигурацию и не зависят от временной недоступности Telegram.
+    const bookingResponse = await routeBookingRequest(request, env);
+    if (bookingResponse) return bookingResponse;
 
     // Незаданный секрет — не «слабее», а опаснее: `${undefined}` превратил бы путь в
     // общеизвестный `/webhook/undefined`. Поэтому проверяем оба секрета ДО сравнений и
@@ -102,21 +99,18 @@ export default {
     // Без update_id дедуплицировать нечем — такой запрос Telegram не присылает.
     if (typeof update?.update_id !== "number") return new Response("Bad request", { status: 400 });
 
-    if (await isFreshUpdate(env.DB, update.update_id)) {
-      try {
-        await routeUpdate(update, env);
-      } catch (err) {
-        // Ошибку логируем, но отвечаем 200: update уже помечен обработанным,
-        // ретрай Telegram всё равно был бы отброшен дедупликацией. Плюс ответ не-200
-        // останавливает всю очередь апдейтов бота, а не только этот один.
-        const where = describeUpdate(update);
-        console.error(`routeUpdate упал (${where}):`, err);
-        // `wrangler tail` работает, только пока его кто-то держит открытым.
-        // Без этого сообщения ученик остался бы без ответа, а школа узнала бы
-        // об этом от него самого — если он вообще напишет второй раз.
-        await alertAdmins(env, `Не ответили ученику: ${where}`, err);
+    try {
+      await acceptInboxUpdate(env.DB, update);
+    } catch (error) {
+      if (error instanceof TypeError || error instanceof RangeError) {
+        return new Response("Bad request", { status: 400 });
       }
+      console.error(`Inbox update_id=${update.update_id} не сохранен (${errorClass(error)})`);
+      return new Response("Unavailable", { status: 503 });
     }
+    // Telegram получает 200 после durable insert. Работа продолжается отдельно,
+    // а минутный cron подберет событие, если текущий isolate завершится раньше.
+    ctx.waitUntil(drainAcceptedWork(env));
     return Response.json({ ok: true });
   },
 
@@ -124,13 +118,33 @@ export default {
   // а проглоченная ошибка исчезла бы и из дашборда Cloudflare. Оповещение шлём
   // до проброса — иначе про ночной сбой никто не узнал бы до следующего захода
   // в дашборд, а телефоны учеников тем временем хранились бы дольше обещанного.
-  async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
+  async scheduled(controller: ScheduledController, env: Env): Promise<void> {
+    const failed: string[] = [];
+    try {
+      await drainInbox(env, routeUpdate);
+    } catch (error) {
+      failed.push("inbox");
+      console.error(`drainInbox упал (${errorClass(error)})`);
+    }
+    if (env.BOOKING_ENABLED === "true") {
+      try {
+        await dispatchOutbox(env);
+      } catch (error) {
+        failed.push("outbox");
+        console.error(`dispatchOutbox упал (${errorClass(error)})`);
+      }
+    }
+    if (controller.cron !== "0 3 * * *") {
+      if (failed.length > 0) throw new Error(`scheduled_failed:${failed.join(",")}`);
+      return;
+    }
     try {
       await runCleanup(env.DB);
     } catch (err) {
-      console.error("runCleanup упал:", err);
-      await alertAdmins(env, "Ночная уборка базы не прошла", err);
-      throw err;
+      failed.push("cleanup");
+      console.error(`runCleanup упал (${errorClass(err)})`);
+      await alertAdmins(env, "Ночная уборка базы не прошла", new Error(errorClass(err)));
     }
+    if (failed.length > 0) throw new Error(`scheduled_failed:${failed.join(",")}`);
   },
 } satisfies ExportedHandler<Env>;

@@ -29,9 +29,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- ?v= — версия файла: меняйте при правках, иначе браузер покажет старую копию из кэша -->
   <link rel="stylesheet" href="css/tokens.css?v=23">
-  <link rel="stylesheet" href="css/style.css?v=31">
-  <link rel="stylesheet" href="css/partner.css?v=13">
-  <link rel="stylesheet" href="css/chat.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=34">
+  <link rel="stylesheet" href="css/partner.css?v=17">
+  <link rel="stylesheet" href="css/about.css?v=1">
+  <link rel="stylesheet" href="css/groups.css?v=1">
+  <link rel="stylesheet" href="css/chat.css?v=8">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -348,59 +350,7 @@
       <p class="marquee__geo">Avtoshkola.ge — автошкола на русском языке в Тбилиси, пр-т Важа Пшавела 9</p>
     </div>
 
-    <section class="partners" aria-labelledby="partners-title">
-      <div class="partners__heading">
-        <p class="section-kicker">Партнёрские предложения</p>
-        <h2 id="partners-title">Для ваших путешествий</h2>
-      </div>
-      <div class="partners__track">
-        <aside class="partner-banner" aria-label="Партнёрское предложение Holafly">
-          <div class="partner-banner__main">
-            <div class="partner-banner__icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48" fill="none"><rect x="12" y="5" width="24" height="38" rx="6" stroke="currentColor" stroke-width="2"/><path d="M20 10h8M21 37h6M17 22a10 10 0 0 1 14 0m-11 4a6 6 0 0 1 8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="30" r="1.5" fill="currentColor"/></svg>
-            </div>
-            <div class="partner-banner__copy">
-              <p class="partner-banner__brand">Holafly</p>
-              <h3 class="partner-banner__title">eSIM для путешествий</h3>
-              <p class="partner-banner__description">Карты, мессенджеры и связь с близкими в поездке за границу.</p>
-            </div>
-          </div>
-          <div class="partner-banner__stub">
-            <div class="partner-banner__deal">
-              <span class="partner-banner__discount">−5%</span>
-              <span class="partner-banner__code">по коду <strong>HOLAAVTO</strong></span>
-            </div>
-            <a class="partner-banner__cta"
-               href="https://holafly.sjv.io/c/7837896/2006335/24764?subId1=avtoshkola&amp;subId2=home-banner"
-               rel="sponsored noopener"
-               target="_blank"
-               data-affiliate="holafly"
-               data-placement="home_banner">Выбрать eSIM <span aria-hidden="true">↗</span></a>
-          </div>
-        </aside>
-        <aside class="partner-banner partner-banner--omio" aria-label="Партнёрское предложение Omio">
-          <div class="partner-banner__main">
-            <div class="partner-banner__icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48" fill="none"><rect x="10" y="5" width="28" height="30" rx="7" stroke="currentColor" stroke-width="2"/><path d="M10 21h28M24 5v16M16 35l-5 8m21-8 5 8M15 40h18" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="28" r="2" fill="currentColor"/><circle cx="31" cy="28" r="2" fill="currentColor"/></svg>
-            </div>
-            <div class="partner-banner__copy">
-              <p class="partner-banner__brand">Omio</p>
-              <h3 class="partner-banner__title">Билеты для путешествий</h3>
-              <p class="partner-banner__description">Сравните поезда, автобусы, самолёты и паромы. Скидка 10% новым клиентам при сумме заказа до 80 €.</p>
-            </div>
-          </div>
-          <div class="partner-banner__stub">
-            <div class="partner-banner__deal">
-              <span class="partner-banner__discount">−10%</span>
-              <span class="partner-banner__code">по коду <strong>NEW10</strong></span>
-            </div>
-            <a class="partner-banner__cta" href="https://omio.sjv.io/c/7837896/4029327/7385"
-               rel="sponsored noopener" target="_blank" data-affiliate="omio"
-               data-placement="home_banner">Найти билеты <span aria-hidden="true">↗</span></a>
-          </div>
-        </aside>
-      </div>
-    </section>
+
   </section>
 
 
@@ -434,9 +384,8 @@
       <p>Теория — в классе на Важа Пшавела 9 или онлайн. Вождение — в Тбилиси, с инструктором, который объясняет спокойно и по делу.</p>
       <a class="exam-link" href="#program">Посмотреть этапы обучения ↓</a>
     </div>
-    <figure class="about__city" data-reveal>
-      <img src="media/tbilisi-wide.webp" srcset="media/tbilisi-wide-900.webp 900w, media/tbilisi-wide.webp 1774w" sizes="(max-width: 700px) calc(100vw - 32px), 92vw" width="1774" height="887" loading="lazy" decoding="async" alt="Иллюстрация Тбилиси: дома с балконами, мост Мира и дорога вдоль реки">
-      <figcaption><span>ТБИЛИСИ · ГРУЗИЯ</span></figcaption>
+    <figure class="about__city" aria-hidden="true">
+      <img src="media/tbilisi-wide.webp" srcset="media/tbilisi-wide-900.webp 900w, media/tbilisi-wide.webp 1774w" sizes="(max-width: 700px) calc(100vw - 32px), 92vw" width="1774" height="887" loading="lazy" decoding="async" alt="">
     </figure>
     <ul class="about__list" data-reveal>
       <li>Полный курс: теория ПДД + вождение</li>
@@ -444,11 +393,73 @@
       <li>Обучение с нуля — опыт не нужен</li>
       <li>Инструкторы говорят по-русски</li>
       <li>Оплата после первого урока — без предоплаты</li>
-      <li>Школа работает больше семи лет</li>
+      <li>Школа работает более 10 лет</li>
     </ul>
+    <span class="about__caption">ТБИЛИСИ · ГРУЗИЯ</span>
   </section>
 
   <!-- Программа · F4 step sequence -->
+  <section class="partners" id="travel" aria-labelledby="partners-title">
+    <div class="partners__heading">
+      <div>
+        <p class="section-kicker">Партнёрские предложения</p>
+        <h2 id="partners-title">Для ваших путешествий</h2>
+      </div>
+      <p class="partners__intro">Связь, дорога и жильё. Выберите то, что нужно для вашей поездки.</p>
+    </div>
+    <div class="partners__track">
+      <article class="travel-card travel-card--trip" data-affiliate-card="tripcom" data-placement="home_travel">
+        <div class="travel-card__visual"><img src="media/partners/trip-travel-v1.webp" alt="" width="960" height="540" loading="lazy" decoding="async"></div>
+        <div class="travel-card__body">
+          <div class="travel-card__top"><span class="travel-card__brand">Trip.com</span><span class="travel-card__tag">Жильё и перелёт</span></div>
+          <h3>Отели и авиабилеты</h3>
+          <p class="travel-card__offer"><strong>Бронирование на русском</strong></p>
+          <div class="travel-card__actions travel-card__actions--pair">
+            <a class="travel-card__cta" href="https://ru.trip.com/hotels?Allianceid=10767149&amp;SID=332507505&amp;trip_sub1=avtoshkola_home_hotels&amp;trip_sub3=D20014780"
+               rel="sponsored noopener" target="_blank" data-affiliate="tripcom" data-placement="home_travel" data-product="hotels">Найти отель <span aria-hidden="true">↗</span></a>
+            <a class="travel-card__cta travel-card__cta--secondary" href="https://ru.trip.com/flights?Allianceid=10767149&amp;SID=332507505&amp;trip_sub1=avtoshkola_home_flights&amp;trip_sub3=D20014780"
+               rel="sponsored noopener" target="_blank" data-affiliate="tripcom" data-placement="home_travel" data-product="flights">Авиабилеты <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+      <article class="travel-card travel-card--holafly" data-affiliate-card="holafly" data-placement="home_travel">
+        <div class="travel-card__visual"><img src="media/partners/holafly-esim-v1.webp" alt="" width="960" height="540" loading="lazy" decoding="async"></div>
+        <div class="travel-card__body">
+          <div class="travel-card__top"><span class="travel-card__brand">Holafly</span><span class="travel-card__tag">Связь</span></div>
+          <h3>Интернет за границей</h3>
+          <p class="travel-card__offer"><strong>Скидка 5%</strong> по коду <b>HOLAAVTO</b></p>
+          <div class="travel-card__actions">
+            <a class="travel-card__cta" href="https://holafly.sjv.io/c/7837896/2006335/24764?subId1=avtoshkola&amp;subId2=home-travel"
+               rel="sponsored noopener" target="_blank" data-affiliate="holafly" data-placement="home_travel" data-product="esim">Выбрать страну <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+      <article class="travel-card travel-card--omio" data-affiliate-card="omio" data-placement="home_travel">
+        <div class="travel-card__visual"><img src="media/partners/omio-rail-v1.webp" alt="" width="960" height="540" loading="lazy" decoding="async"></div>
+        <div class="travel-card__body">
+          <div class="travel-card__top"><span class="travel-card__brand">Omio</span><span class="travel-card__tag">Дорога</span></div>
+          <h3>Поезда и автобусы</h3>
+          <p class="travel-card__offer"><strong>Скидка 10%</strong> по коду <b>NEW10</b><small>Новым клиентам, заказ до 80 €</small></p>
+          <div class="travel-card__actions">
+            <a class="travel-card__cta" href="https://omio.sjv.io/c/7837896/4029327/7385"
+               rel="sponsored noopener" target="_blank" data-affiliate="omio" data-placement="home_travel" data-product="transport">Найти маршрут <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="partners__footer">
+      <p class="partners__disclosure">Это партнёрские ссылки. Мы можем получить комиссию за покупку или бронирование.</p>
+      <details class="partners__details">
+        <summary>Что проверить перед покупкой</summary>
+        <div class="partners__tips">
+          <p><strong>Trip.com.</strong> У отеля проверьте расположение, итоговую цену и условия отмены. У авиабилета проверьте аэропорт, пересадки и включённый багаж. Кроме отелей и перелётов на сервисе есть и другие услуги для поездок.</p>
+          <p><strong>Holafly.</strong> Выберите страну, срок и подходящий пакет. Проверьте модель телефона, поддержку eSIM и правила активации. Код HOLAAVTO указывается при оформлении.</p>
+          <p><strong>Omio.</strong> Сверьте станции отправления и прибытия, багаж и возможность возврата. Промокод NEW10 предназначен для новых клиентов и заказа до 80 €; применение скидки проверяйте до оплаты.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
   <section class="steps" id="program">
     <p class="section-kicker" data-reveal>От первого билета до городских улиц</p>
     <h2 class="section-title" data-reveal>Как проходит обучение</h2>
@@ -513,6 +524,16 @@
     <p class="formats__note">Цены на все форматы — <a href="#prices">в таблице ниже</a>. Расписание подбираем под вас.</p>
   </section>
 
+  <section class="groups" id="groups" aria-labelledby="groups-title" data-groups-root>
+    <p class="section-kicker">Ближайшие группы</p>
+    <div class="groups__heading">
+      <h2 class="section-title" id="groups-title">Выберите дату старта</h2>
+      <p data-groups-status aria-live="polite">Дату ближайшей группы уточняем. Позвоните или напишите в WhatsApp.</p>
+    </div>
+    <div class="groups__list" data-groups-list></div>
+    <button class="groups__retry" type="button" data-groups-retry hidden>Обновить расписание</button>
+  </section>
+
   <!-- Цены -->
   <section class="practice-invite" aria-labelledby="practice-title">
     <div data-reveal>
@@ -561,9 +582,13 @@
           <div class="prices__row">
             <dt>
               Онлайн своей компанией
-              <span class="prices__note">вдвоём, втроём или вчетвером — цена за курс с каждого</span>
+              <span class="prices__note">цена полного курса для одного человека</span>
             </dt>
-            <dd><span data-price-service="theory_company_2">210 ₾</span> / <span data-price-service="theory_company_3">180 ₾</span> / <span data-price-service="theory_company_4">150 ₾</span><span class="prices__unit">с человека</span></dd>
+            <dd class="prices__company">
+              <span><small>Вдвоём</small><strong data-price-service="theory_company_2">210 ₾</strong></span>
+              <span><small>Втроём</small><strong data-price-service="theory_company_3">180 ₾</strong></span>
+              <span><small>Вчетвером</small><strong data-price-service="theory_company_4">150 ₾</strong></span>
+            </dd>
           </div>
         </dl>
       </article>
@@ -677,15 +702,14 @@
   <section class="contact" id="contact">
     <div class="contact__info" data-reveal>
       <h2 class="section-title">Записаться или спросить</h2>
-      <p class="contact__lede">Оставьте имя и номер — перезвоним, ответим на вопросы и подберём программу. Или свяжитесь напрямую:</p>
+      <p class="contact__lede" data-booking-lede>Оставьте имя и номер, чтобы мы перезвонили, ответили на вопросы и подобрали программу. Или свяжитесь напрямую:</p>
       <ul class="contact__links">
-        <li><a href="tel:+995599987707">+995 599 98 77 07</a><span> — позвонить</span></li>
-        <li><a href="https://wa.me/995599987707" rel="noopener">WhatsApp</a><span> — написать можно в любое время суток</span></li>
-        <li><span class="contact__hours">Звонки — ежедневно с 10:00 до 20:00</span><span> — в WhatsApp пишите круглосуточно</span></li>
-        <li><a href="https://m.me/avtoshkolatbilisi" rel="noopener">Messenger</a><span> — написать в Facebook</span></li>
-        <li><a href="mailto:info@avtoshkola.ge">info@avtoshkola.ge</a><span> — почта</span></li>
-        <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span> — аудитория, метро Медицинский университет</span></li>
-        <li><a href="https://maps.app.goo.gl/KDqDEXzkr9bN4wDfA" rel="noopener">Площадка для вождения</a><span> — автодром у метро Церетели</span></li>
+        <li><a href="tel:+995599987707">+995 599 98 77 07</a><span class="contact__detail">Звонки ежедневно с 10:00 до 20:00</span></li>
+        <li><a href="https://wa.me/995599987707" rel="noopener">WhatsApp</a><span class="contact__detail">Сообщения круглосуточно</span></li>
+        <li><a href="https://m.me/avtoshkolatbilisi" rel="noopener">Messenger</a><span class="contact__detail">Сообщения в Facebook</span></li>
+        <li><a href="mailto:info@avtoshkola.ge">info@avtoshkola.ge</a><span class="contact__detail">Электронная почта</span></li>
+        <li><a href="https://maps.app.goo.gl/yNQJUzibnGbbu8Yp8" rel="noopener">Пр-т Важа Пшавела 9</a><span class="contact__detail">Аудитория у метро Медицинский университет</span></li>
+        <li><a href="https://maps.app.goo.gl/KDqDEXzkr9bN4wDfA" rel="noopener">Площадка для вождения</a><span class="contact__detail">Автодром у метро Церетели</span></li>
       </ul>
     </div>
 
@@ -697,30 +721,44 @@
 
       <h3 class="callback__title">Заказать звонок</h3>
 
+      <div class="callback__field" data-booking-only hidden>
+        <label for="cb-group">Группа</label>
+        <select id="cb-group" data-booking-group required disabled>
+          <option value="">Расписание недоступно</option>
+        </select>
+      </div>
+
       <div class="callback__field">
         <label for="cb-name">Ваше имя</label>
-        <input id="cb-name" name="Имя" type="text" autocomplete="name" required minlength="2" placeholder="Как к вам обращаться" aria-describedby="cb-name-error">
+        <input id="cb-name" name="Имя" data-booking-name type="text" autocomplete="name" required minlength="2" maxlength="100" placeholder="Как к вам обращаться" aria-describedby="cb-name-error">
         <p class="callback__error" id="cb-name-error" data-error-for="cb-name">Напишите имя — хотя бы пару букв.</p>
       </div>
 
       <div class="callback__field">
         <label for="cb-phone">Телефон</label>
-        <input id="cb-phone" name="Телефон" type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX" aria-describedby="cb-phone-error">
+        <input id="cb-phone" name="Телефон" data-booking-phone type="tel" autocomplete="tel" required placeholder="+995 5XX XX XX XX" aria-describedby="cb-phone-error">
         <p class="callback__error" id="cb-phone-error" data-error-for="cb-phone">Проверьте номер — минимум 9 цифр.</p>
       </div>
 
-      <div class="callback__field">
+      <div class="callback__field" data-callback-only>
         <label for="cb-comment">Комментарий <span class="callback__optional">(необязательно)</span></label>
         <textarea id="cb-comment" name="Комментарий" rows="2" placeholder="Например: удобно говорить после 18:00"></textarea>
       </div>
 
-      <button class="callback__submit" type="submit">
+      <label class="callback__consent" data-booking-only hidden>
+        <input type="checkbox" data-booking-consent required>
+        <span>Согласен на обработку имени и телефона для этой заявки</span>
+      </label>
+
+      <div class="callback__captcha" data-booking-captcha data-booking-only tabindex="-1" hidden></div>
+
+      <button class="callback__submit" data-booking-submit type="submit">
         <span class="callback__submit-label">Перезвоните мне</span>
         <span class="callback__submit-loading" aria-hidden="true">Отправляем…</span>
       </button>
 
-      <p class="callback__success" role="status" hidden>Заявка отправлена. Перезвоним в ближайшее время!</p>
-      <p class="callback__fail" role="alert" hidden>Не получилось отправить. Позвоните нам: <a href="tel:+995599987707">+995 599 98 77 07</a></p>
+      <p class="callback__success" data-booking-success role="status" hidden>Заявка отправлена. Перезвоним в ближайшее время!</p>
+      <p class="callback__fail" data-booking-fail role="alert" hidden>Не получилось отправить. Позвоните нам: <a href="tel:+995599987707">+995 599 98 77 07</a></p>
     </form>
   </section>
 
@@ -780,11 +818,14 @@
     <button class="fab__toggle" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="Связаться с нами" data-fab-toggle>
       <svg class="fab__icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg>
       <svg class="fab__icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      <span class="fab__toggle-label">Контакты</span>
     </button>
   </div>
 
   <script src="js/analytics.js?v=25" defer></script>
-  <script src="js/main.js?v=29" defer></script>
-  <script type="module" src="js/chat.js?v=5" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
+  <script src="js/affiliate-analytics.js?v=1" defer></script>
+  <script src="js/main.js?v=32" defer data-booking-api="https://booking.avtoshkola.ge" data-turnstile-sitekey="0x4AAAAAAFI6Us-SkuRj4Bvt"></script>
+  <script type="module" src="js/groups.js?v=2"></script>
+  <script type="module" src="js/chat.js?v=9" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
 </body>
 </html>

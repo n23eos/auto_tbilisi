@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { applyRussianTranslations } from '../../js/ticket-bank.js';
 
 const read = name => JSON.parse(readFileSync(new URL(`../../data/${name}`, import.meta.url)));
+const indexSource = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
 const translations = Object.assign({}, ...['1742-1758', '1759-1775', '1776-1792'].map(range => read(`eco-ru-${range}.json`)));
 const tickets = applyRussianTranslations(read('tickets-b-ru.json').tickets, translations);
 
@@ -37,6 +38,12 @@ async function noHorizontalOverflow(page) {
 }
 
 test('главная: действия перед купонами, форма показывает ошибки без отправки', async ({ page, externalPosts }) => {
+  await page.route('http://127.0.0.1:8881/', route => route.fulfill({
+    contentType: 'text/html; charset=utf-8',
+    body: indexSource
+      .replace(/data-booking-api="[^"]*"/, 'data-booking-api=""')
+      .replace(/data-turnstile-sitekey="[^"]*"/, 'data-turnstile-sitekey=""'),
+  }));
   await page.goto('/');
   const signup = page.getByRole('link', { name: 'Записаться на обучение', exact: true });
   const coupon = page.getByRole('region', { name: 'Для ваших путешествий' });
@@ -169,5 +176,86 @@ test('свёрнутые панели оставляют доступными н
   await page.getByRole('button', { name: 'Найти', exact: true }).click();
   await expect(page.locator('#t-source-id')).toHaveText('337');
   await expect(page.locator('#t-settings')).not.toHaveAttribute('open');
+  await noHorizontalOverflow(page);
+});
+
+
+test('партнеры: показы, продуктовые переходы и условия доступны без отправки аналитики', async ({ page, context }) => {
+  await page.addInitScript(() => {
+    window.partnerEvents = [];
+    window.gtag = (...args) => window.partnerEvents.push(args);
+  });
+  await page.goto('/');
+  const cards = page.locator('[data-affiliate-card]');
+  await expect(cards).toHaveCount(3);
+  for (const card of await cards.all()) {
+    await card.scrollIntoViewIfNeeded();
+    const affiliate = await card.getAttribute('data-affiliate-card');
+    await expect.poll(() => page.evaluate(name => window.partnerEvents.filter(event =>
+      event[1] === 'affiliate_impression' && event[2].affiliate === name).length, affiliate)).toBe(1);
+    expect(await card.evaluate(node => {
+      const box = node.getBoundingClientRect();
+      return box.left >= 0 && box.right <= document.documentElement.clientWidth;
+    })).toBe(true);
+  }
+  await cards.first().scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => window.partnerEvents.filter(event => event[1] === 'affiliate_impression').length)).toBe(3);
+
+  await expect(page.locator('[data-affiliate-card]').first()).toHaveAttribute('data-affiliate-card', 'tripcom');
+  for (const image of await page.locator('.travel-card__visual img').all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
+  }
+
+  const links = page.locator('a[data-affiliate]');
+  await expect(links).toHaveCount(4);
+  for (const link of await links.all()) {
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toHaveAttribute('rel', 'sponsored noopener');
+    await link.hover();
+    await expect(link).toHaveCSS('color', (await link.getAttribute('class')).includes('--secondary')
+      ? 'rgb(23, 67, 168)' : 'rgb(255, 255, 255)');
+    const product = await link.getAttribute('data-product');
+    const href = new URL(await link.getAttribute('href'));
+    if (product === 'esim') {
+      expect(href.hostname).toBe('holafly.sjv.io');
+      expect(href.pathname).toBe('/c/7837896/2006335/24764');
+      expect(href.searchParams.get('subId1')).toBe('avtoshkola');
+      expect(href.searchParams.get('subId2')).toBe('home-travel');
+    }
+    if (product === 'transport') {
+      expect(href.hostname).toBe('omio.sjv.io');
+      expect(href.pathname).toBe('/c/7837896/4029327/7385');
+    }
+    if (product === 'hotels' || product === 'flights') {
+      expect(href.hostname).toBe('ru.trip.com');
+      expect(href.pathname).toBe('/' + product);
+      expect(href.searchParams.get('SID')).toBe('332507505');
+      expect(href.searchParams.get('trip_sub1')).toBe('avtoshkola_home_' + product);
+    }
+    expect(await link.evaluate(node => {
+      const box = node.getBoundingClientRect();
+      return box.left >= 0 && box.right <= document.documentElement.clientWidth && box.height >= 44;
+    })).toBe(true);
+    const popupPromise = context.waitForEvent('page');
+    await link.locator('span').click();
+    const popup = await popupPromise;
+    await popup.close();
+    await expect.poll(() => page.evaluate(name => window.partnerEvents.filter(event =>
+      event[1] === 'affiliate_click' && event[2].product === name).length, product)).toBe(1);
+  }
+  const details = page.locator('.partners__details');
+  await details.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(details).toHaveAttribute('open');
+  await expect(details).toContainText('поддержку eSIM');
+  await page.keyboard.press('Enter');
+  await expect(details).not.toHaveAttribute('open');
+  const events = await page.evaluate(() => window.partnerEvents.filter(event => event[1].startsWith('affiliate_')));
+  for (const event of events) {
+    expect(Object.keys(event[2]).sort()).toEqual(event[1] === 'affiliate_click'
+      ? ['affiliate', 'placement', 'product'] : ['affiliate', 'placement']);
+    expect(event[2].placement).toBe('home_travel');
+  }
   await noHorizontalOverflow(page);
 });

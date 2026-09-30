@@ -562,6 +562,7 @@ a:hover {
   font-weight: 700;
   white-space: nowrap;
   color: var(--color-accent-deep);
+  line-height: 1.25;
 }
 
 .prices__row .prices__free {
@@ -584,6 +585,30 @@ a:hover {
   font-weight: 500;
   text-align: right;
   color: var(--color-ink-faint);
+}
+
+.prices__company {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: var(--space-sm);
+  white-space: normal !important;
+}
+
+.prices__company > span {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.prices__company small {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-ink-faint);
+}
+
+.prices__company strong {
+  font: inherit;
+  color: inherit;
 }
 
 .prices__fees {
@@ -859,6 +884,13 @@ a:hover {
   color: var(--color-ink-faint);
 }
 
+.contact__detail {
+  display: block;
+  margin-top: var(--space-2xs);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
 /* Форма звонка */
 
 .callback {
@@ -1068,17 +1100,27 @@ a:hover {
 }
 
 .fab__toggle {
-  width: 3.5rem;
+  position: relative;
+  width: auto;
+  min-width: 3.5rem;
   height: 3.5rem;
+  padding: 0 var(--space-md);
+  gap: var(--space-xs);
   border: none;
   border-radius: 50%;
   background: var(--color-contact);
   color: var(--color-on-contact);
   cursor: pointer;
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   box-shadow: 0 6px 20px oklch(20% 0.02 265 / 0.28);
   transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out);
+}
+
+.fab__toggle-label {
+  font: 600 var(--text-xs)/1 var(--font-body);
 }
 
 .fab__toggle:hover {
@@ -1345,6 +1387,33 @@ a:hover {
     padding: var(--space-lg);
   }
 
+  .formats {
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+
+  .formats__card {
+    padding: var(--space-lg);
+  }
+
+  .formats__tag {
+    margin-bottom: var(--space-lg);
+  }
+
+  .prices {
+    padding-top: var(--space-2xl);
+  }
+
+  .prices__grid {
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+
+  .prices__company {
+    flex: 1 1 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
   .footer__meta {
     flex-direction: column;
     gap: var(--space-2xs);
@@ -1356,8 +1425,9 @@ a:hover {
   }
 
   .fab__toggle {
-    width: 3.25rem;
+    min-width: 3.25rem;
     height: 3.25rem;
+    padding-inline: var(--space-sm);
   }
 }
 

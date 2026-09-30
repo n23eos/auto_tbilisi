@@ -3,9 +3,14 @@ import { CONTACTS, PHONE, menuAnswer, searchKb } from "./kb";
 import { getFact, setFact } from "./facts";
 import {
   startConversation, getConversation, updateConversation, deleteConversation, validatePhone,
+  startDurableConversation, advanceDurableConversation,
   truncate, NAME_LIMIT, QUESTION_LIMIT,
   type Conversation,
 } from "./conversation";
+import { publicGroups } from "./groups";
+import { createBooking, bookingAction } from "./bookings";
+import { DomainError } from "./booking-commands";
+import { supersedeConversationPrompts } from "./outbox";
 import {
   createLead, getLead, takeLead, markCalled, closeLead, releaseLead, forceReleaseLead,
   renderLeadCard, statusLabel,
@@ -13,6 +18,13 @@ import {
 import { escapeClamped } from "./escape";
 import { formatTbilisi } from "./time";
 import type { Env } from "./types";
+
+export interface RouteContext {
+  operationId: string;
+  fence: { chatId: number; leaseToken: string; leaseRevision: number };
+}
+
+const TELEGRAM_CONSENT_VERSION = "telegram-group-booking-v1-2026-09-29";
 
 export const MAIN_MENU = {
   inline_keyboard: [
@@ -87,13 +99,49 @@ function isAdmin(env: Env, chatId: number, userId: number): boolean {
   return chatId === Number(env.ADMIN_CHAT_ID) && admins.includes(userId);
 }
 
-export async function routeUpdate(update: any, env: Env): Promise<void> {
-  const tg = makeClient(env);
-  if (update.callback_query) return handleCallback(update.callback_query, env, tg);
-  if (update.message) return handleMessage(update.message, env, tg);
+function normalizeBookingPhone(raw: string): string | null {
+  const value = validatePhone(raw);
+  if (!value) return null;
+  if (value.startsWith("+")) return /^\+\d{7,15}$/.test(value) ? value : null;
+  const international = value.length === 9 && value.startsWith("5") ? `+995${value}` : `+${value}`;
+  return /^\+\d{7,15}$/.test(international) ? international : null;
 }
 
-async function handleMessage(msg: any, env: Env, tg: TelegramClient): Promise<void> {
+function requireBookingContext(env: Env, context?: RouteContext): RouteContext {
+  if (!context || !env.BOOKING_SECRET) throw new Error("durable_booking_context_missing");
+  return context;
+}
+
+function errorClass(error: unknown): string {
+  return error instanceof Error && error.name ? error.name : "UnknownError";
+}
+
+async function answerCallbackBestEffort(
+  tg: TelegramClient,
+  callbackId: string,
+  text?: string,
+): Promise<void> {
+  try {
+    await tg.answerCallbackQuery(callbackId, text);
+  } catch (error) {
+    // Ответ на callback только закрывает индикатор Telegram. Сообщение анкеты
+    // или доменная команда уже защищены outbox и не должны повторяться из-за него.
+    console.error(`Telegram callback answer не доставлен (${errorClass(error)})`);
+  }
+}
+
+export async function routeUpdate(update: any, env: Env, context?: RouteContext): Promise<void> {
+  const tg = makeClient(env);
+  if (update.callback_query) return handleCallback(update.callback_query, env, tg, context);
+  if (update.message) return handleMessage(update.message, env, tg, context);
+}
+
+async function handleMessage(
+  msg: any,
+  env: Env,
+  tg: TelegramClient,
+  context?: RouteContext,
+): Promise<void> {
   const chatId: number = msg.chat.id;
   const fromId: number = msg.from?.id ?? 0;
   const text: string = msg.text ?? "";
@@ -105,13 +153,13 @@ async function handleMessage(msg: any, env: Env, tg: TelegramClient): Promise<vo
   if (msg.chat.type !== "private") return;
 
   if (text === "/start") {
-    await deleteConversation(env.DB, chatId);
+    await deleteConversation(env.DB, chatId, undefined, context?.fence);
     await tg.sendMessage(chatId, "Привет! Я бот автошколы. Отвечу на вопросы и запишу на занятия 👇", MAIN_MENU);
     return;
   }
 
   const conv = await getConversation(env.DB, chatId);
-  if (conv) return handleFormInput(conv, msg, env, tg);
+  if (conv) return handleFormInput(conv, msg, env, tg, context);
 
   const hit = text ? searchKb(text) : null;
   if (hit) {
@@ -121,9 +169,57 @@ async function handleMessage(msg: any, env: Env, tg: TelegramClient): Promise<vo
   }
 }
 
-async function handleFormInput(conv: Conversation, msg: any, env: Env, tg: TelegramClient): Promise<void> {
+async function handleFormInput(
+  conv: Conversation,
+  msg: any,
+  env: Env,
+  tg: TelegramClient,
+  context?: RouteContext,
+): Promise<void> {
   const chatId: number = msg.chat.id;
   const text: string = (msg.text ?? "").trim();
+
+  if (env.BOOKING_ENABLED === "true" && conv.data.bookingFlow) {
+    if (!context || !env.BOOKING_SECRET) throw new Error("durable_booking_context_missing");
+    if (conv.step === "name") {
+      if (!text) {
+        await tg.sendMessage(chatId, "Напишите, пожалуйста, ваше имя текстом.");
+        return;
+      }
+      const name = truncate(text, NAME_LIMIT);
+      await advanceDurableConversation(
+        env.DB,
+        conv,
+        "phone",
+        { ...conv.data, name },
+        "ask_phone",
+        { operationId: context.operationId, secret: env.BOOKING_SECRET, fence: context.fence },
+      );
+      return;
+    }
+    if (conv.step === "phone") {
+      if (msg.contact && msg.contact.user_id !== msg.from?.id) {
+        await tg.sendMessage(chatId, "Можно записать только свой номер. Введите его вручную или поделитесь своим контактом.");
+        return;
+      }
+      const phone = normalizeBookingPhone(msg.contact?.phone_number ?? text);
+      if (!phone) {
+        await tg.sendMessage(chatId, "Введите телефон с кодом страны, например +995 599 12 34 56.");
+        return;
+      }
+      await advanceDurableConversation(
+        env.DB,
+        conv,
+        "consent",
+        { ...conv.data, phone },
+        "ask_consent",
+        { operationId: context.operationId, secret: env.BOOKING_SECRET, fence: context.fence },
+      );
+      return;
+    }
+    await tg.sendMessage(chatId, "Нажмите Согласен, чтобы отправить запись, или Отмена.");
+    return;
+  }
 
   if (conv.step === "name") {
     if (!text) { await tg.sendMessage(chatId, "Напишите, пожалуйста, ваше имя текстом."); return; }
@@ -247,25 +343,92 @@ async function deliverCard(leadId: number, env: Env, tg: TelegramClient, notice?
       .run();
     return true;
   } catch (err) {
-    console.error(`Карточка заявки #${leadId} не доставлена:`, err);
+    console.error(`Карточка заявки #${leadId} не доставлена (${errorClass(err)})`);
     return false;
   }
 }
 
-async function handleCallback(cb: any, env: Env, tg: TelegramClient): Promise<void> {
+async function handleCallback(
+  cb: any,
+  env: Env,
+  tg: TelegramClient,
+  context?: RouteContext,
+): Promise<void> {
   const chatId: number = cb.message?.chat?.id;
   const data: string = cb.data ?? "";
 
   if (data.startsWith("lead:")) return handleLeadCallback(cb, env, tg);
+  if (data.startsWith("bk:")) return handleBookingAdminCallback(cb, env, tg, context);
 
   // Всё остальное — только личка. Кнопки меню в группе игнорируются.
   if (cb.message?.chat?.type !== "private") { await tg.answerCallbackQuery(cb.id); return; }
 
   if (data === "menu:zapis") {
+    if (env.BOOKING_ENABLED === "true") {
+      const durable = requireBookingContext(env, context);
+      await startDurableConversation(
+        env.DB,
+        chatId,
+        { bookingFlow: true },
+        "select_group",
+        { operationId: durable.operationId, secret: env.BOOKING_SECRET!, fence: durable.fence },
+      );
+      await answerCallbackBestEffort(tg, cb.id);
+      return;
+    }
     await startConversation(env.DB, chatId);
     await tg.answerCallbackQuery(cb.id);
     await tg.sendMessage(chatId, "Запишу вас! Как вас зовут?");
     return;
+  }
+  if (env.BOOKING_ENABLED === "true" && data.startsWith("bg:")) {
+    const durable = requireBookingContext(env, context);
+    const [, sequenceRaw, revisionRaw] = data.split(":");
+    const sequence = Number(sequenceRaw);
+    const revision = Number(revisionRaw);
+    const group = Number.isSafeInteger(sequence) && Number.isSafeInteger(revision)
+      ? await env.DB
+          .prepare(
+            `SELECT id, sequence, revision, start_date, start_time
+             FROM groups
+             WHERE service_id = 'theory_group' AND sequence = ? AND revision = ?
+               AND lifecycle = 'scheduled' AND enrollment_open = 1
+               AND datetime(starts_at_utc) > datetime('now')
+               AND (SELECT count(*) FROM bookings b
+                    WHERE b.group_id = groups.id AND b.status = 'confirmed') < capacity`,
+          )
+          .bind(sequence, revision)
+          .first<{ id: string; sequence: number; revision: number; start_date: string; start_time: string }>()
+      : null;
+    if (!group) {
+      await startDurableConversation(
+        env.DB,
+        chatId,
+        { bookingFlow: true },
+        "select_group",
+        { operationId: durable.operationId, secret: env.BOOKING_SECRET!, fence: durable.fence },
+      );
+      await answerCallbackBestEffort(tg, cb.id, "Список обновился");
+      return;
+    }
+    await startDurableConversation(
+      env.DB,
+      chatId,
+      {
+        bookingFlow: true,
+        groupId: group.id,
+        groupRevision: group.revision,
+        groupSequence: group.sequence,
+        groupLabel: `${group.start_date} ${group.start_time}`,
+      },
+      "ask_name",
+      { operationId: durable.operationId, secret: env.BOOKING_SECRET!, fence: durable.fence },
+    );
+    await answerCallbackBestEffort(tg, cb.id);
+    return;
+  }
+  if (env.BOOKING_ENABLED === "true" && data.startsWith("bf:")) {
+    return handleBookingConsent(cb, env, tg, context);
   }
   if (data === "form:consent_yes") { await tg.answerCallbackQuery(cb.id); await submitForm(chatId, env, tg); return; }
   if (data === "form:consent_no") {
@@ -276,6 +439,42 @@ async function handleCallback(cb: any, env: Env, tg: TelegramClient): Promise<vo
   }
   if (data === "menu:kontakty") { await tg.answerCallbackQuery(cb.id); await tg.sendMessage(chatId, CONTACTS, MAIN_MENU); return; }
   if (data === "menu:gruppa") {
+    if (env.BOOKING_ENABLED === "true") {
+      const snapshot = await publicGroups(env.DB);
+      await tg.answerCallbackQuery(cb.id);
+      if (snapshot.groups.length === 0) {
+        await tg.sendMessage(chatId, "Сейчас нет открытых групп. Администратор подскажет следующий старт.", MAIN_MENU);
+        return;
+      }
+      const { results: tokens } = await env.DB
+        .prepare(
+          `SELECT id, sequence FROM groups
+           WHERE id IN (${snapshot.groups.map(() => "?").join(",")})`,
+        )
+        .bind(...snapshot.groups.map((group) => group.id))
+        .all<{ id: string; sequence: number }>();
+      const sequenceById = new Map(tokens.map((row) => [row.id, row.sequence]));
+      const openGroups = snapshot.groups.filter((group) => group.availability === "open");
+      await tg.sendMessage(
+        chatId,
+        snapshot.groups
+          .map((group) => {
+            const availability = group.availability === "full"
+              ? "мест нет"
+              : group.availability === "closed" ? "запись закрыта" : "запись открыта";
+            const dateStatus = group.dateStatus === "planned" ? "предварительно" : "дата подтверждена";
+            return `${group.startDate} ${group.startTime} (${dateStatus}, ${availability})`;
+          })
+          .join("\n"),
+        openGroups.length > 0 ? {
+          inline_keyboard: openGroups.map((group) => [{
+            text: `Выбрать ${group.startDate}`,
+            callback_data: `bg:${sequenceById.get(group.id)}:${group.revision}`,
+          }]),
+        } : MAIN_MENU,
+      );
+      return;
+    }
     const date = await getFact(env.DB, "next_group_date");
     await tg.answerCallbackQuery(cb.id);
     await tg.sendMessage(
@@ -296,14 +495,139 @@ async function handleCallback(cb: any, env: Env, tg: TelegramClient): Promise<vo
     try {
       answer = menuAnswer(id);
     } catch (err) {
-      console.error(`Неизвестный пункт меню ${id}:`, err);
+      console.error(`Неизвестный пункт меню ${id} (${errorClass(err)})`);
       await tg.sendMessage(chatId, FALLBACK, FALLBACK_MENU);
       return;
     }
     await tg.sendLong(chatId, answer, MAIN_MENU);
     return;
   }
+  await answerCallbackBestEffort(tg, cb.id);
+}
+
+async function handleBookingConsent(
+  cb: any,
+  env: Env,
+  tg: TelegramClient,
+  context?: RouteContext,
+): Promise<void> {
+  const durable = requireBookingContext(env, context);
+  const chatId = Number(cb.message?.chat?.id);
+  const [, revisionRaw, answer] = String(cb.data).split(":");
+  const expectedRevision = Number(revisionRaw);
+  const conversation = await getConversation(env.DB, chatId);
   await tg.answerCallbackQuery(cb.id);
+  if (
+    !conversation
+    || conversation.revision !== expectedRevision
+    || conversation.step !== "consent"
+    || !conversation.data.bookingFlow
+  ) {
+    await tg.sendMessage(chatId, "Эта кнопка устарела. Откройте запись заново из меню.", MAIN_MENU);
+    return;
+  }
+  if (answer === "no") {
+    await supersedeConversationPrompts(env.DB, conversation.id);
+    await deleteConversation(env.DB, chatId, conversation.revision, durable.fence);
+    await tg.sendMessage(chatId, "Запись отменена. Меню остается доступно ниже.", MAIN_MENU);
+    return;
+  }
+  if (
+    answer !== "yes"
+    || !conversation.data.groupId
+    || !conversation.data.groupRevision
+    || !conversation.data.name
+    || !conversation.data.phone
+  ) {
+    await tg.sendMessage(chatId, "Анкета неполная. Откройте запись заново из меню.", MAIN_MENU);
+    return;
+  }
+
+  try {
+    await createBooking(
+      env.DB,
+      {
+        groupId: conversation.data.groupId,
+        groupRevision: conversation.data.groupRevision,
+        name: conversation.data.name,
+        phone: conversation.data.phone,
+        consentVersion: TELEGRAM_CONSENT_VERSION,
+        source: "telegram",
+        studentChatId: chatId,
+        conversation: { id: conversation.id, revision: conversation.revision },
+        fence: durable.fence,
+      },
+      durable.operationId,
+      env.BOOKING_SECRET!,
+    );
+  } catch (error) {
+    if (error instanceof DomainError && ["group_changed", "group_full", "group_closed"].includes(error.code)) {
+      await startDurableConversation(
+        env.DB,
+        chatId,
+        { bookingFlow: true },
+        "select_group",
+        { operationId: durable.operationId, secret: env.BOOKING_SECRET!, fence: durable.fence },
+      );
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleBookingAdminCallback(
+  cb: any,
+  env: Env,
+  tg: TelegramClient,
+  context?: RouteContext,
+): Promise<void> {
+  const chatId = Number(cb.message?.chat?.id);
+  const fromId = Number(cb.from?.id ?? 0);
+  if (!isAdmin(env, chatId, fromId)) {
+    await answerCallbackBestEffort(tg, cb.id, "Только для администраторов");
+    return;
+  }
+  if (env.BOOKING_ENABLED !== "true") {
+    await answerCallbackBestEffort(tg, cb.id, "Новая запись пока отключена");
+    return;
+  }
+  const durable = requireBookingContext(env, context);
+  const [, reference, revisionRaw, shortAction] = String(cb.data).split(":");
+  const expectedRevision = Number(revisionRaw);
+  const action = shortAction === "c" ? "confirm" : shortAction === "d" ? "decline" : null;
+  if (!reference || !Number.isSafeInteger(expectedRevision) || !action) {
+    await answerCallbackBestEffort(tg, cb.id, "Битая или устаревшая кнопка");
+    return;
+  }
+  const booking = await env.DB
+    .prepare(
+      `SELECT b.id, b.revision, g.revision AS group_revision
+       FROM bookings b JOIN groups g ON g.id = b.group_id
+       WHERE b.public_reference = ?`,
+    )
+    .bind(reference)
+    .first<{ id: string; revision: number; group_revision: number }>();
+  if (!booking || booking.revision !== expectedRevision) {
+    await answerCallbackBestEffort(tg, cb.id, "Карточка устарела, откройте запись в админке");
+    return;
+  }
+  try {
+    await bookingAction(
+      env.DB,
+      booking.id,
+      { action, expectedRevision, groupRevision: booking.group_revision },
+      durable.operationId,
+      `telegram:${fromId}`,
+      env.BOOKING_SECRET!,
+    );
+    await answerCallbackBestEffort(tg, cb.id, "Готово");
+  } catch (error) {
+    if (error instanceof DomainError) {
+      await answerCallbackBestEffort(tg, cb.id, "Состояние изменилось, откройте запись в админке");
+      return;
+    }
+    throw error;
+  }
 }
 
 async function handleLeadCallback(cb: any, env: Env, tg: TelegramClient): Promise<void> {
@@ -425,7 +749,7 @@ async function refreshCard(
     await tg.editMessageText(Number(env.ADMIN_CHAT_ID), messageId, card.text, card.keyboard);
     return "";
   } catch (err) {
-    console.error(`Карточка заявки #${leadId} не перерисована:`, err);
+    console.error(`Карточка заявки #${leadId} не перерисована (${errorClass(err)})`);
     return ` Старую карточку обновить не удалось — похоже, её удалили. Выслать заново: /card ${leadId}`;
   }
 }
@@ -468,6 +792,11 @@ async function handleAdminCommand(raw: string, fromId: number, env: Env, tg: Tel
   const text = stripBotMention(raw);
 
   if (text.startsWith("/set ")) {
+    if (env.BOOKING_ENABLED === "true") {
+      const adminUrl = env.ADMIN_ORIGIN ? `${env.ADMIN_ORIGIN.replace(/\/$/, "")}/admin/` : "веб-админка";
+      await tg.sendMessage(adminChat, `Расписание теперь меняется только здесь: ${adminUrl}`);
+      return;
+    }
     const rest = text.slice("/set ".length).trim();
     const spaceIdx = rest.indexOf(" ");
     if (spaceIdx < 1) {

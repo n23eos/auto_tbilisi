@@ -62,6 +62,11 @@ PRICES = [
 ]
 
 
+def ascii_dashes(text):
+    """Собранные материалы соблюдают правило проекта о коротком дефисе."""
+    return text.replace("\u2013", "-").replace("\u2014", "-")
+
+
 def strip_frontmatter(text):
     """Убирает YAML-шапку между строками --- в начале файла.
 
@@ -163,7 +168,7 @@ def convert(md_text):
         if line == "" and result and result[-1] == "":
             continue
         result.append(line)
-    return "\n".join(result).strip() + "\n"
+    return ascii_dashes("\n".join(result).strip() + "\n")
 
 
 def extract_qa(md_text, tema):
@@ -215,9 +220,9 @@ def write_faq_csv(pairs):
     файл корректно открывался в Excel и Google Таблицах."""
     path = OUT_DIR / "faq.csv"
     with path.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator="\n")
         writer.writerow(["Тема", "Вопрос", "Ответ"])
-        writer.writerows(pairs)
+        writer.writerows(tuple(ascii_dashes(value) for value in row) for row in pairs)
     return path
 
 
@@ -225,9 +230,9 @@ def write_prices_csv():
     """Прайс таблицей: категория, услуга, что входит, цена, кому платится."""
     path = OUT_DIR / "ceny.csv"
     with path.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator="\n")
         writer.writerow(["Категория", "Услуга", "Что входит", "Цена", "Кому платится"])
-        writer.writerows(PRICES)
+        writer.writerows(tuple(ascii_dashes(value) for value in row) for row in PRICES)
     return path
 
 
@@ -263,7 +268,7 @@ def main():
         print(f"готово: {out_path.relative_to(ROOT)}  ({len(text)} символов)")
 
     full = OUT_DIR / "baza-znaniy-polnaya.txt"
-    full.write_text("\n".join(combined), encoding="utf-8")
+    full.write_text(ascii_dashes("\n".join(combined)), encoding="utf-8")
     print(f"готово: {full.relative_to(ROOT)}  ({full.stat().st_size} байт)")
 
     faq = write_faq_csv(qa_pairs)

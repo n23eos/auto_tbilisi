@@ -185,6 +185,7 @@ curl -X POST "https://api.telegram.org/bot<ТОКЕН>/setWebhook" \
   -d '{
     "url": "https://<АДРЕС>/webhook/<WEBHOOK_PATH_SECRET>",
     "secret_token": "<WEBHOOK_HEADER_SECRET>",
+    "max_connections": 1,
     "allowed_updates": ["message", "callback_query"]
   }'
 ```
@@ -296,16 +297,19 @@ npx wrangler secret put ADMIN_IDS
 
 ---
 
-## Ежедневная уборка
+## Очереди и ежедневная уборка
 
-По расписанию (`crons = ["0 3 * * *"]`, 03:00 UTC) воркер сам чистит базу.
-Настраивать ничего не нужно.
+Минутный cron обрабатывает durable inbox и outbox. Ночной cron в 03:00 UTC
+дополнительно запускает cleanup. Webhook отвечает 200 только после сохранения
+update в D1. Настройка `max_connections: 1` уменьшает переупорядочивание в
+Telegram, но дедупликация `update_id` и запрет обгона работают независимо от нее.
 
 | Что | Когда удаляется |
 |---|---|
 | записи дедупликации апдейтов | через 7 дней |
-| брошенные анкеты | по истечении срока анкеты |
-| журнал действий по заявкам | через 180 дней |
+| raw inbox и брошенные анкеты | не дольше 24 часов |
+| audit и command results | 180 дней и 24 часа соответственно |
+| завершенный outbox | через 30 дней, абсолютный предел 180 дней |
 | контакты в заявке | через 90 дней после закрытия, в любом случае — через 180 дней после создания |
 
 «Контакты» — это телефон, имя, текст вопроса и chat_id ученика: вместе они
@@ -315,15 +319,90 @@ npx wrangler secret put ADMIN_IDS
 
 ---
 
-## Если бот упал
+## Мониторинг inbox и outbox
 
-Ошибка обработки сообщения и падение ночной уборки приходят сообщением в
-группу администраторов: «⚠️ Бот дал сбой» с номером апдейта и чатом ученика,
-которому не ответили. По этим номерам человека можно найти и написать руками.
+Проверяйте Worker logs и D1 не реже одного раза в рабочий день. Запросы ниже
+не возвращают имя, телефон или текст анкеты:
 
-Повторные сообщения об ошибках приходят не чаще раза в пять минут — иначе
-систематическая поломка залила бы группу одинаковыми сообщениями вперемешку
-с настоящими заявками. Полная картина — в `npx wrangler tail`.
+```sql
+SELECT state, count(*) AS count, min(created_at) AS oldest
+FROM inbox WHERE state != 'done' GROUP BY state;
+
+SELECT state, count(*) AS count, min(created_at) AS oldest
+FROM outbox WHERE state IN ('pending','sending','failed','manual_contact')
+GROUP BY state;
+```
+
+Нормальное состояние: нет `failed`, `manual_contact` разобраны сотрудником,
+а `oldest` для pending не старше нескольких минут. Рост attempts, lag больше
+пяти минут или просроченный sending lease требуют просмотра `wrangler tail`.
+Ошибка одного update не теряется: payload хранится до 24 часов и повторяется
+по расписанию 1, 5, 15, 60 минут, затем раз в час. События одного chat_id не
+обгоняют самое раннее незавершенное событие.
+
+`sent` означает успешный ответ Telegram API, но не прочтение человеком.
+Crash после ответа Telegram и до D1 commit может дать повтор сообщения.
+Exactly-once для внешней доставки не заявляется. Повтор доставки не повторяет
+доменное confirm/decline действие.
+
+## Staging, backup и восстановление
+
+Staging использует отдельные Worker, D1, Telegram bot и Access audience.
+Production export нельзя импортировать в локальные UI tests. Перед каждой
+production migration сделайте export, а ежедневный зашифрованный backup
+храните не дольше 7 дней. Цели: RPO не больше 24 часов, RTO не больше 60 минут.
+
+Порядок восстановления:
+
+1. Создать изолированную D1 из выбранного backup или Time Travel.
+2. Не подключать cron, webhook и пользовательские hostnames.
+3. Сравнить counts и стабильные IDs groups/bookings с контрольным отчетом.
+4. Запустить cleanup на восстановленной копии до открытия доступа.
+5. Оставить outbox остановленным, проверить старые pending/sending вручную и
+   пометить недействительные события superseded. Не рассылать backup повторно.
+6. Только после сверки переключить binding и включить cron/webhook.
+
+Факт репетиции, время RTO и возраст backup записываются отдельно. Этот runbook
+не является разрешением на production restore.
+
+## Cutover и rollback групповых записей
+
+Новый writer включается только секретом `BOOKING_ENABLED=true`. До включения
+задайте `BOOKING_SECRET`, `BOOKING_ALLOWED_ORIGINS`, `TURNSTILE_SECRET`,
+`ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`, `ADMIN_ORIGIN` и
+проверьте Access, staging D1, inbox/outbox и тестового Telegram bot.
+
+Клиенты получают адреса отдельно от Worker secrets:
+
+- в `index.html` и `voprosy/index.html` у загрузчика `js/main.js` заполнить `data-booking-api` полным
+  origin Worker без завершающего `/`, а `data-turnstile-sitekey` публичным
+  site key Turnstile;
+- на VPS задать `BOOKING_API_URL` тем же origin Worker для read-only списка;
+- на VPS задать `BOOKING_ADMIN_URL` полным адресом `<origin Worker>/admin/`,
+  чтобы прежняя Python-админка вела в новый интерфейс;
+- `ADMIN_ORIGIN` в Worker должен точно совпадать с origin новой админки.
+
+Пустой `data-booking-api` оставляет новый интерфейс записи выключенным. Это
+безопасное состояние до cutover, а не production настройка.
+
+Cutover выполняется в одном окне:
+
+1. Сделать D1 export и проверить свежесть backup.
+2. Накатить миграции, оставив `BOOKING_ENABLED` выключенным.
+3. Проверить public GET, admin auth и синтетическую запись в staging.
+4. Отключить старые writers дат: `/set дата_группы` и Python save_group.
+5. Отключить FormSubmit перед включением Worker POST, чтобы не было dual-send.
+6. Включить `BOOKING_ENABLED=true`, затем проверить три reader и три канала
+   записи на синтетических данных.
+
+Перед rollback остановить новый прием на сайте и в Telegram, дождаться пустого
+inbox и завершить либо явно отменить активные conversations. Затем выключить
+`BOOKING_ENABLED` и вернуть сайт на состояние до cutover. Эта настройка также
+закрывает admin API, поэтому новые bookings до повторного открытия проверяются
+сотрудником только через защищенный ручной доступ к D1. Не переносить их в
+legacy leads автоматически и не включать два writer одновременно. Outbox
+остановить до сверки, уже выполненные бизнес-команды не повторять кнопкой
+доставки.
 
 ---
 

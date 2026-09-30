@@ -53,11 +53,12 @@ def client_address(environ):
 
 class Application:
     def __init__(self, harness, origins=('https://avtoshkola.ge', 'https://www.avtoshkola.ge'),
-                 *, access=None, admin_origin='https://admin.avtoshkola.ge'):
+                 *, access=None, admin_origin='https://admin.avtoshkola.ge', booking_admin_url=''):
         self.harness = harness
         self.origins = frozenset(origins)
         self.access = access
         self.admin_origin = admin_origin.rstrip('/')
+        self.booking_admin_url = booking_admin_url
         self.limits = Limits()
 
     def _read_json(self, environ, maximum=20000):
@@ -107,7 +108,16 @@ class Application:
             kind, filename = assets[path]
             return self._bytes(start_response, headers + [('Content-Type', kind)], 200, (STATIC/filename).read_bytes())
         if path == '/api/admin/catalog' and method == 'GET':
-            return self._json(start_response, headers, 200, {**self.harness.catalog.admin_snapshot(), 'actor': actor})
+            snapshot = self.harness.catalog.admin_snapshot()
+            shared_groups = getattr(self.harness, 'group_source', None)
+            writer_enabled = not getattr(shared_groups, 'is_shared', False)
+            return self._json(start_response, headers, 200, {
+                **snapshot,
+                'groups': snapshot['groups'] if writer_enabled else [],
+                'group_writer_enabled': writer_enabled,
+                'booking_admin_url': self.booking_admin_url if not writer_enabled else '',
+                'actor': actor,
+            })
         price_match, group_match = ADMIN_PRICE.fullmatch(path or ''), ADMIN_GROUP.fullmatch(path or '')
         if method != 'PUT' or not (price_match or group_match):
             return self._json(start_response, headers, 404, {'error': 'not_found'})
@@ -132,6 +142,11 @@ class Application:
                     current['unit'], 'admin', today_tbilisi().isoformat(), data['valid_until'])
                 result = self.harness.catalog.save_price(price, expected_revision=data['expected_revision'], actor=actor)
             else:
+                if getattr(getattr(self.harness, 'group_source', None), 'is_shared', False):
+                    return self._json(start_response, headers, 410, {
+                        'error': 'group_writer_disabled',
+                        'admin_url': self.booking_admin_url,
+                    })
                 if set(data) != {'status', 'start_date', 'expected_revision'}:
                     raise ValueError('invalid_fields')
                 if group_match[1] not in {s['service_id'] for s in self.harness.catalog.services()}:
