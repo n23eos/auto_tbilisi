@@ -252,13 +252,23 @@ a:hover {
   to { transform: translateY(0); }
 }
 
-/* Кнопки на первом экране: запись + WhatsApp */
+/* Условия курса видны до выбора между обучением и билетами. */
+.marquee__course {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 1.25rem;
+  margin-top: var(--space-lg);
+  max-width: 42rem;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.5;
+}
+
 .marquee__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .marquee__cta {
@@ -297,8 +307,20 @@ a:hover {
   color: var(--color-ink);
 }
 
+.marquee__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 44px;
+  margin-top: var(--space-xs);
+  color: var(--color-ink-invert);
+  font-size: var(--text-sm);
+}
+
+.marquee__contact:hover { color: var(--color-accent-bright); }
+
 .marquee__geo {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-xs);
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
   opacity: 0;
@@ -866,10 +888,69 @@ a:hover {
   margin-bottom: var(--space-xl);
 }
 
+.prices__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-lg);
+  margin-block: var(--space-lg);
+}
+.prices__actions a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+
 .contact__links {
   list-style: none;
   padding: 0;
 }
+
+.contact__consultation {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-paper-3);
+}
+
+.contact__consultation h3 { font-size: var(--text-lg); }
+.contact__consultation p { margin-top: var(--space-xs); }
+.contact__consultation a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-sm);
+  font-weight: 600;
+  gap: .35rem;
+}
+
+.booking-fallback__actions,
+.groups__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.booking-fallback__link,
+.groups__contact a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: .65rem .8rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: 600 var(--text-sm) var(--font-body);
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+}
+
+.booking-fallback__link:hover,
+.groups__contact a:hover { background: var(--color-paper-2); color: var(--color-ink); }
+.booking-fallback__retry { background: transparent; }
+.booking-fallback [hidden],
+.booking-fallback[hidden],
+[data-booking-field][hidden] { display: none !important; }
 
 .contact__links li {
   padding: var(--space-md) 0;
@@ -1373,6 +1454,10 @@ a:hover {
     font-size: clamp(1.6rem, 8vw, 2.5rem);
     max-width: none;
   }
+
+  .marquee__course { flex-direction: column; margin-top: var(--space-md); }
+  .marquee__actions { align-items: stretch; }
+  .marquee__cta { padding-inline: var(--space-lg); text-align: center; }
 
   .marquee__geo {
     font-size: var(--text-xs);

@@ -23,14 +23,17 @@ function clearSnapshot(message) {
 
 function render(data) {
   snapshot = data;
-  if (retry) retry.hidden = true;
+  const hasOpenGroup = data.groups.some(canBookGroup);
+  if (retry) retry.hidden = hasOpenGroup;
   if (!data.groups.length) {
     if (list) list.replaceChildren();
     if (status) status.textContent = 'Дату ближайшей группы уточняем. Позвоните или напишите в WhatsApp.';
     announce({status: 'success', snapshot: data});
     return;
   }
-  if (status) status.textContent = 'Время указано по Тбилиси. Перед отправкой заявки дата проверяется еще раз.';
+  if (status) status.textContent = hasOpenGroup
+    ? 'Время указано по Тбилиси. Перед отправкой заявки дата проверяется еще раз.'
+    : 'Сейчас нет группы с открытой записью. Обновите расписание или свяжитесь со школой.';
   const cards = data.groups.map(group => {
     const card = document.createElement('article');
     card.className = 'groups__card';

@@ -37,7 +37,7 @@ async function noHorizontalOverflow(page) {
   }))).toBe(true);
 }
 
-test('главная: действия перед купонами, форма показывает ошибки без отправки', async ({ page, externalPosts }) => {
+test('главная: условия и два входа на первом экране, партнеры после контактов', async ({ page, externalPosts }) => {
   await page.route('http://127.0.0.1:8881/', route => route.fulfill({
     contentType: 'text/html; charset=utf-8',
     body: indexSource
@@ -45,20 +45,58 @@ test('главная: действия перед купонами, форма �
       .replace(/data-turnstile-sitekey="[^"]*"/, 'data-turnstile-sitekey=""'),
   }));
   await page.goto('/');
-  const signup = page.getByRole('link', { name: 'Записаться на обучение', exact: true });
+  const signup = page.getByRole('link', { name: 'Выбрать обучение', exact: true });
+  const ticketsLink = page.getByRole('link', { name: 'Решать билеты', exact: true });
   const coupon = page.getByRole('region', { name: 'Для ваших путешествий' });
   await expect(signup).toBeInViewport();
+  await expect(ticketsLink).toBeInViewport();
+  await expect(ticketsLink).toHaveAttribute('href', '/bilety/');
+  await expect(page.locator('.marquee__course')).toContainText('150 ₾');
+  await expect(page.locator('.marquee__course')).toContainText('9 занятий');
+  await expect(page.locator('.marquee__course')).toContainText('19:00');
+  expect(await coupon.evaluate(node => Boolean(document.querySelector('#contact').compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   expect(await signup.evaluate(node => Boolean(node.compareDocumentPosition(document.querySelector('.partners')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   if (page.viewportSize().width < 896) expect((await signup.boundingBox()).y).toBeLessThan((await coupon.boundingBox()).y);
   await expect(page.getByText('HOLAAVTO', { exact: true })).toBeVisible();
   await expect(page.getByText('NEW10', { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
   await signup.click();
+  await expect(page).toHaveURL(/#prices$/);
+  await page.getByRole('link', { name: 'Контакты', exact: true }).click();
   await page.getByRole('button', { name: 'Перезвоните мне' }).click();
   await expect(page.locator('#cb-name')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#cb-phone')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#cb-name')).toBeFocused();
   expect(externalPosts).toEqual([]);
+});
+
+test('цена теории на первом экране обновляется вместе с таблицей', async ({ page }) => {
+  await page.route('**/api/catalog', route => route.fulfill({json: {
+    services: [{service_id: 'theory_group', status: 'success', amount_minor: 17000}],
+  }}));
+  await page.goto('/');
+  await expect(page.locator('.marquee [data-price-service="theory_group"]')).toHaveText('170 ₾');
+  await expect(page.locator('#prices [data-price-service="theory_group"]')).toHaveText('170 ₾');
+});
+
+test('без booking API остается рабочая форма обратного звонка', async ({page}) => {
+  await page.route('http://127.0.0.1:8881/', route => route.fulfill({
+    contentType: 'text/html; charset=utf-8',
+    body: indexSource.replace(/data-booking-api="[^"]*"/, 'data-booking-api=""'),
+  }));
+  const submitted = [];
+  await page.route('https://formsubmit.co/ajax/**', route => {
+    submitted.push(route.request().postDataJSON());
+    return route.fulfill({json: {success: true}});
+  });
+  await page.goto('/');
+  await page.locator('#cb-name').fill('Тестовый ученик');
+  await page.locator('#cb-phone').fill('+995 599 12 34 56');
+  await page.getByRole('button', {name: 'Перезвоните мне'}).click();
+  await expect(page.locator('.callback__success')).toBeVisible();
+  expect(submitted).toHaveLength(1);
+  expect(submitted[0]['Имя']).toBe('Тестовый ученик');
+  expect(submitted[0]['Телефон']).toBe('+995 599 12 34 56');
 });
 
 test('чат не открывается сам, загружает аватар по запросу и возвращает фокус', async ({ page }) => {

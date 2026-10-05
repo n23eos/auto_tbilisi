@@ -83,6 +83,40 @@ function responseMessage(code) {
   }[code] || 'Не получилось отправить заявку. Позвоните: +995 599 98 77 07.';
 }
 
+function createFallback(onRetry) {
+  const fallback = document.createElement('section');
+  fallback.className = 'booking-fallback';
+  fallback.dataset.bookingFallback = '';
+  fallback.setAttribute('aria-live', 'polite');
+
+  const message = document.createElement('p');
+  message.dataset.bookingFallbackMessage = '';
+  const actions = document.createElement('div');
+  actions.className = 'booking-fallback__actions';
+
+  const whatsapp = document.createElement('a');
+  whatsapp.className = 'booking-fallback__link';
+  whatsapp.href = 'https://wa.me/995599987707?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D1%83%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D1%8C%20%D0%B1%D0%BB%D0%B8%D0%B6%D0%B0%D0%B9%D1%88%D1%83%D1%8E%20%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%83%20%D0%BF%D0%BE%20%D1%82%D0%B5%D0%BE%D1%80%D0%B8%D0%B8.';
+  whatsapp.target = '_blank';
+  whatsapp.rel = 'noopener';
+  whatsapp.textContent = 'Написать в WhatsApp';
+
+  const phone = document.createElement('a');
+  phone.className = 'booking-fallback__link';
+  phone.href = 'tel:+995599987707';
+  phone.textContent = 'Позвонить: +995 599 98 77 07';
+
+  const retry = document.createElement('button');
+  retry.className = 'booking-fallback__link booking-fallback__retry';
+  retry.type = 'button';
+  retry.textContent = 'Обновить расписание';
+  retry.addEventListener('click', onRetry);
+
+  actions.append(whatsapp, phone, retry);
+  fallback.append(message, actions);
+  return fallback;
+}
+
 export function mountBookingForm(form, {
   api,
   sitekey,
@@ -101,20 +135,65 @@ export function mountBookingForm(form, {
   const fail = find(form, 'fail', '.callback__fail');
   const title = form.querySelector('.callback__title, [data-booking-title]');
   const label = form.querySelector('.callback__submit-label, [data-booking-submit-label]');
-  const lede = document.querySelector('[data-booking-lede]');
+  const lede = source === 'site_form' ? document.querySelector('[data-booking-lede]') : null;
+  const fieldNodes = [...new Set([
+    groupSelect?.closest('[data-booking-only], .callback__field, label'),
+    nameInput?.closest('.callback__field, label'),
+    phoneInput?.closest('.callback__field, label'),
+    consent?.closest('[data-booking-only], label'),
+    captcha,
+    submit,
+  ].filter(Boolean))];
+  const fallback = createFallback(() => {
+    if (captchaFailed) window.location.reload();
+    else window.dispatchEvent(new Event('group-booking:refresh'));
+  });
+  const fallbackMessage = fallback.querySelector('[data-booking-fallback-message]');
+  form.insertBefore(fallback, success || fail || null);
   let snapshot = initialSnapshot;
   let captchaToken = '';
   let widgetId = null;
   let pending = null;
   let busy = false;
+  let bookingAvailable = false;
+  let captchaFailed = false;
+  let captchaStarted = false;
+  let snapshotState = initialSnapshot ? 'success' : 'loading';
 
-  form.querySelectorAll('[data-booking-only]').forEach(node => { node.hidden = false; });
+  fieldNodes.forEach(node => { node.dataset.bookingField = ''; });
   form.querySelectorAll('[data-callback-only]').forEach(node => { node.hidden = true; });
   if (title) title.textContent = 'Записаться в группу';
   if (label) label.textContent = 'Отправить заявку';
-  if (lede) lede.textContent = 'Выберите группу, оставьте имя и телефон. Мы проверим заявку и свяжемся с вами для подтверждения места. Задать вопрос можно по контактам ниже.';
 
-  function renderGroups(nextSnapshot, selectedId = groupSelect?.value) {
+  function renderAvailability(state) {
+    const groups = snapshot?.groups || [];
+    bookingAvailable = Boolean(sitekey && !captchaFailed && groups.some(canBookGroup));
+    fieldNodes.forEach(node => { node.hidden = !bookingAvailable; });
+    if (submit) submit.disabled = !bookingAvailable || busy || !captchaToken;
+    fallback.hidden = bookingAvailable;
+    if (lede) lede.textContent = bookingAvailable
+      ? 'Выберите группу, оставьте имя и телефон. Мы свяжемся с вами для подтверждения места. Для консультации можно написать или позвонить напрямую.'
+      : 'Напишите нам или позвоните, чтобы обсудить обучение и ближайшие группы. Консультация бесплатная.';
+    fallback.querySelector('button').textContent = captchaFailed ? 'Обновить страницу' : 'Обновить расписание';
+    if (bookingAvailable) return;
+    if (captchaFailed) {
+      fallbackMessage.textContent = 'Не загрузилась защита от спама. Обновите страницу или свяжитесь со школой напрямую.';
+      return;
+    }
+    if (!sitekey) {
+      fallbackMessage.textContent = 'Онлайн-запись пока не подключена. Напишите нам или позвоните.';
+    } else if (state === 'unavailable') {
+      fallbackMessage.textContent = 'Расписание временно недоступно. Попробуйте обновить его или свяжитесь со школой.';
+    } else if (groups.length === 0 && snapshot) {
+      fallbackMessage.textContent = 'Ближайшая группа еще не опубликована. Уточните дату напрямую или обновите расписание.';
+    } else if (groups.length > 0) {
+      fallbackMessage.textContent = 'Сейчас нет группы с открытой записью. Уточните следующую дату напрямую или обновите расписание.';
+    } else {
+      fallbackMessage.textContent = 'Загружаем расписание. Пока можно написать нам или позвонить.';
+    }
+  }
+
+  function renderGroups(nextSnapshot, selectedId = groupSelect?.value, state = 'success') {
     const previousGroup = snapshot?.groups?.find(group => group.id === selectedId);
     const nextGroup = nextSnapshot?.groups?.find(group => group.id === selectedId);
     const selectionChanged = Boolean(previousGroup && (!nextGroup
@@ -122,6 +201,9 @@ export function mountBookingForm(form, {
       || previousGroup.start_date !== nextGroup.start_date
       || previousGroup.start_time !== nextGroup.start_time));
     snapshot = nextSnapshot;
+    snapshotState = state;
+    renderAvailability(state);
+    if (bookingAvailable) ensureCaptcha();
     if (!groupSelect) return;
     const options = [];
     const placeholder = document.createElement('option');
@@ -198,7 +280,7 @@ export function mountBookingForm(form, {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (busy) return;
+    if (busy || !bookingAvailable) return;
     if (success) success.hidden = true;
     if (fail) fail.hidden = true;
     const body = businessBody();
@@ -253,18 +335,19 @@ export function mountBookingForm(form, {
       showFailure('Ответ сервера не получен. Решите проверку еще раз и повторите отправку - номер операции сохранен.');
     } finally {
       busy = false;
-      submit.disabled = false;
+      renderAvailability(snapshotState);
       submit.classList.remove('is-loading');
     }
   }
 
-  renderGroups(snapshot);
+  renderGroups(snapshot, undefined, snapshot ? 'success' : 'loading');
   form.addEventListener('submit', handleSubmit);
   [nameInput, phoneInput].forEach(input => input?.addEventListener('input', () => {
     setFieldError(form, input, false);
   }));
   window.addEventListener('group-booking:snapshot', event => {
-    renderGroups(event.detail?.status === 'success' ? event.detail.snapshot : null);
+    const state = event.detail?.status || 'unavailable';
+    renderGroups(state === 'success' ? event.detail.snapshot : null, undefined, state);
   });
   if (respondToGroupSelection) {
     window.addEventListener('group-booking:select', event => {
@@ -274,23 +357,30 @@ export function mountBookingForm(form, {
     });
   }
 
-  if (!sitekey) {
-    submit.disabled = true;
-    showFailure('Запись на выбранную группу пока не подключена. Позвоните: +995 599 98 77 07.');
-  } else if (captcha) {
+  function ensureCaptcha() {
+    if (captchaStarted || !captcha || !sitekey) return;
+    captchaStarted = true;
     loadTurnstile().then(turnstile => {
       widgetId = turnstile.render(captcha, {
         sitekey,
         action: 'booking',
         size: 'compact',
-        callback: token => { captchaToken = token; if (fail) fail.hidden = true; },
-        'expired-callback': () => { captchaToken = ''; },
-        'error-callback': () => { captchaToken = ''; showFailure('Не загрузилась защита от спама. Обновите страницу.'); },
+        callback: token => {
+          captchaToken = token;
+          captchaFailed = false;
+          if (fail) fail.hidden = true;
+          renderAvailability(snapshotState);
+        },
+        'expired-callback': () => { captchaToken = ''; renderAvailability(snapshotState); },
+        'error-callback': captchaFailure,
       });
-    }).catch(() => {
-      submit.disabled = true;
-      showFailure('Не загрузилась защита от спама. Обновите страницу или позвоните нам.');
-    });
+    }).catch(captchaFailure);
+  }
+
+  function captchaFailure() {
+    captchaToken = '';
+    captchaFailed = true;
+    renderAvailability(snapshotState);
   }
 
   return {renderGroups};

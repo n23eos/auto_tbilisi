@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 
 const source = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
 const faqSource = readFileSync(new URL('../../voprosy/index.html', import.meta.url), 'utf8');
+const mainSource = readFileSync(new URL('../../js/main.js', import.meta.url), 'utf8');
 
 function withBookingFixture(html) {
   return html
@@ -10,22 +11,24 @@ function withBookingFixture(html) {
     .replace(/data-turnstile-sitekey="[^"]*"/, 'data-turnstile-sitekey="fixture-sitekey"');
 }
 
-function group({revision = 2, date = '2026-10-05'} = {}) {
+function group({revision = 2, date = '2026-10-05', availability = 'open', enrollmentOpen = true} = {}) {
   return {
     id: 'group-1', revision, start_date: date, start_time: '19:00',
-    date_status: 'planned', enrollment_open: true, availability: 'open',
+    date_status: 'planned', enrollment_open: enrollmentOpen, availability,
   };
 }
 
 async function bookingFixture(context) {
   const state = {
     group: group(),
+    groups: null,
     groupsFail: false,
     bookingCalls: [],
     chatCalls: [],
+    externalCalls: [],
     bookingMode: 'success',
   };
-  await context.route('http://127.0.0.1:8881/', route => {
+  await context.route(/^http:\/\/127\.0\.0\.1:8881\/(?:\?.*)?$/, route => {
     return route.fulfill({contentType: 'text/html; charset=utf-8', body: withBookingFixture(source)});
   });
   await context.route('http://127.0.0.1:8881/voprosy/', route => {
@@ -39,7 +42,7 @@ async function bookingFixture(context) {
         schedule_revision: state.group.revision,
         fetched_at: '2026-09-29T12:00:00Z',
         timezone: 'Asia/Tbilisi',
-        groups: [state.group],
+        groups: state.groups ?? [state.group],
       },
     });
   });
@@ -88,6 +91,10 @@ async function bookingFixture(context) {
     state.chatCalls.push(route.request().postDataJSON());
     return route.fulfill({status: 503, json: {error: 'unavailable'}});
   });
+  await context.route('https://formsubmit.co/**', route => {
+    state.externalCalls.push(route.request().url());
+    return route.fulfill({status: 500, json: {error: 'blocked_by_test'}});
+  });
   return state;
 }
 
@@ -109,8 +116,107 @@ test('показывает актуальную группу и очищает �
   await page.evaluate(() => window.dispatchEvent(new Event('group-booking:refresh')));
   await expect(region.getByText('Расписание временно недоступно')).toBeVisible();
   await expect(region.locator('.groups__card')).toHaveCount(0);
-  await expect(page.locator('#cb-group')).toBeDisabled();
+  expect(await page.locator('#callback-form [data-booking-field]').evaluateAll(nodes => nodes.every(node => node.hidden))).toBe(true);
+  const fallback = page.locator('#callback-form [data-booking-fallback]');
+  await expect(fallback).toContainText('Расписание временно недоступно');
+  await expect(fallback.getByRole('link', {name: 'Написать в WhatsApp'})).toHaveAttribute('href', /wa\.me\/995599987707\?text=/);
+  await expect(fallback.getByRole('link', {name: /Позвонить/})).toHaveAttribute('href', 'tel:+995599987707');
+  await expect(fallback.getByRole('button', {name: 'Обновить расписание'})).toBeVisible();
   expect(await region.evaluate(node => node.getBoundingClientRect().right <= document.documentElement.clientWidth)).toBe(true);
+});
+
+test('пустое и закрытое расписание скрывают персональные поля, а повтор восстанавливает запись', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  state.groups = [];
+  await page.goto('/');
+  const form = page.locator('#callback-form');
+  const fallback = form.locator('[data-booking-fallback]');
+  expect(await form.locator('[data-booking-field]').evaluateAll(nodes => nodes.every(node => node.hidden))).toBe(true);
+  await expect(fallback).toContainText('Ближайшая группа еще не опубликована');
+
+  state.groups = [group({availability: 'closed', enrollmentOpen: false})];
+  await fallback.getByRole('button', {name: 'Обновить расписание'}).click();
+  await expect(fallback).toContainText('Сейчас нет группы с открытой записью');
+  expect(await form.locator('[data-booking-field]').evaluateAll(nodes => nodes.every(node => node.hidden))).toBe(true);
+
+  state.groups = [group({revision: 3, date: '2026-10-12'})];
+  await fallback.getByRole('button', {name: 'Обновить расписание'}).click();
+  await expect(fallback).toBeHidden();
+  expect(await form.locator('[data-booking-field]').evaluateAll(nodes => nodes.every(node => !node.hidden))).toBe(true);
+  await expect(form.locator('#cb-group option[value="group-1"]')).toContainText('12 октября 2026 г.');
+  await expect(form.getByRole('button', {name: 'Отправить заявку'})).toBeEnabled();
+});
+
+for (const example of [
+  {query: 'from=training&goal=theory', message: 'Здравствуйте! После тренажера ПДД хочу проконсультироваться по занятиям по теории.'},
+  {query: 'from=training&goal=practice', message: 'Здравствуйте! После тренажера ПДД хочу проконсультироваться по практическому вождению.'},
+  {query: 'from=exam&goal=theory', message: 'Здравствуйте! После экзамена ПДД хочу проконсультироваться по занятиям по теории.'},
+  {query: 'from=exam&goal=practice', message: 'Здравствуйте! После экзамена ПДД хочу проконсультироваться по практическому вождению.'},
+]) {
+  test(`консультация ${example.query} не требует выбора группы`, async ({page, context}) => {
+    const state = await bookingFixture(context);
+    await page.goto(`/?${example.query}#contact`);
+    const form = page.locator('#callback-form');
+    const consultation = form.locator('[data-consultation-fallback]');
+    const link = consultation.getByRole('link', {name: 'Написать в WhatsApp'});
+    const href = new URL(await link.getAttribute('href'));
+    expect(href.origin + href.pathname).toBe('https://wa.me/995599987707');
+    expect(href.searchParams.get('text')).toBe(example.message);
+    await expect(consultation).toBeVisible();
+    await expect(form.locator('#cb-group')).toBeHidden();
+    await expect(form.locator('#cb-name')).toBeHidden();
+    await expect(form.locator('#cb-phone')).toBeHidden();
+    expect(state.bookingCalls).toEqual([]);
+  });
+}
+
+test('ошибка импорта booking блокирует native FormSubmit и оставляет прямые контакты', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  await context.route(/^http:\/\/127\.0\.0\.1:8881\/js\/main\.js\?v=\d+$/, route => route.fulfill({
+    contentType: 'text/javascript; charset=utf-8',
+    body: mainSource.replace(/import\('\.\/booking-form\.js\?v=\d+'\)/, "import('./missing-booking-form.js')"),
+  }));
+  await page.goto('/');
+  const form = page.locator('#callback-form');
+  await expect(form.locator('[data-booking-import-fallback]')).toContainText('Онлайн-запись временно недоступна');
+  await expect(form.getByRole('heading', {name: 'Связаться со школой'})).toBeVisible();
+  await expect(form.locator('#cb-comment')).toBeHidden();
+  await form.evaluate(node => node.requestSubmit());
+  await page.waitForTimeout(100);
+  expect(state.externalCalls).toEqual([]);
+  await expect(form.getByRole('link', {name: 'Написать в WhatsApp'})).toBeVisible();
+  await expect(form.getByRole('link', {name: /Позвонить/})).toBeVisible();
+});
+
+test('из консультации можно выбрать открытую группу и перейти к записи', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  await page.goto('/?from=training&goal=theory#callback-form');
+  const form = page.locator('#callback-form');
+  await expect(form.locator('[data-consultation-fallback]')).toBeVisible();
+  await page.locator('.groups__book').click();
+  await expect(form.locator('[data-consultation-fallback]')).toHaveCount(0);
+  await expect(form.locator('#cb-group')).toHaveValue('group-1');
+  await expect(form.locator('#cb-name')).toBeVisible();
+  await expect(form.getByRole('button', {name: 'Отправить заявку'})).toBeEnabled();
+  expect(state.bookingCalls).toEqual([]);
+});
+
+test('отказ CAPTCHA сохраняет прямые контакты и не включает отправку после обновления групп', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  await context.route('https://challenges.cloudflare.com/turnstile/**', route => route.abort());
+  await page.goto('/');
+  const form = page.locator('#callback-form');
+  const fallback = form.locator('[data-booking-fallback]');
+  await expect(fallback).toContainText('Не загрузилась защита от спама');
+  const refreshed = page.waitForResponse('https://booking.test/api/v1/groups**');
+  await page.evaluate(() => window.dispatchEvent(new Event('group-booking:refresh')));
+  await refreshed;
+  await expect(page.locator('.groups__book')).toBeEnabled();
+  await expect(form.locator('[data-booking-submit]')).toBeDisabled();
+  await expect(form.locator('#cb-name')).toBeHidden();
+  await expect(fallback.getByRole('link', {name: 'Написать в WhatsApp'})).toBeVisible();
+  await expect(fallback.getByRole('button', {name: 'Обновить страницу'})).toBeVisible();
+  expect(state.bookingCalls).toEqual([]);
 });
 
 test('повтор после сети сохраняет key, а новая дата требует новое согласие и key', async ({page, context}) => {

@@ -79,25 +79,119 @@ document.documentElement.classList.add('has-js');
 
   const bookingLoader = document.querySelector('script[data-booking-api]');
   const bookingApi = (bookingLoader?.dataset.bookingApi || '').replace(/\/$/, '');
+  const params = new URLSearchParams(window.location.search);
+  const source = ['exam', 'training'].includes(params.get('from')) ? params.get('from') : null;
+  const goal = ['theory', 'practice'].includes(params.get('goal')) ? params.get('goal') : null;
+  const learningContext = source && goal ? { source, goal } : null;
+  let consultationHref = '';
+  if (learningContext) {
+    const origin = source === 'exam' ? 'экзамена' : 'тренажера';
+    const subject = goal === 'practice' ? 'практическому вождению' : 'занятиям по теории';
+    const consultation = document.querySelector('[data-consultation-link]');
+    {
+      const href = new URL('https://wa.me/995599987707');
+      href.searchParams.set('text', `Здравствуйте! После ${origin} ПДД хочу проконсультироваться по ${subject}.`);
+      consultationHref = href.href;
+      if (consultation) consultation.href = consultationHref;
+    }
+  }
+  if (learningContext && bookingApi) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+    });
+    form.querySelectorAll('.callback__field, .callback__consent, .callback__captcha, [data-booking-submit]').forEach(function (node) {
+      node.hidden = true;
+    });
+    form.querySelector('.callback__title').textContent = goal === 'practice'
+      ? 'Консультация по вождению'
+      : 'Консультация по теории';
+    const fallback = document.createElement('section');
+    fallback.className = 'booking-fallback';
+    fallback.dataset.consultationFallback = '';
+    const message = document.createElement('p');
+    message.textContent = 'Выбирать группу и оставлять персональные данные не нужно. Свяжитесь со школой напрямую.';
+    const actions = document.createElement('div');
+    actions.className = 'booking-fallback__actions';
+    const whatsapp = document.createElement('a');
+    whatsapp.className = 'booking-fallback__link';
+    whatsapp.href = consultationHref;
+    whatsapp.target = '_blank';
+    whatsapp.rel = 'noopener';
+    whatsapp.textContent = 'Написать в WhatsApp';
+    const phone = document.createElement('a');
+    phone.className = 'booking-fallback__link';
+    phone.href = 'tel:+995599987707';
+    phone.textContent = 'Позвонить: +995 599 98 77 07';
+    actions.append(whatsapp, phone);
+    fallback.append(message, actions);
+    form.append(fallback);
+    document.querySelector('[data-booking-lede]').textContent = 'Свяжитесь со школой, чтобы обсудить занятия. Консультация бесплатная, выбирать группу заранее не нужно.';
+    window.addEventListener('group-booking:select', event => startBooking(event.detail?.groupId), {once: true});
+    return;
+  }
   if (bookingApi) {
-    Promise.all([
-      import('./booking-form.js?v=2'),
-      import('./groups.js?v=2'),
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+    });
+    startBooking();
+    return;
+  }
+
+  function startBooking(groupId) {
+    return Promise.all([
+      import('./booking-form.js?v=4'),
+      import('./groups.js?v=4'),
     ]).then(([booking, groups]) => {
-      booking.mountBookingForm(form, {
+      form.querySelector('[data-consultation-fallback]')?.remove();
+      const mounted = booking.mountBookingForm(form, {
         api: bookingApi,
         sitekey: bookingLoader.dataset.turnstileSitekey || '',
         source: 'site_form',
         initialSnapshot: groups.currentGroupsSnapshot(),
       });
-    }).catch(function () {
-      const failure = form.querySelector('.callback__fail');
-      if (failure) {
-        failure.textContent = 'Запись на выбранную группу временно недоступна. Позвоните: +995 599 98 77 07.';
-        failure.hidden = false;
+      if (groupId) {
+        mounted.renderGroups(groups.currentGroupsSnapshot(), groupId);
+        form.scrollIntoView({behavior: 'smooth', block: 'center'});
+        form.querySelector('[data-booking-group]')?.focus({preventScroll: true});
       }
+    }).catch(function () {
+      const controls = [
+        form.querySelector('[data-booking-group]')?.closest('[data-booking-only], .callback__field'),
+        form.querySelector('[data-booking-name]')?.closest('.callback__field'),
+        form.querySelector('[data-booking-phone]')?.closest('.callback__field'),
+        form.querySelector('[data-booking-consent]')?.closest('[data-booking-only], label'),
+        form.querySelector('[data-booking-captcha]'),
+        form.querySelector('[data-booking-submit]'),
+        form.querySelector('[data-callback-only]'),
+      ].filter(Boolean);
+      controls.forEach(node => { node.hidden = true; });
+      form.querySelector('[data-consultation-fallback]')?.remove();
+      form.querySelector('.callback__title').textContent = 'Связаться со школой';
+      document.querySelector('[data-booking-lede]').textContent = 'Напишите нам или позвоните, чтобы обсудить обучение и ближайшие группы.';
+      const fallback = document.createElement('section');
+      fallback.className = 'booking-fallback';
+      fallback.dataset.bookingImportFallback = '';
+      const message = document.createElement('p');
+      message.textContent = 'Онлайн-запись временно недоступна. Напишите нам или позвоните.';
+      const actions = document.createElement('div');
+      actions.className = 'booking-fallback__actions';
+      const whatsapp = document.createElement('a');
+      whatsapp.className = 'booking-fallback__link';
+      whatsapp.href = 'https://wa.me/995599987707';
+      whatsapp.textContent = 'Написать в WhatsApp';
+      const phone = document.createElement('a');
+      phone.className = 'booking-fallback__link';
+      phone.href = 'tel:+995599987707';
+      phone.textContent = 'Позвонить: +995 599 98 77 07';
+      const retry = document.createElement('button');
+      retry.className = 'booking-fallback__link booking-fallback__retry';
+      retry.type = 'button';
+      retry.textContent = 'Обновить страницу';
+      retry.addEventListener('click', () => window.location.reload());
+      actions.append(whatsapp, phone, retry);
+      fallback.append(message, actions);
+      form.append(fallback);
     });
-    return;
   }
 
   const nameInput = form.querySelector('#cb-name');
@@ -108,10 +202,6 @@ document.documentElement.classList.add('has-js');
 
   // Только известные значения: произвольный текст URL не попадает в заявку
   // и аналитику. Выбор ученика сохраняется при переходе из тренажёра.
-  const params = new URLSearchParams(window.location.search);
-  const source = ['exam', 'training'].includes(params.get('from')) ? params.get('from') : null;
-  const goal = ['theory', 'practice'].includes(params.get('goal')) ? params.get('goal') : null;
-  const learningContext = source && goal ? { source, goal } : null;
   if (learningContext) {
     const isPractice = goal === 'practice';
     form.querySelector('.callback__title').textContent = isPractice ? 'Подобрать вождение' : 'Обсудить теорию';

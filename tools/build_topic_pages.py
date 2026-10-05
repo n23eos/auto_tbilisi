@@ -255,7 +255,7 @@ def render_page(page, tickets, topics):
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&amp;family=Golos+Text:wght@400;500;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/tokens.css?v=23">
-  <link rel="stylesheet" href="/css/style.css?v=34">
+  <link rel="stylesheet" href="/css/style.css?v=35">
   <link rel="stylesheet" href="/css/exam.css?v=29">
   <link rel="stylesheet" href="/css/topics.css?v=1">
   <link rel="icon" href="/favicon.ico" sizes="any">
