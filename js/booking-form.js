@@ -122,6 +122,7 @@ export function mountBookingForm(form, {
   sitekey,
   source,
   initialSnapshot = null,
+  initialStatus = initialSnapshot ? 'success' : 'loading',
   respondToGroupSelection = true,
 }) {
   if (!form || !api) return null;
@@ -158,7 +159,7 @@ export function mountBookingForm(form, {
   let bookingAvailable = false;
   let captchaFailed = false;
   let captchaStarted = false;
-  let snapshotState = initialSnapshot ? 'success' : 'loading';
+  let snapshotState = initialStatus;
 
   fieldNodes.forEach(node => { node.dataset.bookingField = ''; });
   form.querySelectorAll('[data-callback-only]').forEach(node => { node.hidden = true; });
@@ -340,7 +341,7 @@ export function mountBookingForm(form, {
     }
   }
 
-  renderGroups(snapshot, undefined, snapshot ? 'success' : 'loading');
+  renderGroups(snapshot, undefined, snapshotState);
   form.addEventListener('submit', handleSubmit);
   [nameInput, phoneInput].forEach(input => input?.addEventListener('input', () => {
     setFieldError(form, input, false);

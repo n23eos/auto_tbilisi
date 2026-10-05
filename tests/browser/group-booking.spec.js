@@ -102,6 +102,27 @@ test.beforeEach(async ({page}) => {
   page.on('pageerror', error => { throw error; });
 });
 
+test('форма получает ошибку расписания, случившуюся до ее загрузки', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  state.groupsFail = true;
+  let releaseBooking;
+  const bookingGate = new Promise(resolve => { releaseBooking = resolve; });
+  await context.route(/\/js\/booking-form\.js\?v=\d+$/, async route => {
+    await bookingGate;
+    await route.continue();
+  });
+  const navigation = page.goto('/', {waitUntil: 'commit'});
+  await navigation;
+  try {
+    await expect(page.locator('[data-groups-status]')).toContainText('Расписание временно недоступно');
+  } finally {
+    releaseBooking();
+  }
+  await expect(page.locator('#callback-form [data-booking-fallback]')).toContainText('Расписание временно недоступно');
+  await expect(page.locator('#cb-name')).toBeHidden();
+  expect(state.externalCalls).toEqual([]);
+});
+
 test('показывает актуальную группу и очищает ее после ошибки источника', async ({page, context}) => {
   const state = await bookingFixture(context);
   await page.goto('/');

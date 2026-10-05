@@ -7,9 +7,11 @@ const status = root?.querySelector('[data-groups-status]');
 const list = root?.querySelector('[data-groups-list]');
 const retry = root?.querySelector('[data-groups-retry]');
 let snapshot = null;
+let snapshotStatus = api ? 'loading' : 'unconfigured';
 let timer = null;
 
 function announce(detail) {
+  snapshotStatus = detail.status;
   window.dispatchEvent(new CustomEvent('group-booking:snapshot', {detail}));
 }
 
@@ -92,4 +94,8 @@ if (api) {
 
 export function currentGroupsSnapshot() {
   return snapshot;
+}
+
+export function currentGroupsStatus() {
+  return snapshotStatus;
 }

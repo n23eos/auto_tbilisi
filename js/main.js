@@ -139,8 +139,8 @@ document.documentElement.classList.add('has-js');
 
   function startBooking(groupId) {
     return Promise.all([
-      import('./booking-form.js?v=4'),
-      import('./groups.js?v=4'),
+      import('./booking-form.js?v=5'),
+      import('./groups.js?v=5'),
     ]).then(([booking, groups]) => {
       form.querySelector('[data-consultation-fallback]')?.remove();
       const mounted = booking.mountBookingForm(form, {
@@ -148,6 +148,7 @@ document.documentElement.classList.add('has-js');
         sitekey: bookingLoader.dataset.turnstileSitekey || '',
         source: 'site_form',
         initialSnapshot: groups.currentGroupsSnapshot(),
+        initialStatus: groups.currentGroupsStatus(),
       });
       if (groupId) {
         mounted.renderGroups(groups.currentGroupsSnapshot(), groupId);
