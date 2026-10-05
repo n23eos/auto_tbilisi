@@ -151,7 +151,7 @@ document.documentElement.classList.add('has-js');
         initialStatus: groups.currentGroupsStatus(),
       });
       if (groupId) {
-        mounted.renderGroups(groups.currentGroupsSnapshot(), groupId);
+        mounted.renderGroups(groups.currentGroupsSnapshot(), groupId, groups.currentGroupsStatus());
         form.scrollIntoView({behavior: 'smooth', block: 'center'});
         form.querySelector('[data-booking-group]')?.focus({preventScroll: true});
       }

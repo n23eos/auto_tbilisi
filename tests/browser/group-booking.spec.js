@@ -102,18 +102,24 @@ test.beforeEach(async ({page}) => {
   page.on('pageerror', error => { throw error; });
 });
 
-test('форма получает ошибку расписания, случившуюся до ее загрузки', async ({page, context}) => {
+for (const fromConsultation of [false, true]) {
+test(`форма получает раннюю ошибку расписания: consultation=${fromConsultation}`, async ({page, context}) => {
   const state = await bookingFixture(context);
-  state.groupsFail = true;
+  state.groupsFail = !fromConsultation;
   let releaseBooking;
   const bookingGate = new Promise(resolve => { releaseBooking = resolve; });
   await context.route(/\/js\/booking-form\.js\?v=\d+$/, async route => {
     await bookingGate;
     await route.continue();
   });
-  const navigation = page.goto('/', {waitUntil: 'commit'});
+  const navigation = page.goto(fromConsultation ? '/?from=training&goal=practice' : '/', {waitUntil: 'commit'});
   await navigation;
   try {
+    if (fromConsultation) {
+      await page.getByRole('button', {name: 'Записаться в эту группу'}).click();
+      state.groupsFail = true;
+      await page.evaluate(() => window.dispatchEvent(new Event('group-booking:refresh')));
+    }
     await expect(page.locator('[data-groups-status]')).toContainText('Расписание временно недоступно');
   } finally {
     releaseBooking();
@@ -122,6 +128,7 @@ test('форма получает ошибку расписания, случи�
   await expect(page.locator('#cb-name')).toBeHidden();
   expect(state.externalCalls).toEqual([]);
 });
+}
 
 test('показывает актуальную группу и очищает ее после ошибки источника', async ({page, context}) => {
   const state = await bookingFixture(context);
