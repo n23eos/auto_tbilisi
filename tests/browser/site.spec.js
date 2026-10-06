@@ -37,7 +37,7 @@ async function noHorizontalOverflow(page) {
   }))).toBe(true);
 }
 
-test('главная: условия и два входа на первом экране, партнеры после контактов', async ({ page, externalPosts }) => {
+test('главная: два входа на первом экране, партнеры после контактов', async ({ page, externalPosts }) => {
   await page.route('http://127.0.0.1:8881/', route => route.fulfill({
     contentType: 'text/html; charset=utf-8',
     body: indexSource
@@ -51,9 +51,7 @@ test('главная: условия и два входа на первом эк
   await expect(signup).toBeInViewport();
   await expect(ticketsLink).toBeInViewport();
   await expect(ticketsLink).toHaveAttribute('href', '/bilety/');
-  await expect(page.locator('.marquee__course')).toContainText('150 ₾');
-  await expect(page.locator('.marquee__course')).toContainText('9 занятий');
-  await expect(page.locator('.marquee__course')).toContainText('19:00');
+  await expect(page.locator('.marquee__course')).toHaveCount(0);
   expect(await coupon.evaluate(node => Boolean(document.querySelector('#contact').compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   expect(await signup.evaluate(node => Boolean(node.compareDocumentPosition(document.querySelector('.partners')) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
   if (page.viewportSize().width < 896) expect((await signup.boundingBox()).y).toBeLessThan((await coupon.boundingBox()).y);
@@ -70,13 +68,13 @@ test('главная: условия и два входа на первом эк
   expect(externalPosts).toEqual([]);
 });
 
-test('цена теории на первом экране обновляется вместе с таблицей', async ({ page }) => {
+test('цена теории в карточках обновляется вместе с таблицей', async ({ page }) => {
   await page.route('**/api/catalog', route => route.fulfill({json: {
     services: [{service_id: 'theory_group', status: 'success', amount_minor: 17000}],
   }}));
   await page.goto('/');
-  await expect(page.locator('.marquee [data-price-service="theory_group"]')).toHaveText('170 ₾');
-  await expect(page.locator('#prices [data-price-service="theory_group"]')).toHaveText('170 ₾');
+  await expect(page.locator('.course-choice [data-price-service="theory_group"]')).toHaveText(['170 ₾', '170 ₾']);
+  await expect(page.locator('[data-budget-price-source] [data-price-service="theory_group"]')).toHaveText('170 ₾');
 });
 
 test('без booking API остается рабочая форма обратного звонка', async ({page}) => {

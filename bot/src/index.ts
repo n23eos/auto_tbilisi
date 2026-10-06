@@ -4,6 +4,7 @@ import { alertAdmins } from "./alert";
 import { routeBookingRequest } from "./booking-api";
 import { acceptInboxUpdate, drainInbox } from "./inbox";
 import { dispatchOutbox } from "./outbox";
+import { maintainRollingSchedule, rollingScheduleConfig } from "./rolling-groups";
 import type { Env } from "./types";
 
 const encoder = new TextEncoder();
@@ -120,6 +121,13 @@ export default {
   // в дашборд, а телефоны учеников тем временем хранились бы дольше обещанного.
   async scheduled(controller: ScheduledController, env: Env): Promise<void> {
     const failed: string[] = [];
+    try {
+      const rollingConfig = rollingScheduleConfig(env);
+      if (rollingConfig) await maintainRollingSchedule(env.DB, rollingConfig);
+    } catch (error) {
+      failed.push("rolling_schedule");
+      console.error(`maintainRollingSchedule упал (${errorClass(error)})`);
+    }
     try {
       await drainInbox(env, routeUpdate);
     } catch (error) {

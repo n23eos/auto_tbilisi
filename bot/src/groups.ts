@@ -405,6 +405,19 @@ function groupNotificationInsert(
     .bind(operationId, eventType, eventType, templateId, eventType, createdAt, createdAt, groupId);
 }
 
+function rollingSlotReservation(
+  db: D1Database,
+  groupId: string,
+  slotDate: string,
+  createdAt: string,
+): D1PreparedStatement {
+  return db.prepare(
+    `INSERT INTO rolling_schedule_slots (service_id, slot_date, group_id, created_at)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT DO NOTHING`,
+  ).bind(THEORY_SERVICE_ID, slotDate, groupId, createdAt);
+}
+
 export async function commitSchedule(
   db: D1Database,
   rawCommand: ScheduleCommand,
@@ -473,6 +486,7 @@ export async function commitSchedule(
     const ordered = [...preview.changes].sort((a, b) => delta >= 0 ? b.sequence - a.sequence : a.sequence - b.sequence);
     for (const change of ordered) {
       statements.push(
+        rollingSlotReservation(db, change.id!, change.oldDate!, createdAt),
         groupNotificationInsert(db, idempotencyKey, change.id!, "group_moved", "student_group_moved", createdAt),
         db.prepare(
           `UPDATE groups
@@ -502,6 +516,7 @@ export async function commitSchedule(
   } else {
     const change = preview.changes[0];
     statements.push(
+      rollingSlotReservation(db, change.id!, change.oldDate!, createdAt),
       groupNotificationInsert(db, idempotencyKey, change.id!, "group_cancelled", "student_group_cancelled", createdAt),
       db.prepare(
         `INSERT INTO audit_events (

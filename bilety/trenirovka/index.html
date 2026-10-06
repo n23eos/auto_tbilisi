@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="../../css/tokens.css?v=23">
   <link rel="stylesheet" href="../../css/style.css?v=35">
   <link rel="stylesheet" href="../../css/exam.css?v=29">
+  <link rel="stylesheet" href="../../css/training-start.css?v=1">
   <!-- Билеты нужны, чтобы кнопка старта разблокировалась. Без этой
        подсказки запрос уходит только после того, как браузер скачает и
        выполнит цепочку модулей — три последовательных раундтрипа впустую. -->
@@ -82,7 +83,7 @@
   }
   </script>
 </head>
-<body>
+<body class="training-page">
   <header class="nav is-solid">
     <a class="nav__brand" href="/" aria-label="Автошкола на русском языке в Тбилиси">Автошкола<span class="nav__brand-dot">·</span><span class="nav__brand-city">Тбилиси</span></a>
     <nav class="nav__links" aria-label="Разделы сайта">
@@ -105,44 +106,45 @@
     <h1 class="exam__title" id="t-page-title">Тренировка по билетам ПДД</h1>
     <p class="exam__lead" id="t-set-note" hidden></p>
     <p class="exam__lead" id="t-general-note">
-      Учитесь короткими сессиями, возвращайтесь к ошибкам и закрепляйте уже решённые
-      вопросы. Доступен <a href="#bank-coverage"><b id="t-available-count">921</b> вопрос на русском</a>.
+      Начните короткую сессию из <a href="#bank-coverage"><b id="t-available-count">921</b> вопроса на русском</a>.
       Регистрация не нужна, прогресс хранится в этом браузере.
     </p>
 
-    <section class="training-resume" id="t-resume" aria-labelledby="t-resume-title" hidden>
-      <p class="section-kicker">Незавершённое занятие</p>
-      <h2 id="t-resume-title"></h2>
-      <p id="t-resume-note"></p>
-      <div class="exam__actions">
-        <button class="exam__btn exam__btn--primary" id="t-resume-action" type="button">Продолжить</button>
-        <button class="exam__btn exam__btn--ghost" id="t-resume-discard" type="button">Начать заново</button>
-      </div>
-    </section>
+    <div class="training-launch" aria-label="Начать или продолжить тренировку">
+      <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
+        <div class="training-dashboard__head">
+          <div>
+            <p class="section-kicker">Короткая сессия</p>
+            <h2 id="t-dashboard-title">На сегодня</h2>
+            <p class="training-dashboard__note" id="t-plan-note"></p>
+          </div>
+          <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 вопросов</button>
+        </div>
+        <dl class="training-stats" aria-label="Прогресс во всей базе">
+          <div><dt>Верно во всей базе</dt><dd id="t-stat-solved">0</dd></div>
+          <div><dt>Повторить во всей базе</dt><dd id="t-stat-due">0</dd></div>
+          <div><dt>Ещё не решено</dt><dd id="t-stat-remaining">0</dd></div>
+        </dl>
+      </section>
+
+      <section class="training-resume" id="t-resume" aria-labelledby="t-resume-title" hidden>
+        <p class="section-kicker">Незавершённая сессия</p>
+        <h2 id="t-resume-title"></h2>
+        <p id="t-resume-note"></p>
+        <div class="exam__actions">
+          <button class="exam__btn exam__btn--primary" id="t-resume-action" type="button">Продолжить</button>
+          <button class="exam__btn exam__btn--ghost" id="t-resume-discard" type="button">Начать заново</button>
+        </div>
+      </section>
+    </div>
     <p class="exam__status" id="t-session-status" role="status" aria-live="polite"></p>
 
-    <details class="training-controls" id="t-settings" open>
+    <details class="training-controls" id="t-settings">
       <summary>
         <span class="training-controls__title">Подборка и настройки</span>
         <span class="training-controls__summary">Режим, поиск, тема и общий прогресс</span>
       </summary>
       <div class="training-controls__body">
-        <section class="training-dashboard" id="t-dashboard" aria-labelledby="t-dashboard-title" hidden>
-          <div class="training-dashboard__head">
-            <div>
-              <p class="section-kicker">Ваш прогресс</p>
-              <h2 id="t-dashboard-title">Миссия на сегодня</h2>
-              <p class="training-dashboard__note" id="t-plan-note"></p>
-            </div>
-            <button class="exam__btn exam__btn--primary" id="t-start-today" type="button">Начать 20 вопросов</button>
-          </div>
-          <dl class="training-stats">
-            <div><dt>Верно решено</dt><dd id="t-stat-solved">0</dd></div>
-            <div><dt>Повторить сейчас</dt><dd id="t-stat-due">0</dd></div>
-            <div><dt>Ещё не освоено</dt><dd id="t-stat-remaining">0</dd></div>
-          </dl>
-        </section>
-
         <h2 class="training-subtitle">Настройте тренировку</h2>
         <section class="training-tools" aria-label="Поиск и настройки тренировки">
           <form class="training-search" id="t-search-form" role="search">
@@ -188,11 +190,19 @@
       </div>
     </details>
 
-    <div class="exam__bar">
-      <span class="exam__counter">Вопрос <b id="t-index">1</b> из <b id="t-total">0</b></span>
-      <span class="exam__counter">Решено верно: <b id="t-solved">0</b> из <b id="t-pool">0</b></span>
+    <div class="exam__bar training-progress-summary" aria-label="Прогресс тренировки">
+      <span class="exam__counter training-progress-summary__item">
+        <span class="training-progress-summary__label">Текущая сессия</span>
+        <span>Вопрос <b id="t-index">1</b> из <b id="t-total">0</b>, с ответом <b id="t-session-answered">0</b></span>
+      </span>
+      <span class="exam__counter training-progress-summary__item">
+        <span class="training-progress-summary__label" id="t-pool-label">Во всей базе</span>
+        <span>Верно решено: <b id="t-solved">0</b> из <b id="t-pool">0</b></span>
+      </span>
     </div>
-    <div class="exam__progress"><div class="exam__progress-fill" id="t-progress"></div></div>
+    <div class="exam__progress" id="t-pool-progress" role="progressbar" aria-labelledby="t-pool-label" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+      <div class="exam__progress-fill" id="t-progress"></div>
+    </div>
 
     <p class="exam__status" id="t-status" role="status">Загружаем билеты…</p>
     <p class="exam__status exam__status--error" id="t-storage-status" role="status" hidden>
@@ -317,6 +327,6 @@
   </footer>
 
   <script src="../../js/analytics.js?v=25" defer></script>
-  <script type="module" src="../../js/training.js?v=13"></script>
+  <script type="module" src="../../js/training.js?v=14"></script>
 </body>
 </html>

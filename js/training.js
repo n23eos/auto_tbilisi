@@ -135,7 +135,7 @@ function sessionLabel(context) {
 function showResumeOffer() {
   const saved = state.savedSession;
   el("t-resume").hidden = !saved;
-  el("t-settings").open = !saved;
+  el("t-settings").open = false;
   if (!saved) return;
   const { snapshot: previous } = saved;
   el("t-resume-title").textContent = sessionLabel(previous.context);
@@ -200,12 +200,17 @@ function renderSetContext() {
 function renderCounters() {
   const summary = progressSummary(selectionPool(), state.progress);
   const bankSummary = progressSummary(state.all, state.progress);
+  const currentSession = sessionSummary(state.session);
   el("t-total").textContent = String(state.list.length);
   el("t-index").textContent = String(state.list.length && !state.completed ? state.progress.position + 1 : 0);
+  el("t-session-answered").textContent = String(currentSession.answered);
   el("t-solved").textContent = String(summary.solved);
   el("t-pool").textContent = String(summary.total);
+  el("t-pool-label").textContent = state.selectedSet ? `В билете ${state.selectedSet.number}` : "Во всей базе";
   el("t-available-count").textContent = String(bankSummary.total);
   el("t-progress").style.width = summary.total ? `${(summary.solved / summary.total) * 100}%` : "0";
+  el("t-pool-progress").setAttribute("aria-valuemax", String(summary.total));
+  el("t-pool-progress").setAttribute("aria-valuenow", String(summary.solved));
 }
 
 function renderDashboard() {
@@ -234,7 +239,7 @@ function renderDashboard() {
     ? `Начать ${today.length} ${questionWord(today.length)}`
     : "Нет вопросов на сегодня";
   el("t-start-today").disabled = today.length === 0;
-  el("t-dashboard").hidden = Boolean(state.selectedSet);
+  el("t-dashboard").hidden = Boolean(state.selectedSet || state.savedSession || state.sessionStarted);
 }
 
 function compactTrainingPanels() {

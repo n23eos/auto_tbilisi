@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="css/about.css?v=1">
   <link rel="stylesheet" href="css/groups.css?v=1">
   <link rel="stylesheet" href="css/chat.css?v=8">
+  <link rel="stylesheet" href="css/course-choice.css?v=1">
   <!-- Стоп-кадр — самый крупный элемент первого экрана, грузим его первым -->
   <link rel="preload" as="image" href="media/hero-poster.jpg" fetchpriority="high">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -343,7 +344,6 @@
         <span class="marquee__line"><span class="marquee__inner">Учим водить.</span></span>
         <span class="marquee__line marquee__line--accent"><span class="marquee__inner">На русском.</span></span>
       </h1>
-      <p class="marquee__course"><span>Теория в группе: <strong><span data-price-service="theory_group">150 ₾</span> за курс</strong></span><span>9 занятий · будни в 19:00</span></p>
       <div class="marquee__actions">
         <a class="marquee__cta" href="#prices">Выбрать обучение</a>
         <a class="marquee__cta marquee__cta--ghost" href="/bilety/">Решать билеты</a>
@@ -499,7 +499,81 @@
   <section class="prices" id="prices">
     <h2 class="section-title" data-reveal>Цены</h2>
 
-    <div class="prices__grid" data-reveal-group>
+    <p>Выберите, что нужно сейчас. Теория и вождение оплачиваются отдельно.</p>
+    <div class="course-choice" aria-label="Выберите обучение">
+      <article class="course-choice__card">
+        <h3>С нуля</h3>
+        <p class="course-choice__who">Если раньше не водили и хотите пройти все этапы.</p>
+        <ul>
+          <li>Теория на русском: 9 занятий по 90 минут, две недели.</li>
+          <li>Площадка, затем город с инструктором.</li>
+          <li>Количество занятий за рулем подбираем под ваш уровень.</li>
+        </ul>
+        <p class="course-choice__cost">Теория в группе <strong data-price-service="theory_group">150 ₾</strong> за курс.<br>Вождение оплачивается за каждое занятие по прайсу ниже.</p>
+        <a class="learning-button" href="https://wa.me/995599987707?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BD%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%81%20%D0%BD%D1%83%D0%BB%D1%8F.%20%D0%9F%D0%BE%D0%BC%D0%BE%D0%B3%D0%B8%D1%82%D0%B5%20%D0%BF%D0%BE%D0%B4%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D1%8C%20%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D1%8F." target="_blank" rel="noopener">Подобрать обучение</a>
+      </article>
+      <article class="course-choice__card">
+        <h3>Только теория</h3>
+        <p class="course-choice__who">Если готовитесь к теоретическому экзамену или хотите разобраться в ПДД.</p>
+        <ul>
+          <li>В классе: 9 занятий по 90 минут, будни в 19:00.</li>
+          <li>Индивидуально онлайн: 10 занятий, график по договоренности.</li>
+          <li>Бесплатный тренажер для самостоятельного повторения.</li>
+        </ul>
+        <p class="course-choice__cost">В группе <strong data-price-service="theory_group">150 ₾</strong> за курс.<br>Индивидуально онлайн <strong data-price-service="theory_individual_online">280 ₾</strong> за курс.</p>
+        <a class="learning-button" href="#groups">Выбрать дату группы</a>
+      </article>
+      <article class="course-choice__card">
+        <h3>Практика вождения</h3>
+        <p class="course-choice__who">Если нужна практика на площадке или в городе.</p>
+        <ul>
+          <li>Механика или автомат, инструктор говорит по-русски.</li>
+          <li>Площадка: 45 минут, у метро Церетели.</li>
+          <li>Город: маршруты Тбилиси, график по договоренности.</li>
+        </ul>
+        <p class="course-choice__cost">Площадка <strong data-price-service="driving_ground">40 ₾</strong> за занятие.<br>Город <strong data-price-service="driving_city">50 ₾</strong> за занятие.</p>
+        <a class="learning-button" href="https://wa.me/995599987707?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D1%8C%20%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D1%8F%20%D0%BF%D0%BE%20%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%BC%D1%83%20%D0%B2%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8E." target="_blank" rel="noopener">Подобрать вождение</a>
+      </article>
+    </div>
+
+    <details class="course-budget" id="budget">
+      <summary>Рассчитать бюджет обучения</summary>
+      <p>Выберите теорию и количество занятий за рулем. Это расчет ваших расходов; сколько занятий понадобится, определите вместе с инструктором.</p>
+      <form class="course-budget__form" data-course-budget hidden aria-label="Расчет бюджета обучения">
+        <fieldset class="course-budget__fields">
+          <legend class="sr-only">Выбранные занятия</legend>
+          <label for="budget-theory">Теория
+            <select id="budget-theory" name="theory">
+              <option value="theory_group">В группе в аудитории</option>
+              <option value="theory_individual_online">Индивидуально онлайн</option>
+              <option value="theory_company_2">Онлайн вдвоем, за человека</option>
+              <option value="theory_company_3">Онлайн втроем, за человека</option>
+              <option value="theory_company_4">Онлайн вчетвером, за человека</option>
+              <option value="none">Без теории</option>
+            </select>
+          </label>
+          <label for="budget-ground">Занятия на площадке
+            <input id="budget-ground" name="ground" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" aria-describedby="budget-count-note budget-message">
+          </label>
+          <label for="budget-city">Занятия в городе
+            <input id="budget-city" name="city" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" aria-describedby="budget-count-note budget-message">
+          </label>
+        </fieldset>
+        <label class="course-budget__extras" for="budget-extras"><input id="budget-extras" name="extras" type="checkbox"><span>Добавить медицинскую справку и первые экзамены по теории и вождению в городе</span></label>
+        <p class="course-budget__note" id="budget-count-note">От 0 до 100 занятий каждого вида. Пересдачи, перевод паспорта, ускоренная запись и другие дополнительные услуги в расчет не входят.</p>
+        <ul class="course-budget__lines" data-budget-lines aria-label="Состав расчета"></ul>
+        <dl class="course-budget__totals" aria-live="polite" aria-atomic="true">
+          <div><dt>Выбранные занятия</dt><dd data-budget-school></dd></div>
+          <div><dt>Справка и первые экзамены</dt><dd data-budget-extras></dd></div>
+          <div class="course-budget__total"><dt>Итого по вашему выбору</dt><dd data-budget-total></dd></div>
+        </dl>
+        <p class="course-budget__message" data-budget-message id="budget-message" role="status" hidden></p>
+      </form>
+      <p data-budget-unavailable>Для расчета включите JavaScript или обратитесь в школу. Все цены доступны ниже.</p>
+    </details>
+    <a class="exam-link course-choice__details" href="#prices-table">Все тарифы и дополнительные расходы ↓</a>
+
+    <div class="prices__grid" id="prices-table" data-budget-price-source data-reveal-group>
       <article class="prices__group" data-reveal>
         <h3 class="prices__group-title">Теория</h3>
         <dl class="prices__list">
@@ -592,7 +666,7 @@
 
     <!-- Пошлины идут государству, а не школе — держим их отдельно,
          иначе прайс читается дороже, чем он есть -->
-    <div class="prices__fees" data-reveal>
+    <div class="prices__fees" data-budget-fees data-reveal>
       <h3 class="prices__group-title">Государственные пошлины</h3>
       <p class="prices__fees-lede">Платятся государству при записи на экзамен, не автошколе.</p>
       <ul class="prices__fees-list">
@@ -842,6 +916,7 @@
   <script src="js/affiliate-analytics.js?v=1" defer></script>
   <script src="js/main.js?v=35" defer data-booking-api="https://booking.avtoshkola.ge" data-turnstile-sitekey="0x4AAAAAAFI6Us-SkuRj4Bvt"></script>
   <script type="module" src="js/groups.js?v=5"></script>
-  <script type="module" src="js/chat.js?v=12" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
+  <script type="module" src="js/chat.js?v=13" data-chat-api="https://vps-apds.tail9c66b0.ts.net:10000"></script>
+  <script type="module" src="js/course-budget.js?v=1"></script>
 </body>
 </html>

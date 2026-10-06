@@ -219,7 +219,12 @@ async function updatePrices() {
   try {
     const data = await fetchPriceCatalog(api);
     const prices = new Map(data.services.map(item => [item.service_id, formatPrice(item)]));
-    targets.forEach(node => { const value = prices.get(node.dataset.priceService); if (value) node.textContent = value; });
+    targets.forEach(node => {
+      if (!prices.has(node.dataset.priceService)) return;
+      // Явно неизвестная или устаревшая цена не должна оставаться прежней:
+      // иначе расчет бюджета выглядел бы актуальным при отказе источника.
+      node.textContent = prices.get(node.dataset.priceService) || 'Уточните цену';
+    });
   } catch {
     document.querySelector('.prices__disclaimer')?.append(' Актуальность цены можно уточнить по телефону или в WhatsApp.');
   }

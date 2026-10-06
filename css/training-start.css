@@ -1,0 +1,119 @@
+/* Первый экран тренировки: одно действие для старта или продолжения. */
+
+.training-page .exam:has(> .learning-nav) {
+  padding-top: var(--space-md);
+}
+
+.training-page .learning-nav {
+  margin-bottom: var(--space-md);
+}
+
+.training-page .exam__title {
+  font-size: clamp(1.7rem, 5vw, 2.6rem);
+  line-height: 1.15;
+  margin-bottom: var(--space-xs);
+}
+
+.training-page .exam__lead {
+  max-width: 44rem;
+  margin-bottom: var(--space-md);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+.training-launch {
+  margin-bottom: var(--space-sm);
+}
+
+.training-launch .training-dashboard,
+.training-launch .training-resume {
+  margin: 0;
+  padding: clamp(.9rem, 3vw, 1.35rem);
+}
+
+.training-launch .training-dashboard__head {
+  gap: var(--space-md);
+}
+
+.training-launch .training-dashboard h2,
+.training-launch .training-resume h2 {
+  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  line-height: 1.25;
+}
+
+.training-launch .training-dashboard__note,
+.training-launch .training-resume p {
+  line-height: 1.45;
+}
+
+.training-launch .training-resume .exam__actions {
+  margin-bottom: 0;
+}
+
+.training-progress-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.training-progress-summary__item {
+  display: grid;
+  gap: .15rem;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-2);
+}
+
+.training-progress-summary__label {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .training-page .learning-nav {
+    gap: .4rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .training-page .learning-nav__link {
+    min-height: 2.8rem;
+    padding: .45rem .3rem;
+  }
+
+  .training-launch .training-dashboard__head {
+    gap: var(--space-sm);
+  }
+
+  .training-launch .training-stats {
+    margin-top: var(--space-sm);
+  }
+
+  .training-launch .training-stats div {
+    padding-top: var(--space-sm);
+  }
+}
+
+@media (max-width: 420px) {
+  .training-page .exam:has(> .learning-nav) {
+    padding-top: var(--space-sm);
+  }
+
+  .training-page .exam__lead {
+    font-size: var(--text-sm);
+  }
+
+  .training-launch .training-dashboard,
+  .training-launch .training-resume {
+    padding: var(--space-sm);
+  }
+
+  .training-launch .training-stats dt {
+    font-size: .64rem;
+    line-height: 1.25;
+  }
+
+  .training-progress-summary {
+    grid-template-columns: 1fr;
+  }
+}

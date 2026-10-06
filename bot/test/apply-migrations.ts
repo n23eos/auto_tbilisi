@@ -22,6 +22,7 @@ const TABLES_CHILD_FIRST = [
   "inbox",
   "chat_leases",
   "bookings",
+  "rolling_schedule_slots",
   "groups",
   "schedule_state",
   "lead_events",

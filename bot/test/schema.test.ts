@@ -24,6 +24,7 @@ describe("schema", () => {
       "leads",
       "outbox",
       "processed_updates",
+      "rolling_schedule_slots",
       "schedule_state",
     ]);
   });
