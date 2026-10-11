@@ -234,6 +234,7 @@ test('отказ CAPTCHA сохраняет прямые контакты и н�
   const state = await bookingFixture(context);
   await context.route('https://challenges.cloudflare.com/turnstile/**', route => route.abort());
   await page.goto('/');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const form = page.locator('#callback-form');
   const fallback = form.locator('[data-booking-fallback]');
   await expect(fallback).toContainText('Не загрузилась защита от спама');
