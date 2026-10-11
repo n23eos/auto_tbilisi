@@ -8,7 +8,6 @@ const api = (loader?.dataset.chatApi || '').replace(/\/$/, '');
 const bookingLoader = document.querySelector('script[data-booking-api]');
 const bookingApi = (bookingLoader?.dataset.bookingApi || '').replace(/\/$/, '');
 const turnstileSitekey = bookingLoader?.dataset.turnstileSitekey || '';
-const INVITE_DELAY_MS = 30000;
 const INVITE_SESSION_KEY = 'school-chat-invite-seen';
 
 let history = [];
@@ -44,17 +43,6 @@ const make = (tag, className, text) => {
 };
 
 const root = make('div', 'school-chat');
-const invite = make('section', 'school-chat__invite');
-invite.hidden = true;
-invite.setAttribute('aria-label', 'Приглашение от бота автошколы');
-const inviteClose = make('button', 'school-chat__invite-close', 'Закрыть');
-inviteClose.type = 'button';
-inviteClose.setAttribute('aria-label', 'Закрыть приглашение');
-const inviteIdentity = make('span', 'school-chat__invite-identity', 'Бот автошколы');
-const inviteText = make('p', 'school-chat__invite-text', 'Подсказать по обучению или правам в Грузии?');
-const inviteOpen = make('button', 'school-chat__invite-open', 'Задать вопрос');
-inviteOpen.type = 'button';
-invite.append(inviteClose, inviteIdentity, inviteText, inviteOpen);
 const toggle = make('button', 'school-chat__toggle');
 toggle.setAttribute('aria-label', 'Открыть чат с ботом');
 const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -128,19 +116,19 @@ if (bookingApi) {
 panel.append(header, messages, suggestions, form);
 if (bookingView) panel.append(bookingView);
 panel.append(contacts);
-root.append(invite, toggle, panel);
+root.append(toggle, panel);
 document.body.append(root);
 document.body.classList.add('has-school-chat');
 
-let inviteHandled = false;
+let autoOpenDismissed = false;
 try {
-  inviteHandled = sessionStorage.getItem(INVITE_SESSION_KEY) === '1';
+  autoOpenDismissed = sessionStorage.getItem(INVITE_SESSION_KEY) === '1';
 } catch {
-  // В закрытом хранилище флаг текущей страницы всё равно не даст повторить приглашение.
+  // Некоторые приватные режимы запрещают sessionStorage, но сам чат должен работать.
 }
 
-function rememberInvite() {
-  inviteHandled = true;
+function rememberAutoOpenDismissed() {
+  autoOpenDismissed = true;
   try {
     sessionStorage.setItem(INVITE_SESSION_KEY, '1');
   } catch {
@@ -148,32 +136,23 @@ function rememberInvite() {
   }
 }
 
-function trackInvite(name) {
-  if (typeof window.gtag === 'function') window.gtag('event', name);
-}
-
-function hideInvite() {
-  invite.hidden = true;
-}
-
-function setOpen(open) {
-  if (open) {
-    rememberInvite();
-    hideInvite();
-  }
+function setOpen(open, {focus = true} = {}) {
   panel.hidden = !open;
   toggle.setAttribute('aria-expanded', String(open));
   if (open) {
     // Закрытая панель не должна загружать даже уменьшенную картинку заранее.
     if (!avatar.hasAttribute('src')) avatar.src = new URL('../images/chat-robot-132.webp', import.meta.url).href;
-    previousFocus = invite.contains(document.activeElement) ? toggle : document.activeElement;
-    if (bookingView && !bookingView.hidden) {
-      bookingView.querySelector('[data-booking-group]')?.focus();
-    } else {
-      input.focus();
+    previousFocus = focus ? document.activeElement : toggle;
+    if (focus) {
+      if (bookingView && !bookingView.hidden) {
+        bookingView.querySelector('[data-booking-group]')?.focus();
+      } else {
+        input.focus();
+      }
     }
-  } else if (panel.contains(document.activeElement)) {
-    (previousFocus || toggle).focus();
+  } else {
+    rememberAutoOpenDismissed();
+    if (panel.contains(document.activeElement)) (previousFocus || toggle).focus();
   }
 }
 
@@ -240,20 +219,9 @@ async function send(question) {
 
 toggle.addEventListener('click', () => setOpen(panel.hidden));
 close.addEventListener('click', () => setOpen(false));
-inviteOpen.addEventListener('click', () => {
-  trackInvite('chat_invite_open');
-  setOpen(true);
-});
-inviteClose.addEventListener('click', () => {
-  rememberInvite();
-  hideInvite();
-  if (invite.contains(document.activeElement)) toggle.focus();
-  trackInvite('chat_invite_dismiss');
-});
 const fabToggle = document.querySelector('[data-fab-toggle]');
 fabToggle?.addEventListener('click', () => {
   if (!panel.hidden) setOpen(false);
-  if (fabToggle.getAttribute('aria-expanded') === 'true') hideInvite();
 });
 input.addEventListener('keydown', event => {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -264,69 +232,7 @@ form.addEventListener('submit', event => { event.preventDefault(); send(input.va
 panel.addEventListener('keydown', event => {
   if (event.key === 'Escape') setOpen(false);
 });
-
-function formControlIsActive() {
-  const active = document.activeElement;
-  return active instanceof HTMLElement
-    && Boolean(active.closest('form'))
-    && active.matches('input, textarea, select, [contenteditable="true"]');
-}
-
-function inviteCanAppear() {
-  return !inviteHandled
-    && !document.hidden
-    && panel.hidden
-    && !formControlIsActive()
-    && fabToggle?.getAttribute('aria-expanded') !== 'true';
-}
-
-function showInvite() {
-  if (!inviteCanAppear()) return;
-  rememberInvite();
-  invite.hidden = false;
-  trackInvite('chat_invite_view');
-}
-
-let inviteRemaining = INVITE_DELAY_MS;
-let inviteStartedAt = 0;
-let inviteTimer = 0;
-
-function pauseInviteTimer() {
-  if (!inviteTimer) return;
-  window.clearTimeout(inviteTimer);
-  inviteTimer = 0;
-  inviteRemaining = Math.max(0, inviteRemaining - (Date.now() - inviteStartedAt));
-}
-
-function startInviteTimer() {
-  if (inviteHandled || document.hidden || inviteTimer) return;
-  inviteStartedAt = Date.now();
-  inviteTimer = window.setTimeout(() => {
-    inviteTimer = 0;
-    inviteRemaining = 0;
-    showInvite();
-  }, inviteRemaining);
-}
-
-function reconsiderInvite() {
-  if (inviteHandled) return;
-  if (document.hidden) {
-    pauseInviteTimer();
-    return;
-  }
-  if (inviteRemaining > 0) startInviteTimer();
-  else showInvite();
-}
-
-document.addEventListener('visibilitychange', reconsiderInvite);
-document.addEventListener('focusout', () => window.setTimeout(reconsiderInvite));
-if (fabToggle) {
-  new MutationObserver(() => {
-    if (fabToggle.getAttribute('aria-expanded') === 'true') hideInvite();
-    else reconsiderInvite();
-  }).observe(fabToggle, {attributes: true, attributeFilter: ['aria-expanded']});
-}
-startInviteTimer();
+if (!autoOpenDismissed) setOpen(true, {focus: false});
 
 async function updatePrices() {
   const targets = [...document.querySelectorAll('[data-price-service]')];

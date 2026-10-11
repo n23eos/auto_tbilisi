@@ -45,6 +45,7 @@ test('главная: два входа на первом экране, парт
       .replace(/data-turnstile-sitekey="[^"]*"/, 'data-turnstile-sitekey=""'),
   }));
   await page.goto('/');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const signup = page.getByRole('link', { name: 'Выбрать обучение', exact: true });
   const ticketsLink = page.getByRole('link', { name: 'Решать билеты', exact: true });
   const coupon = page.getByRole('region', { name: 'Для ваших путешествий' });
@@ -97,19 +98,20 @@ test('без booking API остается рабочая форма обратн
   expect(submitted[0]['Телефон']).toBe('+995 599 12 34 56');
 });
 
-test('чат не открывается сам, загружает аватар по запросу и возвращает фокус', async ({ page }) => {
+test('чат открывается без фокуса, закрывается и вручную открывается с фокусом', async ({ page }) => {
   await page.goto('/');
   const toggle = page.getByRole('button', { name: 'Открыть чат с ботом' });
   await expect(toggle).toBeVisible();
   const panel = page.locator('#school-chat-panel');
   const avatar = page.locator('.school-chat__avatar');
-  await expect(avatar).not.toHaveAttribute('src');
-  // Прежний дефект проявлялся ровно через 10 секунд после загрузки.
-  await page.waitForTimeout(10500);
-  await expect(panel).toBeHidden();
-  await toggle.click();
   await expect(panel).toBeVisible();
   await expect(avatar).toHaveAttribute('src', /chat-robot-132\.webp$/);
+  await expect(page.getByLabel('Ваш вопрос', { exact: true })).not.toBeFocused();
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
+  await expect(panel).toBeHidden();
+  await expect(toggle).toBeFocused();
+  await toggle.click();
+  await expect(panel).toBeVisible();
   await expect(page.getByLabel('Ваш вопрос', { exact: true })).toBeFocused();
   const box = await panel.boundingBox();
   expect(box.x).toBeGreaterThanOrEqual(0);
@@ -222,6 +224,7 @@ test('партнеры: показы, продуктовые переходы и
     window.gtag = (...args) => window.partnerEvents.push(args);
   });
   await page.goto('/');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const cards = page.locator('[data-affiliate-card]');
   await expect(cards).toHaveCount(3);
   for (const card of await cards.all()) {

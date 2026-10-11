@@ -23,6 +23,7 @@ test.beforeEach(async ({page, externalPosts}) => {
 
 test('выбор обучения ведет к группе или прямой консультации без обязательной группы', async ({page, externalPosts}) => {
   await page.goto('/#prices');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const choices = page.getByLabel('Выберите обучение', {exact: true});
   await expect(choices.getByRole('heading')).toHaveText(['С нуля', 'Только теория', 'Практика вождения']);
   const practice = choices.getByRole('link', {name: 'Подобрать вождение', exact: true});
@@ -38,6 +39,7 @@ test('выбор обучения ведет к группе или прямой
 
 test('расчет отделяет занятия и расходы на справку и первые экзамены', async ({page, externalPosts}) => {
   await page.goto('/#budget');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   await page.getByText('Рассчитать бюджет обучения', {exact: true}).click();
   const budget = page.getByRole('form', {name: 'Расчет бюджета обучения'});
   await budget.getByLabel('Занятия на площадке').fill('5');
@@ -60,6 +62,7 @@ test('обновленный прайс меняет карточки и ито�
   let services = [{service_id: 'theory_group', status: 'success', amount_minor: 17000}];
   await page.route('**/api/catalog', route => route.fulfill({json: {services}}));
   await page.goto('/#budget');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   await page.getByText('Рассчитать бюджет обучения', {exact: true}).click();
   await expect(page.locator('[data-budget-total]')).toHaveText('170 ₾');
   await expect(page.locator('.course-choice [data-price-service="theory_group"]')).toHaveText(['170 ₾', '170 ₾']);

@@ -133,6 +133,7 @@ test(`форма получает раннюю ошибку расписания
 test('показывает актуальную группу и очищает ее после ошибки источника', async ({page, context}) => {
   const state = await bookingFixture(context);
   await page.goto('/');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const region = page.getByRole('region', {name: 'Выберите дату старта'});
   await expect(region.getByText('5 октября 2026 г., 19:00')).toBeVisible();
   await expect(region.getByText('Дата предварительная')).toBeVisible();
@@ -251,6 +252,7 @@ test('повтор после сети сохраняет key, а новая д�
   const state = await bookingFixture(context);
   state.bookingMode = 'network-then-change';
   await page.goto('/');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   await page.locator('.groups__book').click();
   const form = page.locator('#callback-form');
   await form.locator('#cb-name').fill('Анна');
@@ -276,7 +278,6 @@ test('повтор после сети сохраняет key, а новая д�
 test('форма внутри чата работает при отказе AI и не передает PII модели', async ({page, context}) => {
   const state = await bookingFixture(context);
   await page.goto('/');
-  await page.getByRole('button', {name: 'Открыть чат с ботом'}).click();
   await page.getByLabel('Ваш вопрос', {exact: true}).fill('Хочу записаться в группу');
   await page.getByRole('button', {name: 'Отправить сообщение'}).click();
   const booking = page.locator('.school-chat__booking-form');
@@ -295,7 +296,6 @@ test('чат FAQ получает расписание и отправляет �
   const state = await bookingFixture(context);
   await page.goto('/voprosy/');
   await expect(page.locator('[data-groups-root]')).toHaveCount(0);
-  await page.getByRole('button', {name: 'Открыть чат с ботом'}).click();
   await page.getByRole('button', {name: 'Записаться в группу'}).click();
   const booking = page.locator('.school-chat__booking-form');
   const groupSelect = booking.locator('[data-booking-group]');
