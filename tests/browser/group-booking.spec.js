@@ -220,6 +220,7 @@ test('ошибка импорта booking блокирует native FormSubmit �
 test('из консультации можно выбрать открытую группу и перейти к записи', async ({page, context}) => {
   const state = await bookingFixture(context);
   await page.goto('/?from=training&goal=theory#callback-form');
+  await page.getByRole('button', {name: 'Закрыть чат'}).click();
   const form = page.locator('#callback-form');
   await expect(form.locator('[data-consultation-fallback]')).toBeVisible();
   await page.locator('.groups__book').click();
