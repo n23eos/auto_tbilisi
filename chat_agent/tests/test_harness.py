@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -184,7 +185,30 @@ def test_atomic_budget_and_restart(tmp_path):
     budget.reserve(30)
 
 
-def test_flash_thinking_disabled_and_usage(tmp_path):
+@pytest.fixture
+def verified_provider_date(monkeypatch):
+    # Транспорт и бюджет проверяем в день подтверждённых ставок, независимо от даты запуска.
+    class VerifiedDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 9, 12, 12, tzinfo=tz)
+    monkeypatch.setattr('chat_agent.provider.datetime', VerifiedDateTime)
+
+
+def test_expired_provider_rates_reject_before_transport(tmp_path, monkeypatch):
+    class ExpiredDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 10, 13, 12, tzinfo=tz)
+    monkeypatch.setattr('chat_agent.provider.datetime', ExpiredDateTime)
+    def unexpected_transport(*args):
+        pytest.fail('Expired rates must not call the transport')
+    model = DeepSeek('fixture', Budget(tmp_path/'budget'), unexpected_transport)
+    with pytest.raises(ProviderError, match='pricing_requires_review'):
+        model.complete([], [], deadline=time.monotonic()+10)
+
+
+def test_flash_thinking_disabled_and_usage(tmp_path, verified_provider_date):
     bodies = []
     def transport(body, deadline):
         bodies.append(body)
@@ -196,7 +220,7 @@ def test_flash_thinking_disabled_and_usage(tmp_path):
     assert bodies[0]['thinking'] == {'type': 'disabled'}
 
 
-def test_transport_failure_keeps_reservation(tmp_path):
+def test_transport_failure_keeps_reservation(tmp_path, verified_provider_date):
     budget = Budget(tmp_path/'budget', limit_micro=3000)
     def broken(*args):
         raise ProviderError('offline')

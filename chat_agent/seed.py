@@ -31,5 +31,10 @@ def seed(catalog, *, actor='initial-import'):
             catalog.save_price(Price(service_id, name, amount, 'GEL', unit,
                 'index.html#prices', '2026-08-31', '2026-12-31'),
                 expected_revision=0, actor=actor)
+    # Новая услуга добавляется один раз: уже сохранённые редактором цены не трогаем.
+    if 'theory_individual_classroom' not in existing:
+        catalog.save_price(Price('theory_individual_classroom', 'Индивидуальная теория в аудитории',
+            35000, 'GEL', 'course', 'index.html#prices-table', '2026-10-14', '2026-12-31'),
+            expected_revision=0, actor=actor)
     if not any(item['service_id'] == 'theory_group' for item in catalog.admin_snapshot()['groups']):
         catalog.save_group('theory_group', None, 'unknown', expected_revision=0, actor=actor)
