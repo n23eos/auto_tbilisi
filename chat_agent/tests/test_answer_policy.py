@@ -5,15 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from chat_agent.facts import Catalog
+from chat_agent.facts import Catalog, Price
 from chat_agent.harness import Harness
 from chat_agent.knowledge import Knowledge
 
 KB = Path(__file__).resolve().parents[2] / 'baza-znaniy/dlya-bota'
 
 
-def draft(action='answer', ids=()):
-    return {'content': json.dumps({'action': action, 'excerpt_ids': list(ids), 'prices': [], 'groups': []})}
+def draft(action='answer', ids=(), prices=(), groups=()):
+    return {'content': json.dumps({'action': action, 'excerpt_ids': list(ids),
+                                   'prices': list(prices), 'groups': list(groups)})}
 
 
 def review(verdict='accept', reason='ok', scope='school'):
@@ -23,6 +24,12 @@ def review(verdict='accept', reason='ok', scope='school'):
 def search(query):
     return {'tool_calls': [{'id': 'fixture', 'type': 'function', 'function': {
         'name': 'search_knowledge_base', 'arguments': json.dumps({'query': query})}}]}
+
+
+def tool_batch(name, service_ids):
+    return {'tool_calls': [{'id': f'fixture-{index}', 'type': 'function', 'function': {
+        'name': name, 'arguments': json.dumps({'service_id': service_id})}}
+        for index, service_id in enumerate(service_ids)]}
 
 
 class Model:
@@ -56,6 +63,95 @@ def test_enrollment_gets_actionable_instruction_not_price_policy(tmp_path):
     assert 'запис' in result['answer'].lower() and 'WhatsApp' in result['answer']
     assert 'расчёт' not in result['answer'] and 'Правильный ответ' not in result['answer']
     assert 'записаны' not in result['answer']
+
+
+def test_generic_theory_price_retries_clarify_and_requires_three_course_options(tmp_path):
+    catalog = Catalog(tmp_path/'facts')
+    rows = [
+        Price('theory_group', 'Теория в группе', 15000, 'GEL', 'course',
+              'fixture', '2026-10-17', '2026-12-31'),
+        Price('theory_individual_online', 'Индивидуальная теория онлайн', 35000,
+              'GEL', 'course', 'fixture', '2026-10-17', '2026-12-31'),
+        Price('theory_individual_classroom', 'Индивидуальная теория в аудитории',
+              35000, 'GEL', 'course', 'fixture', '2026-10-17', '2026-12-31'),
+    ]
+    for row in rows:
+        catalog.save_price(row, expected_revision=0, actor='fixture')
+    wire_prices = [{key: getattr(row, key) for key in
+                    ('service_id', 'amount_minor', 'currency', 'unit')} for row in rows]
+    service_ids = [row.service_id for row in rows]
+    model = Model([
+        draft('clarify'),
+        tool_batch('get_school_info', service_ids),
+        draft(prices=wire_prices[:1]),
+        draft(prices=wire_prices),
+        review(),
+    ])
+
+    result = Harness(model, catalog, Knowledge(KB)).run('Сколько стоит теория?')
+
+    assert result['status'] == 'success'
+    assert all(row.name in result['answer'] for row in rows)
+    assert result['answer'].count('350 ₾') == 2
+    assert '150 ₾' in result['answer']
+    assert [item['errors'] for item in result['trace']['validation']] == [
+        ['wrong_route'], ['incomplete'], []]
+
+
+def test_generic_theory_price_handoffs_when_a_canonical_price_is_unavailable(tmp_path):
+    catalog = Catalog(tmp_path/'facts')
+    service_ids = ['theory_group', 'theory_individual_online',
+                   'theory_individual_classroom']
+    for service_id, name, amount in (
+            ('theory_group', 'Теория в группе', 15000),
+            ('theory_individual_online', 'Индивидуальная теория онлайн', 35000)):
+        catalog.save_price(Price(service_id, name, amount, 'GEL', 'course',
+            'fixture', '2026-10-17', '2026-12-31'), expected_revision=0, actor='fixture')
+    model = Model([
+        tool_batch('get_school_info', service_ids),
+        draft('handoff'),
+        review(),
+    ])
+
+    result = Harness(model, catalog, Knowledge(KB)).run('Сколько стоит теория?')
+
+    assert result['status'] == 'handoff'
+    assert result['trace']['action'] == 'handoff'
+    assert result['trace']['validation'] == [{'result': 'PASS', 'errors': []}]
+    review_payload = json.loads(model.calls[-1][0][1]['content'])
+    assert review_payload['price_statuses']['theory_individual_classroom'] == 'unknown'
+
+
+def test_generic_training_price_still_clarifies(tmp_path):
+    result, model = run(tmp_path, [draft('clarify'), review()],
+                        'Сколько стоит обучение?')
+    assert result['status'] == 'clarification'
+    assert 'Уточните' in result['answer']
+    assert len(model.calls) == 2
+
+
+def test_group_object_is_rejected_then_source_id_renders_canonical_date(tmp_path):
+    catalog = Catalog(tmp_path/'facts')
+    catalog.save_group('theory_group', '2026-10-19', 'planned',
+                       expected_revision=0, actor='fixture')
+    model = Model([
+        tool_batch('get_available_dates', ['theory_group']),
+        draft(groups=[{'service_id': 'theory_group', 'start_date': '2099-01-01'}]),
+        draft(groups=['theory_group']),
+        review(),
+    ])
+
+    result = Harness(model, catalog, Knowledge(KB)).run(
+        'Когда начинается ближайшая группа?',
+        history=[{'role': 'user', 'content': 'Меня интересует теория.'}])
+
+    assert result['status'] == 'success'
+    assert '19.10.2026' in result['answer']
+    assert '2099' not in result['answer']
+    assert [item['errors'] for item in result['trace']['validation']] == [
+        ['invalid_group_ids'], []]
+    review_payload = json.loads(model.calls[-1][0][1]['content'])
+    assert review_payload['group_statuses'] == {'theory_group': 'planned'}
 
 
 def test_rewritten_search_keeps_original_online_question(tmp_path):
