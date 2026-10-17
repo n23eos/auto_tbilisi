@@ -24,6 +24,15 @@ class Fake:
         return next(self.messages), {'mode': 'fixture'}
 
 
+class NoModel:
+    def __init__(self):
+        self.count = 0
+
+    def complete(self, *args, **kwargs):
+        self.count += 1
+        pytest.fail('Standalone schedule question must not call the model')
+
+
 def call(name, args):
     return {'role': 'assistant', 'tool_calls': [{'id': 'test-call', 'type': 'function',
             'function': {'name': name, 'arguments': json.dumps(args)}}]}
@@ -99,6 +108,112 @@ def test_price_correction(tmp_path):
     assert [v['result'] for v in result['trace']['validation']] == ['FAIL', 'PASS']
 
 
+@pytest.mark.parametrize('question', [
+    'Когда начинается ближайшая группа?',
+    'Когда стартует ближайшая группа по теории?',
+    'Когда группа?',
+    'Расписание групп',
+    'Ближайшая группа',
+])
+def test_standalone_group_questions_use_canonical_source_without_model(tmp_path, question):
+    class SharedGroups:
+        calls = 0
+
+        def get_available_dates(self, service_id):
+            self.calls += 1
+            assert service_id == 'theory_group'
+            return {'status': 'success', 'schedule_revision': 8,
+                    'fetched_at': '2026-10-17T11:00:00Z', 'timezone': 'Asia/Tbilisi',
+                    'booking_enabled': False, 'groups': [
+                        {'id': 'group-1', 'revision': 1, 'start_date': '2026-10-19',
+                         'start_time': '19:00', 'date_status': 'planned',
+                         'enrollment_open': True, 'availability': 'open'},
+                        {'id': 'group-2', 'revision': 1, 'start_date': '2026-11-02',
+                         'start_time': '19:00', 'date_status': 'planned',
+                         'enrollment_open': True, 'availability': 'open'},
+                        {'id': 'group-3', 'revision': 1, 'start_date': '2026-11-16',
+                         'start_time': '19:00', 'date_status': 'planned',
+                         'enrollment_open': True, 'availability': 'open'},
+                    ]}
+
+    model, groups = NoModel(), SharedGroups()
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=groups).run(question)
+    assert result['status'] == 'success'
+    assert all(day in result['answer'] for day in ('19.10.2026', '02.11.2026', '16.11.2026'))
+    assert 'запись через администратора' in result['answer']
+    assert model.count == 0
+    assert groups.calls == 1
+
+
+def test_standalone_group_question_renders_unavailable_without_model(tmp_path):
+    class UnavailableGroups:
+        calls = 0
+
+        def get_available_dates(self, service_id):
+            self.calls += 1
+            return {'status': 'unavailable'}
+
+    model, groups = NoModel(), UnavailableGroups()
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=groups).run('Когда группа?')
+    assert result['status'] == 'success'
+    assert 'Расписание временно недоступно' in result['answer']
+    assert model.count == 0
+    assert groups.calls == 1
+
+
+def test_standalone_group_fast_path_runs_after_history_validation(tmp_path):
+    class Groups:
+        calls = 0
+
+        def get_available_dates(self, service_id):
+            self.calls += 1
+            return {'status': 'unavailable'}
+
+    model, groups = NoModel(), Groups()
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=groups).run('Когда группа?', history=[
+                         {'role': 'user', 'content': 'x'} for _ in range(7)])
+    assert result['status'] == 'error'
+    assert model.count == 0
+    assert groups.calls == 0
+
+
+def test_short_group_question_with_history_keeps_model_cycle(tmp_path):
+    class SharedGroups:
+        def get_available_dates(self, service_id):
+            return {'status': 'success', 'schedule_revision': 8,
+                    'fetched_at': '2026-10-17T11:00:00Z', 'timezone': 'Asia/Tbilisi',
+                    'groups': []}
+
+    model = Fake([call('get_available_dates', {'service_id': 'theory_group'}),
+                  answer(groups=['theory_group']), approved()])
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=SharedGroups()).run('Когда группа?', history=[
+                         {'role': 'user', 'content': 'Хочу уроки вождения'},
+                         {'role': 'assistant', 'content': 'Какой формат вас интересует?'},
+                     ])
+    assert result['status'] == 'success'
+    assert model.count == 3
+
+
+def test_mixed_group_question_keeps_model_cycle(tmp_path):
+    class SharedGroups:
+        def get_available_dates(self, service_id):
+            return {'status': 'success', 'schedule_revision': 8,
+                    'fetched_at': '2026-10-17T11:00:00Z', 'timezone': 'Asia/Tbilisi',
+                    'groups': []}
+
+    model = Fake([call('get_available_dates', {'service_id': 'theory_group'}),
+                  answer(groups=['theory_group']), approved()])
+    result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
+                     group_source=SharedGroups()).run(
+                         'Когда ближайшая группа и сколько стоит обучение?')
+    assert result['status'] == 'success'
+    assert model.count == 3
+
+
 def test_group_tool_reads_configured_shared_source_without_catalog_fallback(tmp_path):
     catalog = Catalog(tmp_path/'facts')
     catalog.save_group('theory_group', '2026-10-19', 'confirmed',
@@ -135,7 +250,8 @@ def test_group_tool_reads_configured_shared_source_without_catalog_fallback(tmp_
 
     model = SnapshotModel([call('get_available_dates', {'service_id': 'theory_group'}),
                            answer(groups=['theory_group']), approved()])
-    result = Harness(model, catalog, Knowledge(KB), group_source=groups).run('Когда группа?')
+    result = Harness(model, catalog, Knowledge(KB), group_source=groups).run(
+        'Когда ближайшая группа и можно ли заниматься онлайн?')
     assert result['status'] == 'success'
     assert '05.10.2026' in result['answer']
     assert '19.10.2026' not in result['answer']
@@ -161,7 +277,7 @@ def test_repeated_group_tool_call_reuses_first_unavailable_snapshot(tmp_path):
                   call('get_available_dates', {'service_id': 'theory_group'}),
                   answer(groups=['theory_group']), approved()])
     result = Harness(model, Catalog(tmp_path/'facts'), Knowledge(KB),
-                     group_source=groups).run('Когда группа?')
+                     group_source=groups).run('Когда ближайшая группа и как записаться?')
     assert result['status'] == 'success'
     assert 'Расписание временно недоступно' in result['answer']
     assert groups.calls == 1
@@ -191,7 +307,7 @@ def verified_provider_date(monkeypatch):
     class VerifiedDateTime(datetime):
         @classmethod
         def now(cls, tz=None):
-            return cls(2026, 9, 12, 12, tzinfo=tz)
+            return cls(2026, 10, 17, 12, tzinfo=tz)
     monkeypatch.setattr('chat_agent.provider.datetime', VerifiedDateTime)
 
 
@@ -199,13 +315,29 @@ def test_expired_provider_rates_reject_before_transport(tmp_path, monkeypatch):
     class ExpiredDateTime(datetime):
         @classmethod
         def now(cls, tz=None):
-            return cls(2026, 10, 13, 12, tzinfo=tz)
+            return cls(2026, 11, 17, 12, tzinfo=tz)
     monkeypatch.setattr('chat_agent.provider.datetime', ExpiredDateTime)
     def unexpected_transport(*args):
         pytest.fail('Expired rates must not call the transport')
     model = DeepSeek('fixture', Budget(tmp_path/'budget'), unexpected_transport)
     with pytest.raises(ProviderError, match='pricing_requires_review'):
         model.complete([], [], deadline=time.monotonic()+10)
+
+
+def test_verified_provider_rates_allow_transport_on_2026_10_17(tmp_path, monkeypatch):
+    class CurrentDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 10, 17, 12, tzinfo=tz)
+    monkeypatch.setattr('chat_agent.provider.datetime', CurrentDateTime)
+    model = DeepSeek('fixture', Budget(tmp_path/'budget'), lambda body, deadline: {
+        'model': 'deepseek-flash',
+        'usage': {'prompt_tokens': 10, 'completion_tokens': 5},
+        'choices': [{'finish_reason': 'stop', 'message': {
+            'role': 'assistant', 'content': '{}'}}],
+    })
+    _, usage = model.complete([], [], deadline=time.monotonic()+10)
+    assert usage['pricing_date'] == '2026-10-17'
 
 
 def test_flash_thinking_disabled_and_usage(tmp_path, verified_provider_date):

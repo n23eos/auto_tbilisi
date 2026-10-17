@@ -10,8 +10,8 @@ import uuid
 from zoneinfo import ZoneInfo
 
 MODEL = 'deepseek-flash'
-RATE_DATE = '2026-09-12'
-RATE_VALID_UNTIL = date(2026, 10, 12)
+RATE_DATE = '2026-10-17'
+RATE_VALID_UNTIL = date(2026, 11, 16)
 # Верхние peak/cache-miss ставки USD за миллион токенов, проверены в официальной документации.
 INPUT_RATE = 0.3
 OUTPUT_RATE = 1.2

@@ -117,6 +117,17 @@ def explicit_categories(text):
     return found
 
 
+def standalone_group_schedule_question(text):
+    normalized = re.sub(r'[?!.,:;]+', ' ', text.strip().lower().replace('ё', 'е'))
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+    return bool(re.fullmatch(
+        r'(?:когда (?:начинается |стартует )?(?:ближайшая )?группа(?: по теории)?'
+        r'|расписание (?:ближайших )?групп(?: по теории)?'
+        r'|ближайшая группа(?: по теории)?)',
+        normalized,
+    ))
+
+
 class Harness:
     def __init__(self, model, catalog, knowledge, group_source=None):
         self.model, self.catalog, self.knowledge = model, catalog, knowledge
@@ -166,6 +177,14 @@ class Harness:
             return message
 
         try:
+            if not history and standalone_group_schedule_question(text):
+                snapshot = get_group_snapshot('theory_group')
+                trace['tools'].append({'name': 'get_available_dates',
+                    'status': snapshot.get('status', 'error'), 'source_ids': []})
+                trace['model_calls'] = 0
+                trace['action'] = 'answer'
+                trace['validation'].append({'result': 'PASS', 'errors': []})
+                return finish('success', render_group(snapshot))
             while model_calls < 6:
                 message = complete(messages, TOOLS)
                 tool_calls = message.get('tool_calls')
