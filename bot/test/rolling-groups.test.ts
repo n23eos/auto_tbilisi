@@ -48,7 +48,10 @@ describe("rolling schedule configuration", () => {
   });
 
   it("использует подтвержденные значения по умолчанию", () => {
-    expect(rollingScheduleConfig({ ROLLING_SCHEDULE_ENABLED: "true", BOOKING_SECRET: ROLLING_SECRET })).toEqual(config);
+    expect(rollingScheduleConfig({ ROLLING_SCHEDULE_ENABLED: "true", BOOKING_SECRET: ROLLING_SECRET })).toEqual({
+      ...config,
+      anchorDate: "2026-10-19",
+    });
   });
 
   it.each([

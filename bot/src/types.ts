@@ -8,6 +8,7 @@ export interface Env {
   // Новый контур включается только явным значением true. Так миграция и деплой
   // кода сами по себе не переключают существующие заявки на другой writer.
   BOOKING_ENABLED?: string;
+  PUBLIC_SCHEDULE_ENABLED?: string;
   BOOKING_SECRET?: string;
   BOOKING_ALLOWED_ORIGINS?: string;
   TURNSTILE_SECRET?: string;

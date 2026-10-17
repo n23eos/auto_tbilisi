@@ -55,3 +55,11 @@ test('HTTP ошибка не превращается в пустое успеш
     fetchImpl: async () => new Response('{}', {status: 503}),
   }), /groups_http_503/);
 });
+
+ test('публичные даты доступны при выключенной онлайн-записи', () => {
+  const clean = validateGroupsPayload({...payload(), booking_enabled: false});
+  assert.equal(clean.groups[0].start_date, '2026-10-05');
+  assert.equal(canBookGroup(clean.groups[0]), false);
+  assert.equal(groupStatusText(clean.groups[0]), 'Запись по телефону или в WhatsApp');
+  assert.throws(() => validateGroupsPayload({...payload(), booking_enabled: 'false'}), /invalid/);
+});

@@ -23,6 +23,7 @@ async function bookingFixture(context) {
     group: group(),
     groups: null,
     groupsFail: false,
+    bookingEnabled: true,
     bookingCalls: [],
     chatCalls: [],
     externalCalls: [],
@@ -39,6 +40,7 @@ async function bookingFixture(context) {
     return route.fulfill({
       headers: {'Cache-Control': 'no-store'},
       json: {
+        booking_enabled: state.bookingEnabled,
         schedule_revision: state.group.revision,
         fetched_at: '2026-09-29T12:00:00Z',
         timezone: 'Asia/Tbilisi',
@@ -310,4 +312,16 @@ test('чат FAQ получает расписание и отправляет �
   await expect(booking.locator('[data-booking-success]')).toContainText('GR-TEST-1');
   expect(state.bookingCalls.at(-1).body.source).toBe('site_chat');
   expect(state.chatCalls).toEqual([]);
+});
+
+ test('расписание видно при выключенной онлайн-записи', async ({page, context}) => {
+  const state = await bookingFixture(context);
+  state.bookingEnabled = false;
+  state.group = group({date: '2026-10-19'});
+  await page.goto('/');
+  await expect(page.locator('[data-groups-list]')).toContainText('19 октября 2026');
+  await expect(page.locator('[data-groups-status]')).toContainText('по понедельникам раз в две недели');
+  await expect(page.locator('.groups__book')).toBeDisabled();
+  await expect(page.locator('[data-groups-root]')).not.toContainText('Набор закрыт');
+  expect(state.bookingCalls).toHaveLength(0);
 });

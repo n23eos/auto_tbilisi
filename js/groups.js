@@ -1,4 +1,4 @@
-import {canBookGroup, fetchGroups, formatGroupDate, groupStatusText} from './groups-logic.js?v=1';
+import {canBookGroup, fetchGroups, formatGroupDate, groupStatusText} from './groups-logic.js?v=2';
 
 const loader = document.querySelector('script[data-booking-api]');
 const api = (loader?.dataset.bookingApi || '').replace(/\/$/, '');
@@ -33,7 +33,9 @@ function render(data) {
     announce({status: 'success', snapshot: data});
     return;
   }
-  if (status) status.textContent = hasOpenGroup
+  if (status) status.textContent = data.booking_enabled === false
+    ? 'Новые группы стартуют по понедельникам раз в две недели. Для записи позвоните или напишите в WhatsApp.'
+    : hasOpenGroup
     ? 'Время указано по Тбилиси. Перед отправкой заявки дата проверяется еще раз.'
     : 'Сейчас нет группы с открытой записью. Обновите расписание или свяжитесь со школой.';
   const cards = data.groups.map(group => {

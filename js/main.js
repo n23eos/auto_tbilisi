@@ -139,8 +139,8 @@ document.documentElement.classList.add('has-js');
 
   function startBooking(groupId) {
     return Promise.all([
-      import('./booking-form.js?v=5'),
-      import('./groups.js?v=5'),
+      import('./booking-form.js?v=6'),
+      import('./groups.js?v=6'),
     ]).then(([booking, groups]) => {
       form.querySelector('[data-consultation-fallback]')?.remove();
       const mounted = booking.mountBookingForm(form, {

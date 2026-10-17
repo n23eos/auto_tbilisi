@@ -35,6 +35,7 @@ export function validateGroupsPayload(payload) {
   if (!payload || typeof payload !== 'object'
       || !Number.isInteger(payload.schedule_revision) || payload.schedule_revision < 0
       || typeof payload.fetched_at !== 'string' || !Number.isFinite(Date.parse(payload.fetched_at))
+      || (payload.booking_enabled !== undefined && typeof payload.booking_enabled !== 'boolean')
       || payload.timezone !== 'Asia/Tbilisi'
       || !Array.isArray(payload.groups) || payload.groups.length > 3
       || !payload.groups.every(validGroup)) {
@@ -46,10 +47,12 @@ export function validateGroupsPayload(payload) {
     if (previous > current) throw new Error('unsorted_groups_payload');
   }
   return {
+    ...(payload.booking_enabled === undefined ? {} : {booking_enabled: payload.booking_enabled}),
     schedule_revision: payload.schedule_revision,
     fetched_at: payload.fetched_at,
     timezone: payload.timezone,
     groups: payload.groups.map(group => ({
+      ...(payload.booking_enabled === undefined ? {} : {booking_enabled: payload.booking_enabled}),
       id: group.id,
       revision: group.revision,
       start_date: group.start_date,
@@ -94,9 +97,10 @@ export function formatGroupDate(group) {
 export function groupStatusText(group) {
   if (group.availability === 'full') return 'Мест нет';
   if (group.availability === 'closed' || !group.enrollment_open) return 'Набор закрыт';
+  if (group.booking_enabled === false) return 'Запись по телефону или в WhatsApp';
   return group.date_status === 'confirmed' ? 'Старт подтвержден' : 'Дата предварительная';
 }
 
 export function canBookGroup(group) {
-  return group.availability === 'open' && group.enrollment_open;
+  return group.booking_enabled !== false && group.availability === 'open' && group.enrollment_open;
 }

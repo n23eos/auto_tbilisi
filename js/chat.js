@@ -1,7 +1,7 @@
 import {SUGGESTIONS, formatPrice, nextHistory, publicAnswer} from './chat-logic.js?v=2';
 import {fetchPriceCatalog} from './chat-api.js?v=1';
-import {createChatBookingForm, mountBookingForm} from './booking-form.js?v=5';
-import {currentGroupsSnapshot, currentGroupsStatus} from './groups.js?v=5';
+import {createChatBookingForm, mountBookingForm} from './booking-form.js?v=6';
+import {currentGroupsSnapshot, currentGroupsStatus} from './groups.js?v=6';
 
 const loader = document.querySelector('script[data-chat-api]');
 const api = (loader?.dataset.chatApi || '').replace(/\/$/, '');

@@ -49,6 +49,7 @@ export interface PublicGroupsSnapshot {
   scheduleRevision: number;
   fetchedAt: string;
   timezone: typeof TBILISI_TIMEZONE;
+  bookingEnabled: boolean;
   groups: PublicGroup[];
 }
 

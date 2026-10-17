@@ -44,6 +44,9 @@ def validate_snapshot(payload):
     groups = payload.get('groups')
     if not isinstance(groups, list) or len(groups) > 3:
         raise ValueError('invalid_groups')
+    booking_enabled = payload.get('booking_enabled', True)
+    if type(booking_enabled) is not bool:
+        raise ValueError('invalid_booking_enabled')
     clean = []
     for item in groups:
         if (not isinstance(item, dict)
@@ -62,7 +65,8 @@ def validate_snapshot(payload):
     if keys != sorted(keys):
         raise ValueError('unsorted_groups')
     return {'status': 'success', 'schedule_revision': payload['schedule_revision'],
-            'fetched_at': fetched_at, 'timezone': 'Asia/Tbilisi', 'groups': clean}
+            'fetched_at': fetched_at, 'timezone': 'Asia/Tbilisi',
+            'booking_enabled': booking_enabled, 'groups': clean}
 
 
 class GroupClient:

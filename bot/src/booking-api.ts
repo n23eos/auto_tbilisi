@@ -6,7 +6,7 @@ import { DomainError } from "./booking-commands";
 import { listNotifications, notificationAction } from "./outbox";
 
 export interface BookingAPIEnv extends AdminConfig {
- DB: D1Database; BOOKING_ENABLED?: string; BOOKING_ALLOWED_ORIGINS?: string; TURNSTILE_SECRET?: string; ASSETS?: Fetcher;
+ DB: D1Database; BOOKING_ENABLED?: string; PUBLIC_SCHEDULE_ENABLED?: string; BOOKING_ALLOWED_ORIGINS?: string; TURNSTILE_SECRET?: string; ASSETS?: Fetcher;
 }
 const MAX_BODY=16384;
 const MUTATIONS=new Set(["POST","PATCH","PUT","DELETE"]);
@@ -29,7 +29,9 @@ async function body(request:Request):Promise<Record<string,unknown>>{
 }
 function only(value:Record<string,unknown>,keys:string[]){if(Object.keys(value).some(k=>!keys.includes(k)))throw new DomainError("invalid_fields",400);}
 function key(request:Request){const v=request.headers.get("Idempotency-Key")??"";if(!/^[a-zA-Z0-9:_-]{22,128}$/.test(v))throw new DomainError("invalid_idempotency_key",400);return v;}
-function enabled(env:BookingAPIEnv){if(env.BOOKING_ENABLED!=="true"||!env.BOOKING_SECRET||env.BOOKING_SECRET.length<32)throw new DomainError("booking_unconfigured",503);}
+function bookingEnabled(env:BookingAPIEnv){return env.BOOKING_ENABLED==="true"&&Boolean(env.BOOKING_SECRET&&env.BOOKING_SECRET.length>=32);}
+function enabled(env:BookingAPIEnv){if(!bookingEnabled(env))throw new DomainError("booking_unconfigured",503);}
+function publicScheduleEnabled(env:BookingAPIEnv){return env.PUBLIC_SCHEDULE_ENABLED==="true"||bookingEnabled(env);}
 function origins(env:BookingAPIEnv){return (env.BOOKING_ALLOWED_ORIGINS??"").split(",").map(x=>x.trim()).filter(Boolean);}
 function cors(request:Request,env:BookingAPIEnv):Record<string,string>{const origin=request.headers.get("Origin");return origin&&origins(env).includes(origin)?{"Access-Control-Allow-Origin":origin,"Vary":"Origin"}:{};}
 async function rateLimit(request:Request,env:BookingAPIEnv){
@@ -61,15 +63,16 @@ export function createBookingRouter(deps:RouterDependencies={authorize:authorize
   if(!publicRoute&&!adminRoute)return null;
   const c=publicRoute?cors(request,env):{};
   try{
-   enabled(env);
    if(publicRoute){
     const origin=request.headers.get("Origin");
     if(origin&&!origins(env).includes(origin))return json({error:"origin_not_allowed"},403);
-    if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{...c,"Access-Control-Allow-Methods":"GET, POST, OPTIONS","Access-Control-Allow-Headers":"Content-Type, Idempotency-Key","Access-Control-Max-Age":"600"}});
     if(path==="/api/v1/groups"&&request.method==="GET"){
+     if(!publicScheduleEnabled(env))throw new DomainError("schedule_unconfigured",503);
      if(url.searchParams.get("service_id")&&url.searchParams.get("service_id")!=="theory_group")throw new DomainError("invalid_service",400);
-     return json(await publicGroups(env.DB),200,c);
+     return json(await publicGroups(env.DB,new Date(),bookingEnabled(env)),200,c);
     }
+    enabled(env);
+    if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{...c,"Access-Control-Allow-Methods":"GET, POST, OPTIONS","Access-Control-Allow-Headers":"Content-Type, Idempotency-Key","Access-Control-Max-Age":"600"}});
     if(path==="/api/v1/bookings"&&request.method==="POST"){
      if(!origin||!origins(env).includes(origin))throw new DomainError("origin_not_allowed",403);
      const value=await body(request);only(value,["group_id","group_revision","name","phone","consent_version","consent","source","turnstile_token"]);
@@ -83,6 +86,7 @@ export function createBookingRouter(deps:RouterDependencies={authorize:authorize
     }
     return json({error:"not_found"},404,c);
    }
+   enabled(env);
    const actor=await deps.authorize(request,env);
    if(MUTATIONS.has(request.method))await requireAdminMutation(request,actor,env);
    if(path==="/api/admin/v1/session"&&request.method==="GET"){

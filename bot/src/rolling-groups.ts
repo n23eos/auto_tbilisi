@@ -82,7 +82,7 @@ export function rollingScheduleConfig(env: RollingScheduleEnv): RollingScheduleC
   if (!env.BOOKING_SECRET || env.BOOKING_SECRET.length < 32) {
     throw new Error("rolling_schedule_secret_missing");
   }
-  const anchorDate = env.ROLLING_SCHEDULE_ANCHOR_DATE ?? "2026-10-05";
+  const anchorDate = env.ROLLING_SCHEDULE_ANCHOR_DATE ?? "2026-10-19";
   const startTime = env.ROLLING_SCHEDULE_START_TIME ?? "19:00";
   const capacityText = env.ROLLING_SCHEDULE_CAPACITY ?? "12";
   const capacity = Number(capacityText);

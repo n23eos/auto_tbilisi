@@ -9,6 +9,7 @@ def payload():
         'schedule_revision': 7,
         'fetched_at': '2026-09-29T12:00:00Z',
         'timezone': 'Asia/Tbilisi',
+        'booking_enabled': True,
         'groups': [{
             'id': 'group-1', 'revision': 2, 'start_date': '2026-10-05',
             'start_time': '19:00', 'date_status': 'planned',
@@ -81,3 +82,12 @@ def test_empty_and_unavailable_have_different_messages():
     empty = validate_snapshot({**payload(), 'groups': []})
     assert 'Дату ближайшей группы уточняем' in render_group(empty)
     assert 'временно недоступно' in render_group({'status': 'unavailable'})
+
+
+def test_available_group_uses_contact_when_online_booking_is_disabled():
+    result = validate_snapshot({**payload(), 'booking_enabled': False})
+    answer = render_group(result)
+    assert '05.10.2026 в 19:00' in answer
+    assert 'запись через администратора' in answer
+    assert '+995 599 98 77 07' in answer
+    assert 'набор закрыт' not in answer

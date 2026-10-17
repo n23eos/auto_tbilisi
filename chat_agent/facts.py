@@ -185,6 +185,7 @@ def render_group(source):
         groups = source.get('groups')
         if not groups:
             return 'Дату ближайшей группы уточняем. ' + CONTACT
+        booking_enabled = source.get('booking_enabled', True)
         parts = []
         for group in groups:
             day = date.fromisoformat(group['start_date']).strftime('%d.%m.%Y')
@@ -193,12 +194,16 @@ def render_group(source):
                 note = 'мест нет'
             elif group['availability'] == 'closed' or not group['enrollment_open']:
                 note = 'набор закрыт'
+            elif not booking_enabled:
+                prefix = 'старт подтвержден' if group['date_status'] == 'confirmed' else 'дата предварительная'
+                note = prefix + ', запись через администратора'
             elif group['date_status'] == 'confirmed':
                 note = 'старт подтвержден, запись открыта'
             else:
                 note = 'дата предварительная, запись открыта'
             parts.append(f'{when} - {note}')
-        return 'Ближайшие группы:\n' + '\n'.join(f'- {part}' for part in parts)
+        answer = 'Ближайшие группы:\n' + '\n'.join(f'- {part}' for part in parts)
+        return answer if booking_enabled else answer + '\n' + CONTACT
     if status not in ('planned', 'confirmed', 'full'):
         return 'Дату ближайшей группы уточняем. ' + CONTACT
     day = date.fromisoformat(source['data']['start_date']).strftime('%d.%m.%Y')

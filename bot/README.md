@@ -372,6 +372,13 @@ production migration сделайте export, а ежедневный зашиф
 `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ACCESS_ALLOWED_EMAILS`, `ADMIN_ORIGIN` и
 проверьте Access, staging D1, inbox/outbox и тестового Telegram bot.
 
+Публичное чтение расписания включается независимо секретом
+`PUBLIC_SCHEDULE_ENABLED=true`. Оно открывает только `GET /api/v1/groups` и
+не включает прием заявок, админку или outbox. Ответ содержит
+`booking_enabled`, чтобы клиенты не путали доступную дату с доступностью
+онлайн-записи. При `BOOKING_ENABLED=true` чтение остается доступным для
+обратной совместимости.
+
 Клиенты получают адреса отдельно от Worker secrets:
 
 - в `index.html` и `voprosy/index.html` у загрузчика `js/main.js` заполнить `data-booking-api` полным
@@ -398,7 +405,7 @@ npx wrangler secret put ROLLING_SCHEDULE_ENABLED
 
 Минутный cron использует тот же `BOOKING_SECRET`, атомарные команды и журнал
 изменений. По умолчанию он поддерживает три будущие предварительные группы от
-якоря `2026-10-05`: каждые 14 дней, в `19:00` Asia/Tbilisi, по 12 мест.
+якоря `2026-10-19`: каждые 14 дней, в `19:00` Asia/Tbilisi, по 12 мест.
 Подтверждение места и старта остается ручным. Перенесенная или отмененная
 календарная позиция сохраняется и автоматически не создается заново.
 
@@ -406,7 +413,7 @@ npx wrangler secret put ROLLING_SCHEDULE_ENABLED
 
 ```bash
 npx wrangler secret put ROLLING_SCHEDULE_ANCHOR_DATE
-# 2026-10-05
+# 2026-10-19
 npx wrangler secret put ROLLING_SCHEDULE_START_TIME
 # 19:00
 npx wrangler secret put ROLLING_SCHEDULE_CAPACITY

@@ -1,4 +1,4 @@
-import {canBookGroup, formatGroupDate, groupStatusText, validateGroupsPayload} from './groups-logic.js?v=1';
+import {canBookGroup, formatGroupDate, groupStatusText, validateGroupsPayload} from './groups-logic.js?v=2';
 
 const CONSENT_VERSION = 'group-booking-v1-2026-09-29';
 const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
@@ -181,7 +181,7 @@ export function mountBookingForm(form, {
       fallbackMessage.textContent = 'Не загрузилась защита от спама. Обновите страницу или свяжитесь со школой напрямую.';
       return;
     }
-    if (!sitekey) {
+    if (snapshot?.booking_enabled === false || !sitekey) {
       fallbackMessage.textContent = 'Онлайн-запись пока не подключена. Напишите нам или позвоните.';
     } else if (state === 'unavailable') {
       fallbackMessage.textContent = 'Расписание временно недоступно. Попробуйте обновить его или свяжитесь со школой.';

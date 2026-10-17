@@ -197,7 +197,11 @@ async function affectedBookingCount(db: D1Database, groupIds: string[]): Promise
   return row?.count ?? 0;
 }
 
-export async function publicGroups(db: D1Database, now = new Date()): Promise<PublicGroupsSnapshot> {
+export async function publicGroups(
+  db: D1Database,
+  now = new Date(),
+  bookingEnabled = false,
+): Promise<PublicGroupsSnapshot> {
   const [stateResult, groupsResult] = await db.batch([
     db.prepare("SELECT revision FROM schedule_state WHERE service_id = ?").bind(THEORY_SERVICE_ID),
     db.prepare(
@@ -216,6 +220,7 @@ export async function publicGroups(db: D1Database, now = new Date()): Promise<Pu
     scheduleRevision: state.revision,
     fetchedAt: timestamp(now),
     timezone: TBILISI_TIMEZONE,
+    bookingEnabled,
     groups: results.map((row) => ({
       id: row.id,
       revision: row.revision,
