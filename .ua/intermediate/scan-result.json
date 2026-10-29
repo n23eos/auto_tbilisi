@@ -1,0 +1,6237 @@
+{
+  "name": "avtoshkola-ge",
+  "description": "Автошкола на русском языке в Тбилиси: статический сайт с тренажёрами билетов ПДД и Telegram-ботом для заявок на Cloudflare Workers с D1. Note: this project has over 100 source files; consider scoping analysis to a subdirectory for faster results.",
+  "languages": [
+    "config",
+    "css",
+    "csv",
+    "html",
+    "javascript",
+    "json",
+    "markdown",
+    "python",
+    "service",
+    "shell",
+    "sql",
+    "toml",
+    "txt",
+    "typescript",
+    "unknown",
+    "webp",
+    "xml",
+    "yaml"
+  ],
+  "frameworks": [
+    "GitHub Actions"
+  ],
+  "files": [
+    {
+      "path": ".agents/skills/speckit-analyze/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 259,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-checklist/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 383,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-clarify/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 291,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-constitution/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 177,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-converge/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 277,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-implement/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 226,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-plan/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 166,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-specify/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 345,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-tasks/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 215,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/speckit-taskstoissues/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 109,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "language": "yaml",
+      "sizeLines": 64,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".hallmark/log.json",
+      "language": "json",
+      "sizeLines": 3,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".plan-audit-fixes.md",
+      "language": "markdown",
+      "sizeLines": 40,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan-bot.md",
+      "language": "markdown",
+      "sizeLines": 1960,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan-chat-harness.md",
+      "language": "markdown",
+      "sizeLines": 89,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan-improve.md",
+      "language": "markdown",
+      "sizeLines": 283,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan-learning.md",
+      "language": "markdown",
+      "sizeLines": 175,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan-llmo.md",
+      "language": "markdown",
+      "sizeLines": 144,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".plan.md",
+      "language": "markdown",
+      "sizeLines": 465,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/init-options.json",
+      "language": "json",
+      "sizeLines": 9,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/integration.json",
+      "language": "json",
+      "sizeLines": 19,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/integrations/codex.manifest.json",
+      "language": "json",
+      "sizeLines": 17,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/integrations/speckit.manifest.json",
+      "language": "json",
+      "sizeLines": 19,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/memory/.constitution-template.json",
+      "language": "json",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/memory/constitution.md",
+      "language": "markdown",
+      "sizeLines": 16,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/scripts/bash/check-prerequisites.sh",
+      "language": "shell",
+      "sizeLines": 243,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/scripts/bash/common.sh",
+      "language": "shell",
+      "sizeLines": 926,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/scripts/bash/create-new-feature.sh",
+      "language": "shell",
+      "sizeLines": 420,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/scripts/bash/resolve-template.sh",
+      "language": "shell",
+      "sizeLines": 57,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/scripts/bash/setup-plan.sh",
+      "language": "shell",
+      "sizeLines": 85,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/scripts/bash/setup-tasks.sh",
+      "language": "shell",
+      "sizeLines": 94,
+      "fileCategory": "script"
+    },
+    {
+      "path": ".specify/templates/checklist-template.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/templates/constitution-template.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/templates/plan-template.md",
+      "language": "markdown",
+      "sizeLines": 113,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/templates/spec-template.md",
+      "language": "markdown",
+      "sizeLines": 131,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/templates/tasks-template.md",
+      "language": "markdown",
+      "sizeLines": 252,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".specify/workflows/speckit/workflow.yml",
+      "language": "yaml",
+      "sizeLines": 74,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".specify/workflows/workflow-registry.json",
+      "language": "json",
+      "sizeLines": 12,
+      "fileCategory": "config"
+    },
+    {
+      "path": "404.html",
+      "language": "html",
+      "sizeLines": 63,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "AGENTS.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "sizeLines": 104,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "CNAME",
+      "language": "unknown",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 168,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/00-o-shkole.md",
+      "language": "markdown",
+      "sizeLines": 58,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/01-obuchenie.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/02-ceny-i-oplata.md",
+      "language": "markdown",
+      "sizeLines": 71,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/03-dokumenty-i-dopusk.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/04-ekzameny.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/05-prava.md",
+      "language": "markdown",
+      "sizeLines": 26,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/06-bystrye-fakty.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/07-pravila-otvetov-bota.md",
+      "language": "markdown",
+      "sizeLines": 57,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/08-iz-audio-shkoly.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/09-fakt-cheking.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/README.md",
+      "language": "markdown",
+      "sizeLines": 74,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/00-o-shkole.txt",
+      "language": "txt",
+      "sizeLines": 52,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/01-obuchenie.txt",
+      "language": "txt",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/02-ceny-i-oplata.txt",
+      "language": "txt",
+      "sizeLines": 58,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/03-dokumenty-i-dopusk.txt",
+      "language": "txt",
+      "sizeLines": 40,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/04-ekzameny.txt",
+      "language": "txt",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/05-prava.txt",
+      "language": "txt",
+      "sizeLines": 22,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/06-bystrye-fakty.txt",
+      "language": "txt",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/07-pravila-otvetov-bota.txt",
+      "language": "txt",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/08-iz-audio-shkoly.txt",
+      "language": "txt",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/09-fakt-cheking.txt",
+      "language": "txt",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/baza-znaniy-polnaya.txt",
+      "language": "txt",
+      "sizeLines": 513,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/ceny.csv",
+      "language": "csv",
+      "sizeLines": 21,
+      "fileCategory": "data"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/faq.csv",
+      "language": "csv",
+      "sizeLines": 301,
+      "fileCategory": "data"
+    },
+    {
+      "path": "baza-znaniy/dlya-bota/КАК-ЗАГРУЗИТЬ.txt",
+      "language": "txt",
+      "sizeLines": 93,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "bilety/ekzamen/index.html",
+      "language": "html",
+      "sizeLines": 202,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/index.html",
+      "language": "html",
+      "sizeLines": 65,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/temy/dorozhnye-znaki/index.html",
+      "language": "html",
+      "sizeLines": 1675,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/temy/ostanovka-stoyanka/index.html",
+      "language": "html",
+      "sizeLines": 395,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/temy/perekrestki/index.html",
+      "language": "html",
+      "sizeLines": 437,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/trenirovka/index.html",
+      "language": "html",
+      "sizeLines": 333,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bilety/voprosy/index.html",
+      "language": "html",
+      "sizeLines": 60,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bot/README.md",
+      "language": "markdown",
+      "sizeLines": 474,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "bot/admin/admin.css",
+      "language": "css",
+      "sizeLines": 1,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bot/admin/admin.js",
+      "language": "javascript",
+      "sizeLines": 56,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/admin/index.html",
+      "language": "html",
+      "sizeLines": 20,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "bot/migrations/0001_init.sql",
+      "language": "sql",
+      "sizeLines": 46,
+      "fileCategory": "data"
+    },
+    {
+      "path": "bot/migrations/0002_leads_status_check.sql",
+      "language": "sql",
+      "sizeLines": 49,
+      "fileCategory": "data"
+    },
+    {
+      "path": "bot/migrations/0003_group_booking.sql",
+      "language": "sql",
+      "sizeLines": 356,
+      "fileCategory": "data"
+    },
+    {
+      "path": "bot/migrations/0004_booking_rate_limits.sql",
+      "language": "sql",
+      "sizeLines": 9,
+      "fileCategory": "data"
+    },
+    {
+      "path": "bot/migrations/0005_rolling_schedule.sql",
+      "language": "sql",
+      "sizeLines": 10,
+      "fileCategory": "data"
+    },
+    {
+      "path": "bot/package.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "bot/scripts/build-kb.mjs",
+      "language": "javascript",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/admin-auth.ts",
+      "language": "typescript",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/alert.ts",
+      "language": "typescript",
+      "sizeLines": 57,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/booking-api.ts",
+      "language": "typescript",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/booking-commands.ts",
+      "language": "typescript",
+      "sizeLines": 226,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/booking-types.ts",
+      "language": "typescript",
+      "sizeLines": 270,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/bookings.ts",
+      "language": "typescript",
+      "sizeLines": 634,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/cleanup.ts",
+      "language": "typescript",
+      "sizeLines": 138,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/conversation.ts",
+      "language": "typescript",
+      "sizeLines": 324,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/escape.ts",
+      "language": "typescript",
+      "sizeLines": 24,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/facts.ts",
+      "language": "typescript",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/generated/kb.ts",
+      "language": "typescript",
+      "sizeLines": 39,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/groups.ts",
+      "language": "typescript",
+      "sizeLines": 683,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/inbox.ts",
+      "language": "typescript",
+      "sizeLines": 301,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/index.ts",
+      "language": "typescript",
+      "sizeLines": 158,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/kb.ts",
+      "language": "typescript",
+      "sizeLines": 209,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/leads.ts",
+      "language": "typescript",
+      "sizeLines": 161,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/outbox.ts",
+      "language": "typescript",
+      "sizeLines": 566,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/rolling-groups.ts",
+      "language": "typescript",
+      "sizeLines": 317,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/router.ts",
+      "language": "typescript",
+      "sizeLines": 877,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/telegram.ts",
+      "language": "typescript",
+      "sizeLines": 158,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/time.ts",
+      "language": "typescript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/src/types.ts",
+      "language": "typescript",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/admin-auth.test.ts",
+      "language": "typescript",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/alert.test.ts",
+      "language": "typescript",
+      "sizeLines": 90,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/apply-migrations.ts",
+      "language": "typescript",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/booking-api.test.ts",
+      "language": "typescript",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/bookings.test.ts",
+      "language": "typescript",
+      "sizeLines": 268,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/cleanup.test.ts",
+      "language": "typescript",
+      "sizeLines": 249,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/conversation.test.ts",
+      "language": "typescript",
+      "sizeLines": 131,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/escape.test.ts",
+      "language": "typescript",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/facts.test.ts",
+      "language": "typescript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/group-fixtures.ts",
+      "language": "typescript",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/groups.test.ts",
+      "language": "typescript",
+      "sizeLines": 151,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/inbox.test.ts",
+      "language": "typescript",
+      "sizeLines": 200,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/kb.test.ts",
+      "language": "typescript",
+      "sizeLines": 121,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/leads.test.ts",
+      "language": "typescript",
+      "sizeLines": 175,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/outbox.test.ts",
+      "language": "typescript",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/rolling-groups.test.ts",
+      "language": "typescript",
+      "sizeLines": 229,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/router.test.ts",
+      "language": "typescript",
+      "sizeLines": 739,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/schema.test.ts",
+      "language": "typescript",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/telegram.test.ts",
+      "language": "typescript",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/time.test.ts",
+      "language": "typescript",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/test/webhook.test.ts",
+      "language": "typescript",
+      "sizeLines": 292,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/tsconfig.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": "bot/vitest.config.ts",
+      "language": "typescript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "bot/wrangler.toml",
+      "language": "toml",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "chat_agent/.env.example",
+      "language": "config",
+      "sizeLines": 6,
+      "fileCategory": "config"
+    },
+    {
+      "path": "chat_agent/README.md",
+      "language": "markdown",
+      "sizeLines": 90,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "chat_agent/__init__.py",
+      "language": "python",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/access.py",
+      "language": "python",
+      "sizeLines": 33,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/cli.py",
+      "language": "python",
+      "sizeLines": 27,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/demo.py",
+      "language": "python",
+      "sizeLines": 28,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/deploy/avtoshkola-chat.service",
+      "language": "service",
+      "sizeLines": 40,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/eval_answers.py",
+      "language": "python",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/facts.py",
+      "language": "python",
+      "sizeLines": 214,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/group_client.py",
+      "language": "python",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/harness.py",
+      "language": "python",
+      "sizeLines": 398,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/http_app.py",
+      "language": "python",
+      "sizeLines": 217,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/knowledge.py",
+      "language": "python",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/provider.py",
+      "language": "python",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/requirements.txt",
+      "language": "txt",
+      "sizeLines": 2,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "chat_agent/seed.py",
+      "language": "python",
+      "sizeLines": 40,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/static/admin.css",
+      "language": "css",
+      "sizeLines": 1,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "chat_agent/static/admin.html",
+      "language": "html",
+      "sizeLines": 25,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "chat_agent/static/admin.js",
+      "language": "javascript",
+      "sizeLines": 12,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_answer_policy.py",
+      "language": "python",
+      "sizeLines": 297,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_eval_answers.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_facts.py",
+      "language": "python",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_group_client.py",
+      "language": "python",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_harness.py",
+      "language": "python",
+      "sizeLines": 396,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_http.py",
+      "language": "python",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_knowledge_quality.py",
+      "language": "python",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/tests/test_seed.py",
+      "language": "python",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "chat_agent/wsgi.py",
+      "language": "python",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "css/about.css",
+      "language": "css",
+      "sizeLines": 23,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/chat.css",
+      "language": "css",
+      "sizeLines": 58,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/course-choice.css",
+      "language": "css",
+      "sizeLines": 57,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/exam.css",
+      "language": "css",
+      "sizeLines": 644,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/groups.css",
+      "language": "css",
+      "sizeLines": 123,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/partner.css",
+      "language": "css",
+      "sizeLines": 48,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/style.css",
+      "language": "css",
+      "sizeLines": 1571,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/tokens.css",
+      "language": "css",
+      "sizeLines": 79,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/topics.css",
+      "language": "css",
+      "sizeLines": 180,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "css/training-start.css",
+      "language": "css",
+      "sizeLines": 119,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "data/eco-ru-1742-1758.json",
+      "language": "json",
+      "sizeLines": 134,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/eco-ru-1759-1775.json",
+      "language": "json",
+      "sizeLines": 133,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/eco-ru-1776-1792.json",
+      "language": "json",
+      "sizeLines": 136,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/ticket-topics.json",
+      "language": "json",
+      "sizeLines": 1157,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tickets-b-ru.json",
+      "language": "json",
+      "sizeLines": 12953,
+      "fileCategory": "config"
+    },
+    {
+      "path": "data/tickets/images/0044c117899348a202c3ef7fc6c5d959.webp",
+      "language": "webp",
+      "sizeLines": 204,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0045d532f5159838b7d8db21ebf88d6e.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/005412fbc4afa1cd5bf3e19a3a82081f.webp",
+      "language": "webp",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/00fe78d21d876aa792fe1a3d0c340562.webp",
+      "language": "webp",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0121a6a9f99c0aff1af904771cbf5e23.webp",
+      "language": "webp",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/01cb7940ccd2a1cbd364a1e3a09c2a5a.webp",
+      "language": "webp",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/01cc317aeb333de7cfbc5924f8c762a0.webp",
+      "language": "webp",
+      "sizeLines": 102,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0305a33b75f70144244cc4af6c45ffec.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0317f0a816cd8a076b7ca8e92c9e4be4.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/03300191ca1de98a4ed0e5871f3d336f.webp",
+      "language": "webp",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0336c820f0b8ed26b447cbff5e1c1423.webp",
+      "language": "webp",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0486c7fd8a2c8fcff7d57c2e0287bd5d.webp",
+      "language": "webp",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/04d4e6b2e4b7385673f5c4c9ada73b42.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/05218b673a37bceeb81319ff81f55b02.webp",
+      "language": "webp",
+      "sizeLines": 238,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/064406dbc1641abcc4467f07d12aa026.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/073889249071781d1e069a74a2266fd8.webp",
+      "language": "webp",
+      "sizeLines": 231,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/07aeda8bc780645c04a627e49f88960b.webp",
+      "language": "webp",
+      "sizeLines": 104,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/07d3661840a7a13cd748f64fb3af113b.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/083dda912abec5e1b7d6dea06732e76e.webp",
+      "language": "webp",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/088b6c2277dc39ad59d0e9acf6a26e65.webp",
+      "language": "webp",
+      "sizeLines": 47,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/090f365112a82b2c8bb07d34cd8af14a.webp",
+      "language": "webp",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/092d1a44d245180c334473238960265c.webp",
+      "language": "webp",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0a471b8dd26de0da2ec1591134d78b9c.webp",
+      "language": "webp",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0acec2b0efa506f7e28281923ab9eaeb.webp",
+      "language": "webp",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0ad3d42a08607cada6b86cdb8b88f466.webp",
+      "language": "webp",
+      "sizeLines": 181,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0ad896f8d6a97091a66b7fa79e9f1810.webp",
+      "language": "webp",
+      "sizeLines": 90,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0b1975f7d633deefada7cc0b0ecfcdbe.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0b5a4e3f0d8846b6936fb2ba75b9dbe5.webp",
+      "language": "webp",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0c09fdddfdefbd03923fde6996f7017c.webp",
+      "language": "webp",
+      "sizeLines": 86,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0c2edfbbc17bfc3aa93efd4d8c821a7c.webp",
+      "language": "webp",
+      "sizeLines": 205,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0c4a1a3395845cf3e9df50650af1227a.webp",
+      "language": "webp",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0c4ab2a9909a8fff70bb5877ffa248c3.webp",
+      "language": "webp",
+      "sizeLines": 261,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0d64895ca54522c606a51b4309b26396.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0ef4f472c3f8af3ab1e677193bd80074.webp",
+      "language": "webp",
+      "sizeLines": 235,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0f824c6f15656125aab1ffd9246204f6.webp",
+      "language": "webp",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0fa9ed8c19b700d213dc20bea1d13f17.webp",
+      "language": "webp",
+      "sizeLines": 238,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0fc54adcc83bce7ecc00880475795466.webp",
+      "language": "webp",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/0fec63faec095cc586877225a395cbfe.webp",
+      "language": "webp",
+      "sizeLines": 266,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1054af36b4f19173c19ea4eb4a4746cd.webp",
+      "language": "webp",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1071b221c23d2b71763d66c8462b6bd2.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/108e31829a5cb07e87361e2f6f29cbb1.webp",
+      "language": "webp",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/113d78da7c2684f4338073e8d4a6456a.webp",
+      "language": "webp",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/116063828e9b734620a55bd4d0eae81d.webp",
+      "language": "webp",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/11e983bd92bfcddf9713a602d13d83d4.webp",
+      "language": "webp",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1250e21c4baee42d9c092bbd5f3b2b80.webp",
+      "language": "webp",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1280059c84b5cf889493d8dbe44f977c.webp",
+      "language": "webp",
+      "sizeLines": 229,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/12e8360b2cb00d9b2ae9351f7e7e0ee6.webp",
+      "language": "webp",
+      "sizeLines": 250,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/131cacd40892f1d27dc27b4ee94ba105.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/133136555e8b0a76f85132b2ac2fabe1.webp",
+      "language": "webp",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1331dc060b7a97688162fff2ee2fe169.webp",
+      "language": "webp",
+      "sizeLines": 53,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/13dd39224a6d2f7ad68c962ec1880bd8.webp",
+      "language": "webp",
+      "sizeLines": 175,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1417b8e74ec5cd1c2a379e782920a7b6.webp",
+      "language": "webp",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/142a59031625df851ed8fec8a7c77ec4.webp",
+      "language": "webp",
+      "sizeLines": 241,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1494d2eaf0d202e32f02c225b0e7a204.webp",
+      "language": "webp",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/15d2f199a79a74100d7c93a9a9a3f5e4.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/15ee5250ad2bf48edc943954d9628447.webp",
+      "language": "webp",
+      "sizeLines": 331,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/167e4ccdb6d68bb50d1a03834ccb0915.webp",
+      "language": "webp",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/172cb4b5ebaba8250b23ede0e2f26746.webp",
+      "language": "webp",
+      "sizeLines": 201,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/18539be947f2c1298118b59670c40741.webp",
+      "language": "webp",
+      "sizeLines": 202,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/191e5b2e3f96387c1411ad9a647769cd.webp",
+      "language": "webp",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/19527981a506b68c4b7896d28cb59d41.webp",
+      "language": "webp",
+      "sizeLines": 51,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1a6712b8419e0f3de66197fff925ba25.webp",
+      "language": "webp",
+      "sizeLines": 149,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1c9c7bb363fa1aaeec5b41dbc5cbcde7.webp",
+      "language": "webp",
+      "sizeLines": 258,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1cb044701b48034e8b7f6150a62b41ef.webp",
+      "language": "webp",
+      "sizeLines": 264,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1cc215658c64fd4205f51122e2fbe2e0.webp",
+      "language": "webp",
+      "sizeLines": 298,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1d2423ca2f874e26194cf0be4f917206.webp",
+      "language": "webp",
+      "sizeLines": 111,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1dac0d962e3eeda99b03f3b1030da499.webp",
+      "language": "webp",
+      "sizeLines": 249,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1e58e45a50e041d784f4e5a8f9e40b2b.webp",
+      "language": "webp",
+      "sizeLines": 353,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1e7b23fe464f2d51dfbc577c5921fc3d.webp",
+      "language": "webp",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1e95525a94783ba48f5d1824d6ad3469.webp",
+      "language": "webp",
+      "sizeLines": 103,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1ee9d28a338a56225dd4a287b4f1074d.webp",
+      "language": "webp",
+      "sizeLines": 114,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1f38a098de916a1a4e604831ab33ac6d.webp",
+      "language": "webp",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/1f567cc13dcb844541c9ce62c386a2bc.webp",
+      "language": "webp",
+      "sizeLines": 389,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2161e3011f3f42c7962089ff665293e4.webp",
+      "language": "webp",
+      "sizeLines": 193,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/22dd8a2f4a9191cb116f3a58672ca351.webp",
+      "language": "webp",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/233c576795268f97201ef177581328be.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/234dfffe6f2ecaf510ba839ea41e6d07.webp",
+      "language": "webp",
+      "sizeLines": 389,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2399fdf6b5cf309811088556d52d153f.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/23a5b6fbc746a000248ed840fedf9ab4.webp",
+      "language": "webp",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2463a0cc3e13b5a495210d9fcd7ba138.webp",
+      "language": "webp",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/246ea8a4f2c82985a6c5319b0655f914.webp",
+      "language": "webp",
+      "sizeLines": 161,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/248849087cdb671683f975a56f582381.webp",
+      "language": "webp",
+      "sizeLines": 81,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/24ce831ab85a5997dcae71ce1d83891e.webp",
+      "language": "webp",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/24e249e97768a07d4c1daa0aad2312c0.webp",
+      "language": "webp",
+      "sizeLines": 198,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/25509f93a4aea1611ad917498d350226.webp",
+      "language": "webp",
+      "sizeLines": 84,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/257f548e1704a907ae5d33c75f3e71f0.webp",
+      "language": "webp",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/25848bd82d96a62ca446fea8272c7c29.webp",
+      "language": "webp",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/25d72ae6d553fbcbb0771869784942cb.webp",
+      "language": "webp",
+      "sizeLines": 161,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/264b249c8dcd71114656999eb4d95592.webp",
+      "language": "webp",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/269bf8ace815aa85dd6c9b1eb234a757.webp",
+      "language": "webp",
+      "sizeLines": 242,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/27b41a24ba75a032cce6fbe2e08c385c.webp",
+      "language": "webp",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/282ddaca19823ed19379d67f5b4b0fff.webp",
+      "language": "webp",
+      "sizeLines": 262,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2854318cbb5e9dc23242a5576e8cf711.webp",
+      "language": "webp",
+      "sizeLines": 84,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/28e975ca756dbce3379def4dee044277.webp",
+      "language": "webp",
+      "sizeLines": 324,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/294bdccb817eafad5b4f458502782d69.webp",
+      "language": "webp",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/29f3507b8f42dd5524ebbeb2afa1652a.webp",
+      "language": "webp",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2d3b62024fd326917b4573c68383de51.webp",
+      "language": "webp",
+      "sizeLines": 177,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2d890a5694f87474d99d5cdf98da52c9.webp",
+      "language": "webp",
+      "sizeLines": 111,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2db98d6ae8cfee2eb0e74e3932cc17a6.webp",
+      "language": "webp",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2dc198701cef86f5a940a9d6512b7368.webp",
+      "language": "webp",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2e6ff4f9e64e8fae74ee0d10796e58ac.webp",
+      "language": "webp",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2ee7be6f3e10931fd737d348131b641c.webp",
+      "language": "webp",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2f049d0ea967f656ca1effb162287e37.webp",
+      "language": "webp",
+      "sizeLines": 61,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2f082e56350285d0323d5d2fe34f453e.webp",
+      "language": "webp",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/2fa400c81c8333206b7169066859bb17.webp",
+      "language": "webp",
+      "sizeLines": 184,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3056c27ce6af46e21045c87cf27b6b5b.webp",
+      "language": "webp",
+      "sizeLines": 40,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/30b160353a85dad8743acd06a4c2549d.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/312547a678df355ebfdd14c218767fea.webp",
+      "language": "webp",
+      "sizeLines": 264,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/31d933759a3e13ae52ea0e2fc7c5b7aa.webp",
+      "language": "webp",
+      "sizeLines": 257,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3213a49188645a75bf1d6f0546f3469e.webp",
+      "language": "webp",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/321f4d57d580aaa58682476e7f2a591d.webp",
+      "language": "webp",
+      "sizeLines": 199,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/32771b5fde4cb3bbbb9e3926f7bc1e39.webp",
+      "language": "webp",
+      "sizeLines": 297,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3295db2f800e83755f54d1886cf54366.webp",
+      "language": "webp",
+      "sizeLines": 225,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/32a266737b74666cdaff299fb11d663f.webp",
+      "language": "webp",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/331232ad8205c217ccfb72b608ae70dc.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/334795513f8a86b49e9352bf4c5493c5.webp",
+      "language": "webp",
+      "sizeLines": 217,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/334bad847fbba599354bbe2ee74232a6.webp",
+      "language": "webp",
+      "sizeLines": 81,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/337f7cf0115b2aa1a6b28d3aa669b869.webp",
+      "language": "webp",
+      "sizeLines": 306,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/354a0b79263e50882150cf577e8468a9.webp",
+      "language": "webp",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/356c122b948f28a592df63c5dee98e6f.webp",
+      "language": "webp",
+      "sizeLines": 179,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/36fb52c5ed6be99ed12722382dc5fbc4.webp",
+      "language": "webp",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/37165e1e488e04bb654c3b789860d6e9.webp",
+      "language": "webp",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/372295438bf5297530969d3e3b0d6299.webp",
+      "language": "webp",
+      "sizeLines": 75,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/38feaeead550c3f20a3af48a4e0b95ce.webp",
+      "language": "webp",
+      "sizeLines": 188,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3901279bfb0b8ba384efab93b45e69c7.webp",
+      "language": "webp",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/39749a3d04d498843b4603661bb1ef70.webp",
+      "language": "webp",
+      "sizeLines": 275,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/39e8433138cfdecd29f390a67db89236.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3a161a6513d96a4e7680f0cfabfff5e0.webp",
+      "language": "webp",
+      "sizeLines": 238,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3a57a44bfe54307fdc2e69ebd5490f1a.webp",
+      "language": "webp",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3a81e4d06fc12730f6d9b773f0aa54a5.webp",
+      "language": "webp",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3b9cb657091b7a23ecd8f024309966b9.webp",
+      "language": "webp",
+      "sizeLines": 129,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3c76f13a72b9b1910d3a5bd4fc805b8a.webp",
+      "language": "webp",
+      "sizeLines": 79,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3cb07c7791ff364838a0fffd676d0820.webp",
+      "language": "webp",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3d3547b9cf89d34451ed9ccef0fe0f1c.webp",
+      "language": "webp",
+      "sizeLines": 242,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3e516ac82f6a3f4618709505fd1a838e.webp",
+      "language": "webp",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3e702ca9189162815f83661b5736c86b.webp",
+      "language": "webp",
+      "sizeLines": 145,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3ec71aec8485052dd5e32a1e20eecc77.webp",
+      "language": "webp",
+      "sizeLines": 212,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3eeafde9ed08770484d0aa3136ca78b9.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3f5eedabc8d64879b5206f817060f244.webp",
+      "language": "webp",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/3fa5203d7218694b70d75ef44bd311c2.webp",
+      "language": "webp",
+      "sizeLines": 290,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/405e9b8e76990e8155f7be9af1b07773.webp",
+      "language": "webp",
+      "sizeLines": 97,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4118754e5fa10113b652c66865fec639.webp",
+      "language": "webp",
+      "sizeLines": 205,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4157fd29ea66594f6e39291955c15cab.webp",
+      "language": "webp",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/41b37cd39eb01874dfd0d892936eea20.webp",
+      "language": "webp",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/41ee2bccedff34cd018fa4e382ab3dd2.webp",
+      "language": "webp",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/42e00f8430d5fef8d59f0350ab60911c.webp",
+      "language": "webp",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/42f937e7e0e78450cb75b69900fdf2f5.webp",
+      "language": "webp",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4332277d211a5c7c43757ff2d3dba967.webp",
+      "language": "webp",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/43b15cae7851c24961f1a750c19533cf.webp",
+      "language": "webp",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4412def1f1006a4a0c8f7e2e7e9968fc.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/44a8070346a18bf27ecb8d9e2c31a89b.webp",
+      "language": "webp",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/457cc1ae46b9d9de3b406f62301336ff.webp",
+      "language": "webp",
+      "sizeLines": 308,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/45defebbb01b82640b03bb83e9243415.webp",
+      "language": "webp",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/465f571bd26a32985a7979a31fe0f145.webp",
+      "language": "webp",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/46a061c5d7a34a7a68df2a3f9a79e182.webp",
+      "language": "webp",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/46fd7b44b23df926af7a0669f5948f36.webp",
+      "language": "webp",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4706e43765f988770829b4628dadba7c.webp",
+      "language": "webp",
+      "sizeLines": 226,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4707a6a4e3cfb08d7c45df731402d416.webp",
+      "language": "webp",
+      "sizeLines": 225,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/47927a3dbcb3d2e8772cb8994a5d6c1e.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/47cebc14b7c9b23f202afdfb650a3a5c.webp",
+      "language": "webp",
+      "sizeLines": 144,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4801306f4afeec48a98a889b23dc2bd4.webp",
+      "language": "webp",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4883fa02d56f0744c3a4a516a998fa83.webp",
+      "language": "webp",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/49cd09c5443e2c5afbf15db574703cdd.webp",
+      "language": "webp",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4a23c8167d89cdc658651a276a88d8dc.webp",
+      "language": "webp",
+      "sizeLines": 199,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4ab74e8b7968224d0a8376b22e29be30.webp",
+      "language": "webp",
+      "sizeLines": 167,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4b41fa5af6c55cf24a09d282f427f777.webp",
+      "language": "webp",
+      "sizeLines": 43,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4bce1a01288eaad07ac759d0ad8b3466.webp",
+      "language": "webp",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4c5f63b19320c0fbc7e52fd5e9b0b216.webp",
+      "language": "webp",
+      "sizeLines": 263,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4ea43fbe99569246c327d5382bbb4339.webp",
+      "language": "webp",
+      "sizeLines": 72,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/4f3807a49c89c40adf8fe86d8391ddbe.webp",
+      "language": "webp",
+      "sizeLines": 325,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/502732040220b5988c374b3b5f4f82e3.webp",
+      "language": "webp",
+      "sizeLines": 132,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/50a557a63f78b3c0038d5c1d781cc655.webp",
+      "language": "webp",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5118321573cde6512fd6a2b53da4a38a.webp",
+      "language": "webp",
+      "sizeLines": 151,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5120b84d74e06d125eb0afc4fef86f6d.webp",
+      "language": "webp",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/52d85c3b37d932df1d8d961efc52e8f4.webp",
+      "language": "webp",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/53a46d17ab6118958214ec68bcd2ff3d.webp",
+      "language": "webp",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/53a71108eea78c567df217174e11b8e1.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/54a384cc941e61877f13abcb6db28826.webp",
+      "language": "webp",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/570ecfddf2886e0c0614cbc069981974.webp",
+      "language": "webp",
+      "sizeLines": 319,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/57a58c8742a5716a64c4a8e66f2ccbd7.webp",
+      "language": "webp",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/57dc50c0b5970b5921382414fbdc51e3.webp",
+      "language": "webp",
+      "sizeLines": 238,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5859480d5f86653f38088d6ce0102684.webp",
+      "language": "webp",
+      "sizeLines": 184,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/586da1545be583568fbe8d798656e64a.webp",
+      "language": "webp",
+      "sizeLines": 159,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/58c1bd7891578a5abda291ca1eff7496.webp",
+      "language": "webp",
+      "sizeLines": 215,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/59817d47816dc33abd6246c776c781eb.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/59e0373425b099277a38ce059d2cd5d9.webp",
+      "language": "webp",
+      "sizeLines": 234,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5a26b9e41a1d29030e3c4be064014a93.webp",
+      "language": "webp",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5b28a3a3e8d7d6da68888cf7453d5bda.webp",
+      "language": "webp",
+      "sizeLines": 164,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5b8f89439ca33ed2e7feaf46d093a5ce.webp",
+      "language": "webp",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5be30372747d6c8161c32d51c7b3cde7.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5c6e08619abea928de545364b9e17381.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5cb00bb75340a9cb4fce47e4e2515e23.webp",
+      "language": "webp",
+      "sizeLines": 235,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5d537ede597004ed4968082ebe81d089.webp",
+      "language": "webp",
+      "sizeLines": 72,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5d6c70b8978330e026d935c84d8a2480.webp",
+      "language": "webp",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5d734bb372cf5a7a5c083c49c0a217ef.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5d75b8df2320db0b7857e57d9a951be0.webp",
+      "language": "webp",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5e515647e2c87d03e55f03a3511b0348.webp",
+      "language": "webp",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5e7c1dc2755182d50cc3ee09ffdf9c99.webp",
+      "language": "webp",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5ea63c32f48b49e1e0eacb913d1081d2.webp",
+      "language": "webp",
+      "sizeLines": 149,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5f08702f09a4a0d32b3d2638edf8df85.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5f1a1e290f286b860f65ba44f1898f25.webp",
+      "language": "webp",
+      "sizeLines": 83,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5f22a8a54c0d1985efb807bfee72c14b.webp",
+      "language": "webp",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5f541596e9c9c3b2508054962fabd9c1.webp",
+      "language": "webp",
+      "sizeLines": 202,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5fa6d84ad367f6f9bd80ed39d7a0babf.webp",
+      "language": "webp",
+      "sizeLines": 94,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5fb685b821e8710fc6d349679d90e14c.webp",
+      "language": "webp",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/5fe5e5e71f3eebb96f804cac7d8651f3.webp",
+      "language": "webp",
+      "sizeLines": 233,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/60fa0a866e6341d89935393b4df60037.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/611046fa56a9be72caf9a6c4b91e2c70.webp",
+      "language": "webp",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/61b976c1cf034e9ed69b7d1e76f62174.webp",
+      "language": "webp",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/62003261effe748bce3c6106c0bf56c7.webp",
+      "language": "webp",
+      "sizeLines": 130,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/634439031cb74304f23b7a35ef98cdd5.webp",
+      "language": "webp",
+      "sizeLines": 72,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/63d8aee2855625c493d0c1a0802e6e2c.webp",
+      "language": "webp",
+      "sizeLines": 91,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/64409250c606748ac85953e47191b279.webp",
+      "language": "webp",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/64a231a10670a19f60a53fd7cc8d838b.webp",
+      "language": "webp",
+      "sizeLines": 329,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6674601e7e22e07e3c711f9a1f54bc3e.webp",
+      "language": "webp",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/66847801ca37e1d2d5f74b4a7ceb46d5.webp",
+      "language": "webp",
+      "sizeLines": 152,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/674e5fc8406a66f20103008bfaebbf1a.webp",
+      "language": "webp",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/67804a985dad2e33ba839a82adbf112d.webp",
+      "language": "webp",
+      "sizeLines": 382,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6847ab3124b90ce3f0edf92d04ffe235.webp",
+      "language": "webp",
+      "sizeLines": 256,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/69072aaa8ec8be9faf8feadebaf7944b.webp",
+      "language": "webp",
+      "sizeLines": 278,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/693e24d2a836bed4e0658f34b7fa14c6.webp",
+      "language": "webp",
+      "sizeLines": 369,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/69b5d71ec61a2a71598979f1487166d2.webp",
+      "language": "webp",
+      "sizeLines": 175,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/69c0c22a4a5ecc6ec1f341081ea1cef3.webp",
+      "language": "webp",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6a18781905494529aac4a432f94e0443.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6a317d781a44b356180391dc7f3c5193.webp",
+      "language": "webp",
+      "sizeLines": 198,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6b2884ef79c61505ce58a2172b4062fc.webp",
+      "language": "webp",
+      "sizeLines": 294,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6b88978ef92622755ed151cf0b089f59.webp",
+      "language": "webp",
+      "sizeLines": 230,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6badd5d8c674639024a817176f3a5f87.webp",
+      "language": "webp",
+      "sizeLines": 79,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6bfd74b3649a8a4d76bbc83633e4680f.webp",
+      "language": "webp",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6c1f75cb1c21aa67ef53b74233eda3e6.webp",
+      "language": "webp",
+      "sizeLines": 114,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6c492a46b366d21a72f3a7b70fc92b4f.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6ce7e17e143a2f2e4f51f516ed5eb7ec.webp",
+      "language": "webp",
+      "sizeLines": 56,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6cf54746857403e7caed949422f912f9.webp",
+      "language": "webp",
+      "sizeLines": 142,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6d0aaa58449983d4ed7161f7817215fc.webp",
+      "language": "webp",
+      "sizeLines": 243,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6d105f180e0e45f4a01788d3ec37a817.webp",
+      "language": "webp",
+      "sizeLines": 133,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6d74e1a36129975840617d32767e88cb.webp",
+      "language": "webp",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6d9b1fd3c78faaef3f782e8f4a283c1a.webp",
+      "language": "webp",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6dddb0f648d4c7373ad19a353a60eaaa.webp",
+      "language": "webp",
+      "sizeLines": 195,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6ef40680855f2cdf6d88a20a1456432f.webp",
+      "language": "webp",
+      "sizeLines": 56,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/6f027dd971f8c7a9689bc5ef78c5aab9.webp",
+      "language": "webp",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/708783337df3a92bb3096daa8bd9a52a.webp",
+      "language": "webp",
+      "sizeLines": 98,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/71b8ccc64dea7b721207bb3d50582e37.webp",
+      "language": "webp",
+      "sizeLines": 259,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/72d8f515408e97c495051140f3978ccd.webp",
+      "language": "webp",
+      "sizeLines": 219,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/745309d597da55e61c43c3ddf74336e9.webp",
+      "language": "webp",
+      "sizeLines": 85,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/74988a5bdfdca0fe129dc7c2ffa2482e.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/74ec754a48eaadc61c087d6dbc562ec5.webp",
+      "language": "webp",
+      "sizeLines": 83,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/74f99397766ea40c09024fd7443c70e1.webp",
+      "language": "webp",
+      "sizeLines": 141,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/74f9aa4d6c770b2b5ec5636245f97d72.webp",
+      "language": "webp",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/76b15a1a64511314be598ab4a307025d.webp",
+      "language": "webp",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/778a6c3e83863334df47d4fd61357124.webp",
+      "language": "webp",
+      "sizeLines": 96,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/77f726bef8f32a5e1290518e29980cc1.webp",
+      "language": "webp",
+      "sizeLines": 142,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/78a27223fbe0708c220cb1f404d26990.webp",
+      "language": "webp",
+      "sizeLines": 137,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/79a9e7d9e19768ba041083dfd273ae63.webp",
+      "language": "webp",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/79c195e8039b58e0e8354ff4008ba34a.webp",
+      "language": "webp",
+      "sizeLines": 98,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7a221746e6c9812b1f5d36557b69f32b.webp",
+      "language": "webp",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7a5696a157dcb418d1777b92d73aaeeb.webp",
+      "language": "webp",
+      "sizeLines": 80,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7aca4aa781a4b60964c2977c499f6571.webp",
+      "language": "webp",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7c5e32aac04d004587d9f6cb49e1dcbb.webp",
+      "language": "webp",
+      "sizeLines": 255,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7d8c36ffc2781903e57613c79a103fa9.webp",
+      "language": "webp",
+      "sizeLines": 91,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7e265624337a9acfec732dba37fe11fb.webp",
+      "language": "webp",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7fc7239e2f736f8201537e08069be427.webp",
+      "language": "webp",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/7fd8bb903310f3e34e0964df0bee87c9.webp",
+      "language": "webp",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/801fd0b9a13cdef97a781fa56e85b9a1.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8179691cf05c807a93c6e6428069166d.webp",
+      "language": "webp",
+      "sizeLines": 338,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/817fdd1baf5be53924fb3fa830261d03.webp",
+      "language": "webp",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/81d55fdc0f163053755fdc365b6a286a.webp",
+      "language": "webp",
+      "sizeLines": 51,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/81f45d82711773d2dff4ec46aceabdc4.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/826de239097abe0c81a0bcc256ba23de.webp",
+      "language": "webp",
+      "sizeLines": 207,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8275c322f5a24b9f5ee3bf7d3db6a509.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8276c0d5610fa0c4e4b3bf5517c1ae02.webp",
+      "language": "webp",
+      "sizeLines": 307,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/82b9ab61d11c94fe8d2977dc2764ec74.webp",
+      "language": "webp",
+      "sizeLines": 158,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/834fab8defa6def8fc3928c8e113f63a.webp",
+      "language": "webp",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/840bc3b2ec591aa2e7fce63264ba92bf.webp",
+      "language": "webp",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8432c64b54146c4df4df153f1bf89cdc.webp",
+      "language": "webp",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/846c4ff80b2386b0891cdf953bdc41c3.webp",
+      "language": "webp",
+      "sizeLines": 264,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/84c940503c4376add21c81b7c097fe29.webp",
+      "language": "webp",
+      "sizeLines": 203,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/856b3a1c4692ab3a01fc4a044627eaf9.webp",
+      "language": "webp",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/85a9633c352f9530d716a12ef5b81efc.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/863de79092d97b3acdc0b16c6a259cdd.webp",
+      "language": "webp",
+      "sizeLines": 104,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/86ca21e5ca1ee7b12e646c93f3886aac.webp",
+      "language": "webp",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/87ed725f1a517bd7573573e117b6ef26.webp",
+      "language": "webp",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/88b06e5d1e6b2e95e2bdc1459d08effd.webp",
+      "language": "webp",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8948bd2903975e845c90b9f45c804508.webp",
+      "language": "webp",
+      "sizeLines": 209,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/897fbc70dfc4c4ab337c83a30fe1c4cc.webp",
+      "language": "webp",
+      "sizeLines": 135,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8a153a9edf37bc758d30a6229e26a831.webp",
+      "language": "webp",
+      "sizeLines": 170,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8a8786618a1e374c5933ceccc79daf5f.webp",
+      "language": "webp",
+      "sizeLines": 205,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8ac9039785686e492077d23aa9adbe6f.webp",
+      "language": "webp",
+      "sizeLines": 97,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8c41ef25113de562c57a098766b9835a.webp",
+      "language": "webp",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8c5113fe03f745d71c037760b1396d0c.webp",
+      "language": "webp",
+      "sizeLines": 129,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8c91007d90a90a6832126350a382a72e.webp",
+      "language": "webp",
+      "sizeLines": 119,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8d034f093e77d70f1928a3d4d4192af1.webp",
+      "language": "webp",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8df59441c680aaaf04f351eab07a1f43.webp",
+      "language": "webp",
+      "sizeLines": 202,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8ee47be53c5ad87705944b807a7451e8.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8f219b3a7ef7533f8316db9b8d7a8237.webp",
+      "language": "webp",
+      "sizeLines": 176,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/8f618bf21ab0e33a5338f92a2fe16564.webp",
+      "language": "webp",
+      "sizeLines": 173,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/915b07493147c8dd5715846dd389f43b.webp",
+      "language": "webp",
+      "sizeLines": 53,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/91d9154a48f1c70af4b57aa2c5a9bae4.webp",
+      "language": "webp",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/920d1c0ba0bc03880ed773e6e6d73e6f.webp",
+      "language": "webp",
+      "sizeLines": 56,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/93028c9319f87dbe7f330f3c93718cc0.webp",
+      "language": "webp",
+      "sizeLines": 330,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/93632cd0aea3a59f0bfe6aa39f3d5b8f.webp",
+      "language": "webp",
+      "sizeLines": 37,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/93804cdae7275d0fa0591b65d7928078.webp",
+      "language": "webp",
+      "sizeLines": 153,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/941e0cfc8c88a7916b2a58f48f1e264f.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9485d48ccce657d345dbd1ae957ecd1d.webp",
+      "language": "webp",
+      "sizeLines": 168,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/948c27853de87c681b84a770ba2ea884.webp",
+      "language": "webp",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/94c1b6e6fa5875359893fe3dce800ec5.webp",
+      "language": "webp",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/94cb89456cef046972bbc00110328176.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/95351e994678c1a75416e14cab4c9f75.webp",
+      "language": "webp",
+      "sizeLines": 319,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/957702fd8f48d8787697def11e908845.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/96a94ae2777014f501fc40877cd6170a.webp",
+      "language": "webp",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/96e3b44e8e38df0eb770174212ea6045.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/970700a86f0ea7fe49ed8c1b49bfccd4.webp",
+      "language": "webp",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/972cea6df002fc2eda7c2a13117d67a9.webp",
+      "language": "webp",
+      "sizeLines": 175,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/97b35143c5148fee7ebe09e3c3980979.webp",
+      "language": "webp",
+      "sizeLines": 59,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/98e7cb8a76ae50f756b17d6b254fb83e.webp",
+      "language": "webp",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9917ac0c258a7727c50004e78a99ea54.webp",
+      "language": "webp",
+      "sizeLines": 257,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/992f6e16b949441afad7408a4e2fb0d9.webp",
+      "language": "webp",
+      "sizeLines": 181,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/997c21b93d60b3212b9d0269deaa0c3d.webp",
+      "language": "webp",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/99f13668c2223dc0144ea948fb4494e7.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9a1e009e7ef6e3da9369223b546f1730.webp",
+      "language": "webp",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9a349b0942d52b2a2c53971ae5b78231.webp",
+      "language": "webp",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9a77f1a8007fe07b7bcb69c242f9453a.webp",
+      "language": "webp",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9bc840eb8c9ce40f313edc1d009f2503.webp",
+      "language": "webp",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9c0acbea87795c6d4b712c62bd04f4b7.webp",
+      "language": "webp",
+      "sizeLines": 176,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9c9be8b9cefc6398b077d5bed2df4079.webp",
+      "language": "webp",
+      "sizeLines": 220,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9cb58ed6d9ac9f16f6a4aa9a65a974ed.webp",
+      "language": "webp",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9ed708bcd2a8e4ffb6f7aa2b1da4bf43.webp",
+      "language": "webp",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9f3298cfb07b5e5c5ce3aa685d42fe25.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9fa4d0b64507c0d0ac12626ce18aee69.webp",
+      "language": "webp",
+      "sizeLines": 149,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/9fc0e80ff77372c3a68d4112de134466.webp",
+      "language": "webp",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a0c0104d34d233c1dc6e5bad07e4b3d6.webp",
+      "language": "webp",
+      "sizeLines": 214,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a17e52233cefa6214a1d8a57f1e5be47.webp",
+      "language": "webp",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a276b374bc897fc314988119fdd28ce7.webp",
+      "language": "webp",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a2b30166979141a5b0bd88d8f2224e75.webp",
+      "language": "webp",
+      "sizeLines": 201,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a3009e7f87fbef70ddf727811abbe441.webp",
+      "language": "webp",
+      "sizeLines": 57,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a3549857eabcc2e7efb2d1884f7e3b33.webp",
+      "language": "webp",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a497e154681061efc382c4a54572b5ec.webp",
+      "language": "webp",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a49d4f27cdd5b8881cc394bee274205b.webp",
+      "language": "webp",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a52e16dc846b2503b1f2bdb8ea81bfd4.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a53fcc7787d1385bdaebdfa58ca88251.webp",
+      "language": "webp",
+      "sizeLines": 157,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a551e42739d9728ac40bdc914c47b857.webp",
+      "language": "webp",
+      "sizeLines": 426,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a573c9e7ea2890fec2b2b2c8c7c62da1.webp",
+      "language": "webp",
+      "sizeLines": 59,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a5cd6662e140d1a28caec1866c561751.webp",
+      "language": "webp",
+      "sizeLines": 178,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a5e5f8f41cec989ceb34c4c6667dc209.webp",
+      "language": "webp",
+      "sizeLines": 259,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a6425abfb4509eec30ba3dc507517864.webp",
+      "language": "webp",
+      "sizeLines": 205,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a66ee730b3a7415278f677d629edcc7a.webp",
+      "language": "webp",
+      "sizeLines": 231,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a69aab2cd6b90038960978e6a001b388.webp",
+      "language": "webp",
+      "sizeLines": 264,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a6c532e6522f7327d5aef879615e00ed.webp",
+      "language": "webp",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a73a45d4eb4510d7b7e184d452d68875.webp",
+      "language": "webp",
+      "sizeLines": 217,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a73fc8b77e5ef6db49f9edb62b7200a1.webp",
+      "language": "webp",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a7501472ae5c79661bbb644750e0828c.webp",
+      "language": "webp",
+      "sizeLines": 207,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a815525427cc805f141501623e96f242.webp",
+      "language": "webp",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a82c6bbf32559f5aa9ea4412cec6f820.webp",
+      "language": "webp",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a843be2e4ab0cd101f02ea7484dde880.webp",
+      "language": "webp",
+      "sizeLines": 288,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a84a572ef05fe203eba63c29b512c56a.webp",
+      "language": "webp",
+      "sizeLines": 103,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a854d0e3eeb61975bff905933ea8d4a2.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a901a6df4efe1f0194956b18590bb438.webp",
+      "language": "webp",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a90ac50aad4ce8f7773826aa21c5154c.webp",
+      "language": "webp",
+      "sizeLines": 225,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a92009b687252fda88ba245f8079af36.webp",
+      "language": "webp",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/a965330003625428f32684c0f8d16ce1.webp",
+      "language": "webp",
+      "sizeLines": 124,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ab09a818b4a1da3462b479d68d67d82e.webp",
+      "language": "webp",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/abd6a7d028b30d7b5369f7545d943821.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/abfdbab322268654603c6c188699d3a5.webp",
+      "language": "webp",
+      "sizeLines": 161,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/acb0d69d171c14b9b0fb07001d735dc7.webp",
+      "language": "webp",
+      "sizeLines": 273,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ad06160d8fa36463f1f3646edc751608.webp",
+      "language": "webp",
+      "sizeLines": 61,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ad7e8bbe7d82b0c55d7aa55dbaea21e8.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ada6530c6d442d10c457e6adb6610857.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ae308e46e30f7986118f1a9888dd1c51.webp",
+      "language": "webp",
+      "sizeLines": 219,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ae40558159556ea34892a5cba3290a8d.webp",
+      "language": "webp",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/afea0a6337230eae76b7a8316e6d50d5.webp",
+      "language": "webp",
+      "sizeLines": 222,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b03e468e4d53912276ef9ae575b747a1.webp",
+      "language": "webp",
+      "sizeLines": 124,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b062e295f859ab0c5db9a13d67392ac8.webp",
+      "language": "webp",
+      "sizeLines": 224,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b11d8c99953cdb01f390ea4c8e78c80e.webp",
+      "language": "webp",
+      "sizeLines": 291,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b2562dbb9a1bd25008703ef27dfca29f.webp",
+      "language": "webp",
+      "sizeLines": 226,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b288f5e262250f34f36be062a772b8e5.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b44e43f69122c803b039a3dd3b5bb90b.webp",
+      "language": "webp",
+      "sizeLines": 108,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b473de0e186e7f8ba55b4280150f8ecc.webp",
+      "language": "webp",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b4c550da979791e37bb9c2f1aea84e0e.webp",
+      "language": "webp",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b59edf3a9a51149602816f106801cc3d.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b5e21cb097753091ce789cf2328e4b32.webp",
+      "language": "webp",
+      "sizeLines": 124,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b64896f0b095b1dd40b2d4926495614b.webp",
+      "language": "webp",
+      "sizeLines": 193,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b652b1fc736ea4aa0f8110ee44733b1f.webp",
+      "language": "webp",
+      "sizeLines": 145,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b6ec3d39c1d402e9a51966ac735c2da6.webp",
+      "language": "webp",
+      "sizeLines": 64,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b70caa94cf5e8bc7379cfac868d0b004.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b72089d025bd203dcb4a2b9ca161af4d.webp",
+      "language": "webp",
+      "sizeLines": 185,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b7567041eab43f56eacfd0c11e8e0dc9.webp",
+      "language": "webp",
+      "sizeLines": 207,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b89eaaeced09a1f551959900e08101ba.webp",
+      "language": "webp",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b8da133f8754727fd7a9d38b18f19319.webp",
+      "language": "webp",
+      "sizeLines": 272,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/b996a6dae6014e677c3aef67089c62b6.webp",
+      "language": "webp",
+      "sizeLines": 98,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ba09fe661c64e49788f59499e73bad56.webp",
+      "language": "webp",
+      "sizeLines": 142,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bc2a6686a980b449ad203b26854bc2e7.webp",
+      "language": "webp",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bcda1ba802061116f9b906225772235b.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bcea1964411fe28a7e7c0d42a0aa79a9.webp",
+      "language": "webp",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bd05dced43b932312735857d7337dd14.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bd48cd22335f257fb53856be248b7144.webp",
+      "language": "webp",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bd50517f07fe7d9c94001727eb5693ca.webp",
+      "language": "webp",
+      "sizeLines": 255,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bd51e545be6264c00ea4341e22f75fc2.webp",
+      "language": "webp",
+      "sizeLines": 133,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bd7c8effc70a8fe82e893c3ac634d91c.webp",
+      "language": "webp",
+      "sizeLines": 241,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bda671f2c48193e8bd88668d28cedba1.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bdd62e2ed1636a77257a1693c677ca4b.webp",
+      "language": "webp",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/be0f4d97f22edf1ae64fd94899715bf8.webp",
+      "language": "webp",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bf84a24dab861f0c98e5a73b3f0610d2.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/bfb35055b7803d9a58d5f3c4125ce87d.webp",
+      "language": "webp",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c071f021a8e940d358c3db22de1fd34d.webp",
+      "language": "webp",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c2c189778c213cdccbf3fcca103081c0.webp",
+      "language": "webp",
+      "sizeLines": 153,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c2d103ea6e0b12ea0529b5097ed9e714.webp",
+      "language": "webp",
+      "sizeLines": 180,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c30382bfe9ad32dc32b02b481dcb965f.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c4bb66cea650d9ddeaf413c8ee3c2d6e.webp",
+      "language": "webp",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c4bbd21f0d172457209a67fbd3430ad8.webp",
+      "language": "webp",
+      "sizeLines": 206,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c4ff0e791ebf698d113efc7f424b04a2.webp",
+      "language": "webp",
+      "sizeLines": 287,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c673f95351dca30eb05681f5077cfa53.webp",
+      "language": "webp",
+      "sizeLines": 210,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c6b5d807dcf42a963da6523ff2816981.webp",
+      "language": "webp",
+      "sizeLines": 168,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c7d649444945c428efe993ec5cfc2b10.webp",
+      "language": "webp",
+      "sizeLines": 261,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c7daad6ec169b4bb4944935614537b7f.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c8340497b00196738ad7c020b5a3870f.webp",
+      "language": "webp",
+      "sizeLines": 85,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c84199ab357f857fadc18f2c736f5030.webp",
+      "language": "webp",
+      "sizeLines": 79,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c898dfdd53b152e290759bd2d3750048.webp",
+      "language": "webp",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c8f9926b38fc92a58012521155e789a7.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c960f409282e0b2d589ef79e31cb6204.webp",
+      "language": "webp",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c96230403b794805316ec101c10c7bc1.webp",
+      "language": "webp",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c964740880f428feb5734e0b15e7c430.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c96a22ae3908cafe6db866a5b09eeaa9.webp",
+      "language": "webp",
+      "sizeLines": 144,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/c9ffb9d6192fb93cfe2ac87ea791f52a.webp",
+      "language": "webp",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ca9047675ad7163762ecc6d4c2d689dc.webp",
+      "language": "webp",
+      "sizeLines": 130,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cadb2415ef90bec7d74b5d92f722e3cd.webp",
+      "language": "webp",
+      "sizeLines": 170,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cc0eb7bbd9004eeba37fdc66c4dcb2c3.webp",
+      "language": "webp",
+      "sizeLines": 63,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cd9ab8d405daa1ca0d431a581d65b11a.webp",
+      "language": "webp",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ce1122bb8f7252667a3bf51162387249.webp",
+      "language": "webp",
+      "sizeLines": 318,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ceb132f66a1994f4dece641a54a6e5b0.webp",
+      "language": "webp",
+      "sizeLines": 86,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cf523bb9c0a786867f3b13211e8b938e.webp",
+      "language": "webp",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cf8cd8c04e50066de93946e2bac309fd.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/cff2be81e46665bb2fb0c9d1eea35e76.webp",
+      "language": "webp",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d03b1dc90764bddfd38e1d82bcb49cc9.webp",
+      "language": "webp",
+      "sizeLines": 170,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d0513af67bf1644ce66c3f4ef6fbb47e.webp",
+      "language": "webp",
+      "sizeLines": 201,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d09e0997ef6cdba358f51f083e706aff.webp",
+      "language": "webp",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d1d327fc6eae302be11251328f5b6cc3.webp",
+      "language": "webp",
+      "sizeLines": 283,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d1e05a4c39d3098ce00863bba07e10d0.webp",
+      "language": "webp",
+      "sizeLines": 144,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d1ff7d510de1e75e8caf3a4eacb3ee3d.webp",
+      "language": "webp",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d238c2fec0423d1b5a943caac514741b.webp",
+      "language": "webp",
+      "sizeLines": 46,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d2419ab6f0cecbe07a69a50f9a27b5a9.webp",
+      "language": "webp",
+      "sizeLines": 84,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d3223d216e21bf9e4b1d1121a985bfa8.webp",
+      "language": "webp",
+      "sizeLines": 214,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d4f1011e3e0f3e3304ce0b60ed8a7bae.webp",
+      "language": "webp",
+      "sizeLines": 375,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d6655adec1787d3a0ad8b67b4829c0a9.webp",
+      "language": "webp",
+      "sizeLines": 177,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d753a0470476db0fe8858a5206a6a3f6.webp",
+      "language": "webp",
+      "sizeLines": 230,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d7e0bafd00f969cb04387165930e60ac.webp",
+      "language": "webp",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d7e18efabd31042faa46c582e396146a.webp",
+      "language": "webp",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d80ba580d14b58905e5ee3f02025d673.webp",
+      "language": "webp",
+      "sizeLines": 171,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d80eee983d5c5a7001a418ef4c673dba.webp",
+      "language": "webp",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d827adf3bce00215ed0c23c32e08724d.webp",
+      "language": "webp",
+      "sizeLines": 57,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d832a2846110cb682d5895f9360d0d72.webp",
+      "language": "webp",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d8537bf67dc5d656ecb8a19e31a9264f.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d8d1bfefdb930a9ddf7d31542775bf5b.webp",
+      "language": "webp",
+      "sizeLines": 229,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/d9368e5c26e97cee22447dd902f47a40.webp",
+      "language": "webp",
+      "sizeLines": 104,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/db8cdaea0be1965469c4fa4fb13960a7.webp",
+      "language": "webp",
+      "sizeLines": 354,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/dbb2dd3dfcd02f216b0fafc6dbd88a56.webp",
+      "language": "webp",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/dbc746d46e04397d56058a341b2830bb.webp",
+      "language": "webp",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/dd4a8db4ffd788247f41b8831c1caf78.webp",
+      "language": "webp",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ddf225177abe90d6f86dcbf545656978.webp",
+      "language": "webp",
+      "sizeLines": 188,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/df9c1a0ea55c9c55e583307d3f476d90.webp",
+      "language": "webp",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/dfb7c51062825662cd354ca76e15b6f7.webp",
+      "language": "webp",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e0083bd50a0d10517c0911a6884feeb5.webp",
+      "language": "webp",
+      "sizeLines": 268,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e0ecc4eefd35c67fe3c447a8396726d4.webp",
+      "language": "webp",
+      "sizeLines": 186,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e1411ea309b78bd4ca96f6595efdfc8f.webp",
+      "language": "webp",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e2378dfc128f5aad2e3286c57cb92931.webp",
+      "language": "webp",
+      "sizeLines": 203,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e27def79e322a71e0a0174eb7cf69908.webp",
+      "language": "webp",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e2b3b3aac8397306a0f64aa7727ca959.webp",
+      "language": "webp",
+      "sizeLines": 215,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e38c4aebb924fc1f91a37995332d85d4.webp",
+      "language": "webp",
+      "sizeLines": 139,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e49c7f81122131c80a062d8ed03f7117.webp",
+      "language": "webp",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e5d7431eda8c9fd87d949a4764350777.webp",
+      "language": "webp",
+      "sizeLines": 188,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e5d93603489e10332039fd9e0f630ec4.webp",
+      "language": "webp",
+      "sizeLines": 186,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e631c390253c9780665578de3766fdb9.webp",
+      "language": "webp",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e6bede6db418750862e935841d3c2395.webp",
+      "language": "webp",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e89f36a8781d2939ff62e8edcf4be2da.webp",
+      "language": "webp",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/e9b555c1d750ba095dfbbf3178ac5260.webp",
+      "language": "webp",
+      "sizeLines": 294,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ea290aa22e6f34919e9f14630eff8a51.webp",
+      "language": "webp",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ea7d3e519f8b9e288f7055cf149e4639.webp",
+      "language": "webp",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ea9afd270042f01f597ec8c978e79f2f.webp",
+      "language": "webp",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/eac6b507c3bb612b42221c183267cc9a.webp",
+      "language": "webp",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/eb647cae3fe57dd43b5a0dc309dbeac5.webp",
+      "language": "webp",
+      "sizeLines": 277,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/eb734499318cf458170f43d40101ddbe.webp",
+      "language": "webp",
+      "sizeLines": 142,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/eb843c53a7c180628ff7ec80979d5d24.webp",
+      "language": "webp",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/eca75c729eee0f344e95577419e6d8b1.webp",
+      "language": "webp",
+      "sizeLines": 100,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ed25ddd1db39de380378579a796fa139.webp",
+      "language": "webp",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ed3642b99b92f9c4ae3806585cbda29a.webp",
+      "language": "webp",
+      "sizeLines": 184,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ed71cfedcadada1ee52af81fe5e283bc.webp",
+      "language": "webp",
+      "sizeLines": 85,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ed7e8f294c39a93ce0c765e157a6e08f.webp",
+      "language": "webp",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ee10b91a2eae31aeedd8aaa422c9f9f4.webp",
+      "language": "webp",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ee2f6df263ce36c598038d86177e7f98.webp",
+      "language": "webp",
+      "sizeLines": 43,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ee4b0dcfa638ca4260fe65d54c77c019.webp",
+      "language": "webp",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/ef1355099ee026e22a33b821328407df.webp",
+      "language": "webp",
+      "sizeLines": 63,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f09668e21eb3919526ab4c38db89bc03.webp",
+      "language": "webp",
+      "sizeLines": 90,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f10a6583fa38e6f133452f6e9e295099.webp",
+      "language": "webp",
+      "sizeLines": 224,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f11750afe6d907e084bb0a9c9eaa8d78.webp",
+      "language": "webp",
+      "sizeLines": 203,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f117a6ef03e0ce2d6fb5d85d9ef347f7.webp",
+      "language": "webp",
+      "sizeLines": 283,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f1dc0deecff0fbf81b92f6c28be10c80.webp",
+      "language": "webp",
+      "sizeLines": 192,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f1e76e531015dc34aa312da750ae4b22.webp",
+      "language": "webp",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f21053634b3226874c8e977c1a831c95.webp",
+      "language": "webp",
+      "sizeLines": 96,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f236c622875f9123c1797f2043852328.webp",
+      "language": "webp",
+      "sizeLines": 272,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f24b95a352dc25441ea2b32cb823623b.webp",
+      "language": "webp",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f2753619c81e92cd98fe5ad95850be28.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f28a8eacd01283e3626b2f5718a62fcd.webp",
+      "language": "webp",
+      "sizeLines": 184,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f2959021ac0d0944df65720addda5225.webp",
+      "language": "webp",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f409077d8b399508d519da6b06096887.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f5290c9d2e5d319aafa5d84f8198d14b.webp",
+      "language": "webp",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f5d6d94400738d1a5ad707628846950c.webp",
+      "language": "webp",
+      "sizeLines": 91,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f5dd3e57ed7a97395c3fd33d7da8490e.webp",
+      "language": "webp",
+      "sizeLines": 215,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f64456ee63938ad7dd7246b6e6da90a5.webp",
+      "language": "webp",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f69ac7221f14c18d1e4c8d93117559c6.webp",
+      "language": "webp",
+      "sizeLines": 80,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f6a6101caf25f69bd0addf36273be912.webp",
+      "language": "webp",
+      "sizeLines": 167,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f7955aa4c77926c747c88ce21a7939e3.webp",
+      "language": "webp",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f833c912c045d9206f4e1635a14c2897.webp",
+      "language": "webp",
+      "sizeLines": 237,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f96b91b60fdd8a77c2b1195d59ba197b.webp",
+      "language": "webp",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f98e478a0ffa666d72158dda1be32089.webp",
+      "language": "webp",
+      "sizeLines": 129,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/f9fef95fb5b76045e5716626cbdb8de4.webp",
+      "language": "webp",
+      "sizeLines": 84,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fa66967e41c52799fae243596cbbe8bf.webp",
+      "language": "webp",
+      "sizeLines": 81,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/faf72d13e5560338451fb3430b61cec2.webp",
+      "language": "webp",
+      "sizeLines": 154,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fb08b995127936ac9c9f0a22da92959c.webp",
+      "language": "webp",
+      "sizeLines": 200,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fbc44eafe2e7a275ed97c26ddde198b7.webp",
+      "language": "webp",
+      "sizeLines": 200,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fc2e656d58eaaa122f8a6c3055afd31a.webp",
+      "language": "webp",
+      "sizeLines": 335,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fc76fb65f633eb70fa4c32d8b9f29112.webp",
+      "language": "webp",
+      "sizeLines": 220,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fc7cda05753ce6557e58558943302dc7.webp",
+      "language": "webp",
+      "sizeLines": 83,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fd88f575426a4dee9532fadc52cfda23.webp",
+      "language": "webp",
+      "sizeLines": 262,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fde8fa81ceb1f65f7ac11705c14d691c.webp",
+      "language": "webp",
+      "sizeLines": 211,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fe42c6f7c34a9cc4cee41a71954dffd9.webp",
+      "language": "webp",
+      "sizeLines": 265,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/tickets/images/fe8fa06785b686a3f1a79cb522cf053f.webp",
+      "language": "webp",
+      "sizeLines": 281,
+      "fileCategory": "code"
+    },
+    {
+      "path": "data/withdrawn-tickets.json",
+      "language": "json",
+      "sizeLines": 174,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/agent-guide.md",
+      "language": "markdown",
+      "sizeLines": 193,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/chat-answer-quality-2026-09-14.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/marketing/holafly-facebook.md",
+      "language": "markdown",
+      "sizeLines": 27,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/exam-booking-2026-09-28.md",
+      "language": "markdown",
+      "sizeLines": 224,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/exam-booking-source-check-2026-09-28.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/research/partner-banner-prompts-2026-09-29.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-26-pdd-tickets-parser.md",
+      "language": "markdown",
+      "sizeLines": 1491,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-27-exam-trainer.md",
+      "language": "markdown",
+      "sizeLines": 1303,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-27-tickets-audit.md",
+      "language": "markdown",
+      "sizeLines": 194,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-27-training-mode.md",
+      "language": "markdown",
+      "sizeLines": 715,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-27-withdrawn-tickets.md",
+      "language": "markdown",
+      "sizeLines": 171,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-26-pdd-tickets-db-design.md",
+      "language": "markdown",
+      "sizeLines": 230,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-27-exam-trainer-design.md",
+      "language": "markdown",
+      "sizeLines": 149,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-27-training-mode-design.md",
+      "language": "markdown",
+      "sizeLines": 87,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-31-telegram-bot-design.md",
+      "language": "markdown",
+      "sizeLines": 206,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-13-site-trust-and-consent-design.md",
+      "language": "markdown",
+      "sizeLines": 150,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/tickets-known-issues.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/visual-refresh.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "images/chat-robot-132.webp",
+      "language": "webp",
+      "sizeLines": 12,
+      "fileCategory": "code"
+    },
+    {
+      "path": "index.html",
+      "language": "html",
+      "sizeLines": 930,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "js/affiliate-analytics.js",
+      "language": "javascript",
+      "sizeLines": 75,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/analytics.js",
+      "language": "javascript",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/answer-marking.js",
+      "language": "javascript",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/booking-form.js",
+      "language": "javascript",
+      "sizeLines": 410,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/chat-api.js",
+      "language": "javascript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/chat-logic.js",
+      "language": "javascript",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/chat.js",
+      "language": "javascript",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/course-budget-logic.js",
+      "language": "javascript",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/course-budget.js",
+      "language": "javascript",
+      "sizeLines": 65,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/exam-logic.js",
+      "language": "javascript",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/exam.js",
+      "language": "javascript",
+      "sizeLines": 405,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/groups-logic.js",
+      "language": "javascript",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/groups.js",
+      "language": "javascript",
+      "sizeLines": 103,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/learning-next-step.js",
+      "language": "javascript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/main.js",
+      "language": "javascript",
+      "sizeLines": 389,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/affiliate-analytics.test.js",
+      "language": "javascript",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/asset-versions.test.js",
+      "language": "javascript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/booking-form.test.js",
+      "language": "javascript",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/chat-api.test.js",
+      "language": "javascript",
+      "sizeLines": 62,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/chat-logic.test.js",
+      "language": "javascript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/course-budget.test.js",
+      "language": "javascript",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/exam-logic.test.js",
+      "language": "javascript",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/groups.test.js",
+      "language": "javascript",
+      "sizeLines": 65,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/learning-next-step.test.js",
+      "language": "javascript",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/ticket-bank.test.js",
+      "language": "javascript",
+      "sizeLines": 35,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/ticket-catalog.test.js",
+      "language": "javascript",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/ticket-grid.test.js",
+      "language": "javascript",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/training-logic.test.js",
+      "language": "javascript",
+      "sizeLines": 377,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/tests/training-session.test.js",
+      "language": "javascript",
+      "sizeLines": 151,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/ticket-bank.js",
+      "language": "javascript",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/ticket-catalog-logic.js",
+      "language": "javascript",
+      "sizeLines": 31,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/ticket-catalog.js",
+      "language": "javascript",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/training-logic.js",
+      "language": "javascript",
+      "sizeLines": 290,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/training-session.js",
+      "language": "javascript",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "js/training.js",
+      "language": "javascript",
+      "sizeLines": 872,
+      "fileCategory": "code"
+    },
+    {
+      "path": "llms-full.txt",
+      "language": "txt",
+      "sizeLines": 180,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "llms.txt",
+      "language": "txt",
+      "sizeLines": 82,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "media/partners/holafly-esim-v1.webp",
+      "language": "webp",
+      "sizeLines": 327,
+      "fileCategory": "code"
+    },
+    {
+      "path": "media/partners/omio-rail-v1.webp",
+      "language": "webp",
+      "sizeLines": 477,
+      "fileCategory": "code"
+    },
+    {
+      "path": "media/partners/trip-travel-v1.webp",
+      "language": "webp",
+      "sizeLines": 452,
+      "fileCategory": "code"
+    },
+    {
+      "path": "media/tbilisi-wide-900.webp",
+      "language": "webp",
+      "sizeLines": 314,
+      "fileCategory": "code"
+    },
+    {
+      "path": "media/tbilisi-wide.webp",
+      "language": "webp",
+      "sizeLines": 1318,
+      "fileCategory": "code"
+    },
+    {
+      "path": "package.json",
+      "language": "json",
+      "sizeLines": 12,
+      "fileCategory": "config"
+    },
+    {
+      "path": "playwright.config.js",
+      "language": "javascript",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "privacy/index.html",
+      "language": "html",
+      "sizeLines": 63,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "robots.txt",
+      "language": "txt",
+      "sizeLines": 31,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "sitemap.xml",
+      "language": "xml",
+      "sizeLines": 42,
+      "fileCategory": "config"
+    },
+    {
+      "path": "specs/001-deepseek-chat/admin-access-policy.json",
+      "language": "json",
+      "sizeLines": 11,
+      "fileCategory": "config"
+    },
+    {
+      "path": "specs/001-deepseek-chat/admin-access.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/001-deepseek-chat/data-model.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/001-deepseek-chat/hosting.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/001-deepseek-chat/plan.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/001-deepseek-chat/spec.md",
+      "language": "markdown",
+      "sizeLines": 99,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/001-deepseek-chat/tasks.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/002-ticket-learning/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/002-ticket-learning/plan.md",
+      "language": "markdown",
+      "sizeLines": 13,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/002-ticket-learning/spec.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/002-ticket-learning/tasks.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/003-holafly-partner/plan.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/003-holafly-partner/spec.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/003-holafly-partner/tasks.md",
+      "language": "markdown",
+      "sizeLines": 8,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/004-learning-missions/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 14,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/004-learning-missions/plan.md",
+      "language": "markdown",
+      "sizeLines": 18,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/004-learning-missions/spec.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/004-learning-missions/tasks.md",
+      "language": "markdown",
+      "sizeLines": 7,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/005-ticket-navigation/plan.md",
+      "language": "markdown",
+      "sizeLines": 5,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/005-ticket-navigation/spec.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/005-ticket-navigation/tasks.md",
+      "language": "markdown",
+      "sizeLines": 7,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/006-topic-pages-resume/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 14,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/006-topic-pages-resume/plan.md",
+      "language": "markdown",
+      "sizeLines": 9,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/006-topic-pages-resume/spec.md",
+      "language": "markdown",
+      "sizeLines": 65,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/006-topic-pages-resume/tasks.md",
+      "language": "markdown",
+      "sizeLines": 8,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/007-frontend-polish/plan.md",
+      "language": "markdown",
+      "sizeLines": 23,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/007-frontend-polish/spec.md",
+      "language": "markdown",
+      "sizeLines": 15,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/007-frontend-polish/tasks.md",
+      "language": "markdown",
+      "sizeLines": 8,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/008-ui-polish/plan.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/008-ui-polish/spec.md",
+      "language": "markdown",
+      "sizeLines": 23,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/008-ui-polish/tasks.md",
+      "language": "markdown",
+      "sizeLines": 12,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/009-partner-offers/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 9,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/009-partner-offers/plan.md",
+      "language": "markdown",
+      "sizeLines": 29,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/009-partner-offers/spec.md",
+      "language": "markdown",
+      "sizeLines": 47,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/009-partner-offers/tasks.md",
+      "language": "markdown",
+      "sizeLines": 8,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/contracts/api.md",
+      "language": "markdown",
+      "sizeLines": 47,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/data-model.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/plan.md",
+      "language": "markdown",
+      "sizeLines": 115,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/quickstart.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/research.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/review.md",
+      "language": "markdown",
+      "sizeLines": 138,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/spec.md",
+      "language": "markdown",
+      "sizeLines": 133,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/010-group-booking/tasks.md",
+      "language": "markdown",
+      "sizeLines": 110,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/011-home-entry-ux/plan.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/011-home-entry-ux/spec.md",
+      "language": "markdown",
+      "sizeLines": 14,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/011-home-entry-ux/tasks.md",
+      "language": "markdown",
+      "sizeLines": 9,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/checklists/requirements.md",
+      "language": "markdown",
+      "sizeLines": 13,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/contracts/ui.md",
+      "language": "markdown",
+      "sizeLines": 15,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/data-model.md",
+      "language": "markdown",
+      "sizeLines": 8,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/plan.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/quickstart.md",
+      "language": "markdown",
+      "sizeLines": 10,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/research.md",
+      "language": "markdown",
+      "sizeLines": 12,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/review.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/spec.md",
+      "language": "markdown",
+      "sizeLines": 104,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/012-recurring-course-ux/tasks.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/013-chat-invitation/plan.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/013-chat-invitation/spec.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "specs/013-chat-invitation/tasks.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tests/browser/README.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tests/browser/admin-booking.spec.js",
+      "language": "javascript",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/browser/chat-invitation.spec.js",
+      "language": "javascript",
+      "sizeLines": 88,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/browser/course-choice.spec.js",
+      "language": "javascript",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/browser/group-booking.spec.js",
+      "language": "javascript",
+      "sizeLines": 327,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/browser/site.spec.js",
+      "language": "javascript",
+      "sizeLines": 300,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/browser/training-start.spec.js",
+      "language": "javascript",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tmp/pdfs/build_media_kit.py",
+      "language": "python",
+      "sizeLines": 158,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/audit_tickets.py",
+      "language": "python",
+      "sizeLines": 436,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/build_kb_txt.py",
+      "language": "python",
+      "sizeLines": 282,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/build_llms_full.py",
+      "language": "python",
+      "sizeLines": 128,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/build_topic_pages.py",
+      "language": "python",
+      "sizeLines": 314,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/import_ticket_topics.py",
+      "language": "python",
+      "sizeLines": 241,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/parse_tickets.py",
+      "language": "python",
+      "sizeLines": 555,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/requirements-dev.txt",
+      "language": "txt",
+      "sizeLines": 3,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tools/requirements.txt",
+      "language": "txt",
+      "sizeLines": 3,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tools/test_booking_migrations.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/__init__.py",
+      "language": "python",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/fixtures/tickets-page-ka.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tools/tests/fixtures/tickets-page-ru.html",
+      "language": "html",
+      "sizeLines": 55,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tools/tests/test_audit_tickets.py",
+      "language": "python",
+      "sizeLines": 148,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_build_kb_txt.py",
+      "language": "python",
+      "sizeLines": 59,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_build_llms_full.py",
+      "language": "python",
+      "sizeLines": 32,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_build_topic_pages.py",
+      "language": "python",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_import_ticket_topics.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_kb_artifacts.py",
+      "language": "python",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_parse_tickets.py",
+      "language": "python",
+      "sizeLines": 774,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/tests/test_update_sitemap.py",
+      "language": "python",
+      "sizeLines": 60,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tools/update_sitemap.py",
+      "language": "python",
+      "sizeLines": 71,
+      "fileCategory": "code"
+    },
+    {
+      "path": "voprosy/index.html",
+      "language": "html",
+      "sizeLines": 857,
+      "fileCategory": "markup"
+    }
+  ],
+  "totalFiles": 856,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "very-large",
+  "importMap": {
+    ".agents/skills/speckit-analyze/SKILL.md": [],
+    ".agents/skills/speckit-checklist/SKILL.md": [],
+    ".agents/skills/speckit-clarify/SKILL.md": [],
+    ".agents/skills/speckit-constitution/SKILL.md": [],
+    ".agents/skills/speckit-converge/SKILL.md": [],
+    ".agents/skills/speckit-implement/SKILL.md": [],
+    ".agents/skills/speckit-plan/SKILL.md": [],
+    ".agents/skills/speckit-specify/SKILL.md": [],
+    ".agents/skills/speckit-tasks/SKILL.md": [],
+    ".agents/skills/speckit-taskstoissues/SKILL.md": [],
+    ".github/workflows/ci.yml": [],
+    ".hallmark/log.json": [],
+    ".plan-audit-fixes.md": [],
+    ".plan-bot.md": [],
+    ".plan-chat-harness.md": [],
+    ".plan-improve.md": [],
+    ".plan-learning.md": [],
+    ".plan-llmo.md": [],
+    ".plan.md": [],
+    ".specify/init-options.json": [],
+    ".specify/integration.json": [],
+    ".specify/integrations/codex.manifest.json": [],
+    ".specify/integrations/speckit.manifest.json": [],
+    ".specify/memory/.constitution-template.json": [],
+    ".specify/memory/constitution.md": [],
+    ".specify/scripts/bash/check-prerequisites.sh": [],
+    ".specify/scripts/bash/common.sh": [],
+    ".specify/scripts/bash/create-new-feature.sh": [],
+    ".specify/scripts/bash/resolve-template.sh": [],
+    ".specify/scripts/bash/setup-plan.sh": [],
+    ".specify/scripts/bash/setup-tasks.sh": [],
+    ".specify/templates/checklist-template.md": [],
+    ".specify/templates/constitution-template.md": [],
+    ".specify/templates/plan-template.md": [],
+    ".specify/templates/spec-template.md": [],
+    ".specify/templates/tasks-template.md": [],
+    ".specify/workflows/speckit/workflow.yml": [],
+    ".specify/workflows/workflow-registry.json": [],
+    "404.html": [],
+    "AGENTS.md": [],
+    "CLAUDE.md": [],
+    "CNAME": [],
+    "README.md": [],
+    "baza-znaniy/00-o-shkole.md": [],
+    "baza-znaniy/01-obuchenie.md": [],
+    "baza-znaniy/02-ceny-i-oplata.md": [],
+    "baza-znaniy/03-dokumenty-i-dopusk.md": [],
+    "baza-znaniy/04-ekzameny.md": [],
+    "baza-znaniy/05-prava.md": [],
+    "baza-znaniy/06-bystrye-fakty.md": [],
+    "baza-znaniy/07-pravila-otvetov-bota.md": [],
+    "baza-znaniy/08-iz-audio-shkoly.md": [],
+    "baza-znaniy/09-fakt-cheking.md": [],
+    "baza-znaniy/README.md": [],
+    "baza-znaniy/dlya-bota/00-o-shkole.txt": [],
+    "baza-znaniy/dlya-bota/01-obuchenie.txt": [],
+    "baza-znaniy/dlya-bota/02-ceny-i-oplata.txt": [],
+    "baza-znaniy/dlya-bota/03-dokumenty-i-dopusk.txt": [],
+    "baza-znaniy/dlya-bota/04-ekzameny.txt": [],
+    "baza-znaniy/dlya-bota/05-prava.txt": [],
+    "baza-znaniy/dlya-bota/06-bystrye-fakty.txt": [],
+    "baza-znaniy/dlya-bota/07-pravila-otvetov-bota.txt": [],
+    "baza-znaniy/dlya-bota/08-iz-audio-shkoly.txt": [],
+    "baza-znaniy/dlya-bota/09-fakt-cheking.txt": [],
+    "baza-znaniy/dlya-bota/baza-znaniy-polnaya.txt": [],
+    "baza-znaniy/dlya-bota/ceny.csv": [],
+    "baza-znaniy/dlya-bota/faq.csv": [],
+    "baza-znaniy/dlya-bota/КАК-ЗАГРУЗИТЬ.txt": [],
+    "bilety/ekzamen/index.html": [],
+    "bilety/index.html": [],
+    "bilety/temy/dorozhnye-znaki/index.html": [],
+    "bilety/temy/ostanovka-stoyanka/index.html": [],
+    "bilety/temy/perekrestki/index.html": [],
+    "bilety/trenirovka/index.html": [],
+    "bilety/voprosy/index.html": [],
+    "bot/README.md": [],
+    "bot/admin/admin.css": [],
+    "bot/admin/admin.js": [],
+    "bot/admin/index.html": [],
+    "bot/migrations/0001_init.sql": [],
+    "bot/migrations/0002_leads_status_check.sql": [],
+    "bot/migrations/0003_group_booking.sql": [],
+    "bot/migrations/0004_booking_rate_limits.sql": [],
+    "bot/migrations/0005_rolling_schedule.sql": [],
+    "bot/package.json": [],
+    "bot/scripts/build-kb.mjs": [],
+    "bot/src/admin-auth.ts": [],
+    "bot/src/alert.ts": [
+      "bot/src/escape.ts",
+      "bot/src/telegram.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/src/booking-api.ts": [
+      "bot/src/admin-auth.ts",
+      "bot/src/booking-commands.ts",
+      "bot/src/booking-types.ts",
+      "bot/src/bookings.ts",
+      "bot/src/groups.ts",
+      "bot/src/outbox.ts"
+    ],
+    "bot/src/booking-commands.ts": [
+      "bot/src/booking-types.ts"
+    ],
+    "bot/src/booking-types.ts": [],
+    "bot/src/bookings.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/booking-types.ts"
+    ],
+    "bot/src/cleanup.ts": [],
+    "bot/src/conversation.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/outbox.ts"
+    ],
+    "bot/src/escape.ts": [],
+    "bot/src/facts.ts": [],
+    "bot/src/generated/kb.ts": [],
+    "bot/src/groups.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/booking-types.ts"
+    ],
+    "bot/src/inbox.ts": [
+      "bot/src/types.ts"
+    ],
+    "bot/src/index.ts": [
+      "bot/src/alert.ts",
+      "bot/src/booking-api.ts",
+      "bot/src/cleanup.ts",
+      "bot/src/inbox.ts",
+      "bot/src/outbox.ts",
+      "bot/src/rolling-groups.ts",
+      "bot/src/router.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/src/kb.ts": [
+      "bot/src/generated/kb.ts"
+    ],
+    "bot/src/leads.ts": [
+      "bot/src/escape.ts",
+      "bot/src/telegram.ts",
+      "bot/src/time.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/src/outbox.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/escape.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/src/rolling-groups.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/booking-types.ts"
+    ],
+    "bot/src/router.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/bookings.ts",
+      "bot/src/conversation.ts",
+      "bot/src/escape.ts",
+      "bot/src/facts.ts",
+      "bot/src/groups.ts",
+      "bot/src/kb.ts",
+      "bot/src/leads.ts",
+      "bot/src/outbox.ts",
+      "bot/src/telegram.ts",
+      "bot/src/time.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/src/telegram.ts": [],
+    "bot/src/time.ts": [],
+    "bot/src/types.ts": [],
+    "bot/test/admin-auth.test.ts": [
+      "bot/src/admin-auth.ts"
+    ],
+    "bot/test/alert.test.ts": [
+      "bot/src/alert.ts"
+    ],
+    "bot/test/apply-migrations.ts": [],
+    "bot/test/booking-api.test.ts": [
+      "bot/src/admin-auth.ts",
+      "bot/src/booking-api.ts",
+      "bot/src/groups.ts"
+    ],
+    "bot/test/bookings.test.ts": [
+      "bot/src/bookings.ts",
+      "bot/src/groups.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/cleanup.test.ts": [
+      "bot/src/cleanup.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/conversation.test.ts": [
+      "bot/src/conversation.ts"
+    ],
+    "bot/test/escape.test.ts": [
+      "bot/src/escape.ts"
+    ],
+    "bot/test/facts.test.ts": [
+      "bot/src/facts.ts"
+    ],
+    "bot/test/group-fixtures.ts": [
+      "bot/src/booking-types.ts",
+      "bot/src/bookings.ts",
+      "bot/src/groups.ts"
+    ],
+    "bot/test/groups.test.ts": [
+      "bot/src/booking-commands.ts",
+      "bot/src/groups.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/inbox.test.ts": [
+      "bot/src/conversation.ts",
+      "bot/src/inbox.ts",
+      "bot/src/router.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/kb.test.ts": [
+      "bot/src/generated/kb.ts",
+      "bot/src/kb.ts"
+    ],
+    "bot/test/leads.test.ts": [
+      "bot/src/leads.ts",
+      "bot/src/types.ts"
+    ],
+    "bot/test/outbox.test.ts": [
+      "bot/src/outbox.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/rolling-groups.test.ts": [
+      "bot/src/groups.ts",
+      "bot/src/rolling-groups.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/router.test.ts": [
+      "bot/src/conversation.ts",
+      "bot/src/facts.ts",
+      "bot/src/leads.ts",
+      "bot/src/router.ts",
+      "bot/src/types.ts",
+      "bot/test/group-fixtures.ts"
+    ],
+    "bot/test/schema.test.ts": [],
+    "bot/test/telegram.test.ts": [
+      "bot/src/telegram.ts"
+    ],
+    "bot/test/time.test.ts": [
+      "bot/src/time.ts"
+    ],
+    "bot/test/webhook.test.ts": [
+      "bot/src/index.ts"
+    ],
+    "bot/tsconfig.json": [],
+    "bot/vitest.config.ts": [],
+    "bot/wrangler.toml": [],
+    "chat_agent/.env.example": [],
+    "chat_agent/README.md": [],
+    "chat_agent/__init__.py": [],
+    "chat_agent/access.py": [],
+    "chat_agent/cli.py": [
+      "chat_agent/facts.py",
+      "chat_agent/harness.py",
+      "chat_agent/knowledge.py",
+      "chat_agent/provider.py"
+    ],
+    "chat_agent/demo.py": [
+      "chat_agent/facts.py"
+    ],
+    "chat_agent/deploy/avtoshkola-chat.service": [],
+    "chat_agent/eval_answers.py": [
+      "chat_agent/facts.py",
+      "chat_agent/harness.py",
+      "chat_agent/knowledge.py",
+      "chat_agent/provider.py",
+      "chat_agent/seed.py"
+    ],
+    "chat_agent/facts.py": [],
+    "chat_agent/group_client.py": [],
+    "chat_agent/harness.py": [
+      "chat_agent/facts.py",
+      "chat_agent/group_client.py",
+      "chat_agent/provider.py"
+    ],
+    "chat_agent/http_app.py": [
+      "chat_agent/access.py",
+      "chat_agent/facts.py"
+    ],
+    "chat_agent/knowledge.py": [],
+    "chat_agent/provider.py": [],
+    "chat_agent/requirements.txt": [],
+    "chat_agent/seed.py": [
+      "chat_agent/facts.py"
+    ],
+    "chat_agent/static/admin.css": [],
+    "chat_agent/static/admin.html": [],
+    "chat_agent/static/admin.js": [],
+    "chat_agent/tests/test_answer_policy.py": [
+      "chat_agent/facts.py",
+      "chat_agent/harness.py",
+      "chat_agent/knowledge.py"
+    ],
+    "chat_agent/tests/test_eval_answers.py": [
+      "chat_agent/eval_answers.py"
+    ],
+    "chat_agent/tests/test_facts.py": [
+      "chat_agent/facts.py"
+    ],
+    "chat_agent/tests/test_group_client.py": [
+      "chat_agent/facts.py",
+      "chat_agent/group_client.py"
+    ],
+    "chat_agent/tests/test_harness.py": [
+      "chat_agent/facts.py",
+      "chat_agent/harness.py",
+      "chat_agent/knowledge.py",
+      "chat_agent/provider.py"
+    ],
+    "chat_agent/tests/test_http.py": [
+      "chat_agent/access.py",
+      "chat_agent/facts.py",
+      "chat_agent/http_app.py",
+      "chat_agent/seed.py"
+    ],
+    "chat_agent/tests/test_knowledge_quality.py": [
+      "chat_agent/knowledge.py"
+    ],
+    "chat_agent/tests/test_seed.py": [
+      "chat_agent/facts.py",
+      "chat_agent/seed.py"
+    ],
+    "chat_agent/wsgi.py": [
+      "chat_agent/access.py",
+      "chat_agent/facts.py",
+      "chat_agent/group_client.py",
+      "chat_agent/harness.py",
+      "chat_agent/http_app.py",
+      "chat_agent/knowledge.py",
+      "chat_agent/provider.py",
+      "chat_agent/seed.py"
+    ],
+    "css/about.css": [],
+    "css/chat.css": [],
+    "css/course-choice.css": [],
+    "css/exam.css": [],
+    "css/groups.css": [],
+    "css/partner.css": [],
+    "css/style.css": [],
+    "css/tokens.css": [],
+    "css/topics.css": [],
+    "css/training-start.css": [],
+    "data/eco-ru-1742-1758.json": [],
+    "data/eco-ru-1759-1775.json": [],
+    "data/eco-ru-1776-1792.json": [],
+    "data/ticket-topics.json": [],
+    "data/tickets-b-ru.json": [],
+    "data/tickets/images/0044c117899348a202c3ef7fc6c5d959.webp": [],
+    "data/tickets/images/0045d532f5159838b7d8db21ebf88d6e.webp": [],
+    "data/tickets/images/005412fbc4afa1cd5bf3e19a3a82081f.webp": [],
+    "data/tickets/images/00fe78d21d876aa792fe1a3d0c340562.webp": [],
+    "data/tickets/images/0121a6a9f99c0aff1af904771cbf5e23.webp": [],
+    "data/tickets/images/01cb7940ccd2a1cbd364a1e3a09c2a5a.webp": [],
+    "data/tickets/images/01cc317aeb333de7cfbc5924f8c762a0.webp": [],
+    "data/tickets/images/0305a33b75f70144244cc4af6c45ffec.webp": [],
+    "data/tickets/images/0317f0a816cd8a076b7ca8e92c9e4be4.webp": [],
+    "data/tickets/images/03300191ca1de98a4ed0e5871f3d336f.webp": [],
+    "data/tickets/images/0336c820f0b8ed26b447cbff5e1c1423.webp": [],
+    "data/tickets/images/0486c7fd8a2c8fcff7d57c2e0287bd5d.webp": [],
+    "data/tickets/images/04d4e6b2e4b7385673f5c4c9ada73b42.webp": [],
+    "data/tickets/images/05218b673a37bceeb81319ff81f55b02.webp": [],
+    "data/tickets/images/064406dbc1641abcc4467f07d12aa026.webp": [],
+    "data/tickets/images/073889249071781d1e069a74a2266fd8.webp": [],
+    "data/tickets/images/07aeda8bc780645c04a627e49f88960b.webp": [],
+    "data/tickets/images/07d3661840a7a13cd748f64fb3af113b.webp": [],
+    "data/tickets/images/083dda912abec5e1b7d6dea06732e76e.webp": [],
+    "data/tickets/images/088b6c2277dc39ad59d0e9acf6a26e65.webp": [],
+    "data/tickets/images/090f365112a82b2c8bb07d34cd8af14a.webp": [],
+    "data/tickets/images/092d1a44d245180c334473238960265c.webp": [],
+    "data/tickets/images/0a471b8dd26de0da2ec1591134d78b9c.webp": [],
+    "data/tickets/images/0acec2b0efa506f7e28281923ab9eaeb.webp": [],
+    "data/tickets/images/0ad3d42a08607cada6b86cdb8b88f466.webp": [],
+    "data/tickets/images/0ad896f8d6a97091a66b7fa79e9f1810.webp": [],
+    "data/tickets/images/0b1975f7d633deefada7cc0b0ecfcdbe.webp": [],
+    "data/tickets/images/0b5a4e3f0d8846b6936fb2ba75b9dbe5.webp": [],
+    "data/tickets/images/0c09fdddfdefbd03923fde6996f7017c.webp": [],
+    "data/tickets/images/0c2edfbbc17bfc3aa93efd4d8c821a7c.webp": [],
+    "data/tickets/images/0c4a1a3395845cf3e9df50650af1227a.webp": [],
+    "data/tickets/images/0c4ab2a9909a8fff70bb5877ffa248c3.webp": [],
+    "data/tickets/images/0d64895ca54522c606a51b4309b26396.webp": [],
+    "data/tickets/images/0ef4f472c3f8af3ab1e677193bd80074.webp": [],
+    "data/tickets/images/0f824c6f15656125aab1ffd9246204f6.webp": [],
+    "data/tickets/images/0fa9ed8c19b700d213dc20bea1d13f17.webp": [],
+    "data/tickets/images/0fc54adcc83bce7ecc00880475795466.webp": [],
+    "data/tickets/images/0fec63faec095cc586877225a395cbfe.webp": [],
+    "data/tickets/images/1054af36b4f19173c19ea4eb4a4746cd.webp": [],
+    "data/tickets/images/1071b221c23d2b71763d66c8462b6bd2.webp": [],
+    "data/tickets/images/108e31829a5cb07e87361e2f6f29cbb1.webp": [],
+    "data/tickets/images/113d78da7c2684f4338073e8d4a6456a.webp": [],
+    "data/tickets/images/116063828e9b734620a55bd4d0eae81d.webp": [],
+    "data/tickets/images/11e983bd92bfcddf9713a602d13d83d4.webp": [],
+    "data/tickets/images/1250e21c4baee42d9c092bbd5f3b2b80.webp": [],
+    "data/tickets/images/1280059c84b5cf889493d8dbe44f977c.webp": [],
+    "data/tickets/images/12e8360b2cb00d9b2ae9351f7e7e0ee6.webp": [],
+    "data/tickets/images/131cacd40892f1d27dc27b4ee94ba105.webp": [],
+    "data/tickets/images/133136555e8b0a76f85132b2ac2fabe1.webp": [],
+    "data/tickets/images/1331dc060b7a97688162fff2ee2fe169.webp": [],
+    "data/tickets/images/13dd39224a6d2f7ad68c962ec1880bd8.webp": [],
+    "data/tickets/images/1417b8e74ec5cd1c2a379e782920a7b6.webp": [],
+    "data/tickets/images/142a59031625df851ed8fec8a7c77ec4.webp": [],
+    "data/tickets/images/1494d2eaf0d202e32f02c225b0e7a204.webp": [],
+    "data/tickets/images/15d2f199a79a74100d7c93a9a9a3f5e4.webp": [],
+    "data/tickets/images/15ee5250ad2bf48edc943954d9628447.webp": [],
+    "data/tickets/images/167e4ccdb6d68bb50d1a03834ccb0915.webp": [],
+    "data/tickets/images/172cb4b5ebaba8250b23ede0e2f26746.webp": [],
+    "data/tickets/images/18539be947f2c1298118b59670c40741.webp": [],
+    "data/tickets/images/191e5b2e3f96387c1411ad9a647769cd.webp": [],
+    "data/tickets/images/19527981a506b68c4b7896d28cb59d41.webp": [],
+    "data/tickets/images/1a6712b8419e0f3de66197fff925ba25.webp": [],
+    "data/tickets/images/1c9c7bb363fa1aaeec5b41dbc5cbcde7.webp": [],
+    "data/tickets/images/1cb044701b48034e8b7f6150a62b41ef.webp": [],
+    "data/tickets/images/1cc215658c64fd4205f51122e2fbe2e0.webp": [],
+    "data/tickets/images/1d2423ca2f874e26194cf0be4f917206.webp": [],
+    "data/tickets/images/1dac0d962e3eeda99b03f3b1030da499.webp": [],
+    "data/tickets/images/1e58e45a50e041d784f4e5a8f9e40b2b.webp": [],
+    "data/tickets/images/1e7b23fe464f2d51dfbc577c5921fc3d.webp": [],
+    "data/tickets/images/1e95525a94783ba48f5d1824d6ad3469.webp": [],
+    "data/tickets/images/1ee9d28a338a56225dd4a287b4f1074d.webp": [],
+    "data/tickets/images/1f38a098de916a1a4e604831ab33ac6d.webp": [],
+    "data/tickets/images/1f567cc13dcb844541c9ce62c386a2bc.webp": [],
+    "data/tickets/images/2161e3011f3f42c7962089ff665293e4.webp": [],
+    "data/tickets/images/22dd8a2f4a9191cb116f3a58672ca351.webp": [],
+    "data/tickets/images/233c576795268f97201ef177581328be.webp": [],
+    "data/tickets/images/234dfffe6f2ecaf510ba839ea41e6d07.webp": [],
+    "data/tickets/images/2399fdf6b5cf309811088556d52d153f.webp": [],
+    "data/tickets/images/23a5b6fbc746a000248ed840fedf9ab4.webp": [],
+    "data/tickets/images/2463a0cc3e13b5a495210d9fcd7ba138.webp": [],
+    "data/tickets/images/246ea8a4f2c82985a6c5319b0655f914.webp": [],
+    "data/tickets/images/248849087cdb671683f975a56f582381.webp": [],
+    "data/tickets/images/24ce831ab85a5997dcae71ce1d83891e.webp": [],
+    "data/tickets/images/24e249e97768a07d4c1daa0aad2312c0.webp": [],
+    "data/tickets/images/25509f93a4aea1611ad917498d350226.webp": [],
+    "data/tickets/images/257f548e1704a907ae5d33c75f3e71f0.webp": [],
+    "data/tickets/images/25848bd82d96a62ca446fea8272c7c29.webp": [],
+    "data/tickets/images/25d72ae6d553fbcbb0771869784942cb.webp": [],
+    "data/tickets/images/264b249c8dcd71114656999eb4d95592.webp": [],
+    "data/tickets/images/269bf8ace815aa85dd6c9b1eb234a757.webp": [],
+    "data/tickets/images/27b41a24ba75a032cce6fbe2e08c385c.webp": [],
+    "data/tickets/images/282ddaca19823ed19379d67f5b4b0fff.webp": [],
+    "data/tickets/images/2854318cbb5e9dc23242a5576e8cf711.webp": [],
+    "data/tickets/images/28e975ca756dbce3379def4dee044277.webp": [],
+    "data/tickets/images/294bdccb817eafad5b4f458502782d69.webp": [],
+    "data/tickets/images/29f3507b8f42dd5524ebbeb2afa1652a.webp": [],
+    "data/tickets/images/2d3b62024fd326917b4573c68383de51.webp": [],
+    "data/tickets/images/2d890a5694f87474d99d5cdf98da52c9.webp": [],
+    "data/tickets/images/2db98d6ae8cfee2eb0e74e3932cc17a6.webp": [],
+    "data/tickets/images/2dc198701cef86f5a940a9d6512b7368.webp": [],
+    "data/tickets/images/2e6ff4f9e64e8fae74ee0d10796e58ac.webp": [],
+    "data/tickets/images/2ee7be6f3e10931fd737d348131b641c.webp": [],
+    "data/tickets/images/2f049d0ea967f656ca1effb162287e37.webp": [],
+    "data/tickets/images/2f082e56350285d0323d5d2fe34f453e.webp": [],
+    "data/tickets/images/2fa400c81c8333206b7169066859bb17.webp": [],
+    "data/tickets/images/3056c27ce6af46e21045c87cf27b6b5b.webp": [],
+    "data/tickets/images/30b160353a85dad8743acd06a4c2549d.webp": [],
+    "data/tickets/images/312547a678df355ebfdd14c218767fea.webp": [],
+    "data/tickets/images/31d933759a3e13ae52ea0e2fc7c5b7aa.webp": [],
+    "data/tickets/images/3213a49188645a75bf1d6f0546f3469e.webp": [],
+    "data/tickets/images/321f4d57d580aaa58682476e7f2a591d.webp": [],
+    "data/tickets/images/32771b5fde4cb3bbbb9e3926f7bc1e39.webp": [],
+    "data/tickets/images/3295db2f800e83755f54d1886cf54366.webp": [],
+    "data/tickets/images/32a266737b74666cdaff299fb11d663f.webp": [],
+    "data/tickets/images/331232ad8205c217ccfb72b608ae70dc.webp": [],
+    "data/tickets/images/334795513f8a86b49e9352bf4c5493c5.webp": [],
+    "data/tickets/images/334bad847fbba599354bbe2ee74232a6.webp": [],
+    "data/tickets/images/337f7cf0115b2aa1a6b28d3aa669b869.webp": [],
+    "data/tickets/images/354a0b79263e50882150cf577e8468a9.webp": [],
+    "data/tickets/images/356c122b948f28a592df63c5dee98e6f.webp": [],
+    "data/tickets/images/36fb52c5ed6be99ed12722382dc5fbc4.webp": [],
+    "data/tickets/images/37165e1e488e04bb654c3b789860d6e9.webp": [],
+    "data/tickets/images/372295438bf5297530969d3e3b0d6299.webp": [],
+    "data/tickets/images/38feaeead550c3f20a3af48a4e0b95ce.webp": [],
+    "data/tickets/images/3901279bfb0b8ba384efab93b45e69c7.webp": [],
+    "data/tickets/images/39749a3d04d498843b4603661bb1ef70.webp": [],
+    "data/tickets/images/39e8433138cfdecd29f390a67db89236.webp": [],
+    "data/tickets/images/3a161a6513d96a4e7680f0cfabfff5e0.webp": [],
+    "data/tickets/images/3a57a44bfe54307fdc2e69ebd5490f1a.webp": [],
+    "data/tickets/images/3a81e4d06fc12730f6d9b773f0aa54a5.webp": [],
+    "data/tickets/images/3b9cb657091b7a23ecd8f024309966b9.webp": [],
+    "data/tickets/images/3c76f13a72b9b1910d3a5bd4fc805b8a.webp": [],
+    "data/tickets/images/3cb07c7791ff364838a0fffd676d0820.webp": [],
+    "data/tickets/images/3d3547b9cf89d34451ed9ccef0fe0f1c.webp": [],
+    "data/tickets/images/3e516ac82f6a3f4618709505fd1a838e.webp": [],
+    "data/tickets/images/3e702ca9189162815f83661b5736c86b.webp": [],
+    "data/tickets/images/3ec71aec8485052dd5e32a1e20eecc77.webp": [],
+    "data/tickets/images/3eeafde9ed08770484d0aa3136ca78b9.webp": [],
+    "data/tickets/images/3f5eedabc8d64879b5206f817060f244.webp": [],
+    "data/tickets/images/3fa5203d7218694b70d75ef44bd311c2.webp": [],
+    "data/tickets/images/405e9b8e76990e8155f7be9af1b07773.webp": [],
+    "data/tickets/images/4118754e5fa10113b652c66865fec639.webp": [],
+    "data/tickets/images/4157fd29ea66594f6e39291955c15cab.webp": [],
+    "data/tickets/images/41b37cd39eb01874dfd0d892936eea20.webp": [],
+    "data/tickets/images/41ee2bccedff34cd018fa4e382ab3dd2.webp": [],
+    "data/tickets/images/42e00f8430d5fef8d59f0350ab60911c.webp": [],
+    "data/tickets/images/42f937e7e0e78450cb75b69900fdf2f5.webp": [],
+    "data/tickets/images/4332277d211a5c7c43757ff2d3dba967.webp": [],
+    "data/tickets/images/43b15cae7851c24961f1a750c19533cf.webp": [],
+    "data/tickets/images/4412def1f1006a4a0c8f7e2e7e9968fc.webp": [],
+    "data/tickets/images/44a8070346a18bf27ecb8d9e2c31a89b.webp": [],
+    "data/tickets/images/457cc1ae46b9d9de3b406f62301336ff.webp": [],
+    "data/tickets/images/45defebbb01b82640b03bb83e9243415.webp": [],
+    "data/tickets/images/465f571bd26a32985a7979a31fe0f145.webp": [],
+    "data/tickets/images/46a061c5d7a34a7a68df2a3f9a79e182.webp": [],
+    "data/tickets/images/46fd7b44b23df926af7a0669f5948f36.webp": [],
+    "data/tickets/images/4706e43765f988770829b4628dadba7c.webp": [],
+    "data/tickets/images/4707a6a4e3cfb08d7c45df731402d416.webp": [],
+    "data/tickets/images/47927a3dbcb3d2e8772cb8994a5d6c1e.webp": [],
+    "data/tickets/images/47cebc14b7c9b23f202afdfb650a3a5c.webp": [],
+    "data/tickets/images/4801306f4afeec48a98a889b23dc2bd4.webp": [],
+    "data/tickets/images/4883fa02d56f0744c3a4a516a998fa83.webp": [],
+    "data/tickets/images/49cd09c5443e2c5afbf15db574703cdd.webp": [],
+    "data/tickets/images/4a23c8167d89cdc658651a276a88d8dc.webp": [],
+    "data/tickets/images/4ab74e8b7968224d0a8376b22e29be30.webp": [],
+    "data/tickets/images/4b41fa5af6c55cf24a09d282f427f777.webp": [],
+    "data/tickets/images/4bce1a01288eaad07ac759d0ad8b3466.webp": [],
+    "data/tickets/images/4c5f63b19320c0fbc7e52fd5e9b0b216.webp": [],
+    "data/tickets/images/4ea43fbe99569246c327d5382bbb4339.webp": [],
+    "data/tickets/images/4f3807a49c89c40adf8fe86d8391ddbe.webp": [],
+    "data/tickets/images/502732040220b5988c374b3b5f4f82e3.webp": [],
+    "data/tickets/images/50a557a63f78b3c0038d5c1d781cc655.webp": [],
+    "data/tickets/images/5118321573cde6512fd6a2b53da4a38a.webp": [],
+    "data/tickets/images/5120b84d74e06d125eb0afc4fef86f6d.webp": [],
+    "data/tickets/images/52d85c3b37d932df1d8d961efc52e8f4.webp": [],
+    "data/tickets/images/53a46d17ab6118958214ec68bcd2ff3d.webp": [],
+    "data/tickets/images/53a71108eea78c567df217174e11b8e1.webp": [],
+    "data/tickets/images/54a384cc941e61877f13abcb6db28826.webp": [],
+    "data/tickets/images/570ecfddf2886e0c0614cbc069981974.webp": [],
+    "data/tickets/images/57a58c8742a5716a64c4a8e66f2ccbd7.webp": [],
+    "data/tickets/images/57dc50c0b5970b5921382414fbdc51e3.webp": [],
+    "data/tickets/images/5859480d5f86653f38088d6ce0102684.webp": [],
+    "data/tickets/images/586da1545be583568fbe8d798656e64a.webp": [],
+    "data/tickets/images/58c1bd7891578a5abda291ca1eff7496.webp": [],
+    "data/tickets/images/59817d47816dc33abd6246c776c781eb.webp": [],
+    "data/tickets/images/59e0373425b099277a38ce059d2cd5d9.webp": [],
+    "data/tickets/images/5a26b9e41a1d29030e3c4be064014a93.webp": [],
+    "data/tickets/images/5b28a3a3e8d7d6da68888cf7453d5bda.webp": [],
+    "data/tickets/images/5b8f89439ca33ed2e7feaf46d093a5ce.webp": [],
+    "data/tickets/images/5be30372747d6c8161c32d51c7b3cde7.webp": [],
+    "data/tickets/images/5c6e08619abea928de545364b9e17381.webp": [],
+    "data/tickets/images/5cb00bb75340a9cb4fce47e4e2515e23.webp": [],
+    "data/tickets/images/5d537ede597004ed4968082ebe81d089.webp": [],
+    "data/tickets/images/5d6c70b8978330e026d935c84d8a2480.webp": [],
+    "data/tickets/images/5d734bb372cf5a7a5c083c49c0a217ef.webp": [],
+    "data/tickets/images/5d75b8df2320db0b7857e57d9a951be0.webp": [],
+    "data/tickets/images/5e515647e2c87d03e55f03a3511b0348.webp": [],
+    "data/tickets/images/5e7c1dc2755182d50cc3ee09ffdf9c99.webp": [],
+    "data/tickets/images/5ea63c32f48b49e1e0eacb913d1081d2.webp": [],
+    "data/tickets/images/5f08702f09a4a0d32b3d2638edf8df85.webp": [],
+    "data/tickets/images/5f1a1e290f286b860f65ba44f1898f25.webp": [],
+    "data/tickets/images/5f22a8a54c0d1985efb807bfee72c14b.webp": [],
+    "data/tickets/images/5f541596e9c9c3b2508054962fabd9c1.webp": [],
+    "data/tickets/images/5fa6d84ad367f6f9bd80ed39d7a0babf.webp": [],
+    "data/tickets/images/5fb685b821e8710fc6d349679d90e14c.webp": [],
+    "data/tickets/images/5fe5e5e71f3eebb96f804cac7d8651f3.webp": [],
+    "data/tickets/images/60fa0a866e6341d89935393b4df60037.webp": [],
+    "data/tickets/images/611046fa56a9be72caf9a6c4b91e2c70.webp": [],
+    "data/tickets/images/61b976c1cf034e9ed69b7d1e76f62174.webp": [],
+    "data/tickets/images/62003261effe748bce3c6106c0bf56c7.webp": [],
+    "data/tickets/images/634439031cb74304f23b7a35ef98cdd5.webp": [],
+    "data/tickets/images/63d8aee2855625c493d0c1a0802e6e2c.webp": [],
+    "data/tickets/images/64409250c606748ac85953e47191b279.webp": [],
+    "data/tickets/images/64a231a10670a19f60a53fd7cc8d838b.webp": [],
+    "data/tickets/images/6674601e7e22e07e3c711f9a1f54bc3e.webp": [],
+    "data/tickets/images/66847801ca37e1d2d5f74b4a7ceb46d5.webp": [],
+    "data/tickets/images/674e5fc8406a66f20103008bfaebbf1a.webp": [],
+    "data/tickets/images/67804a985dad2e33ba839a82adbf112d.webp": [],
+    "data/tickets/images/6847ab3124b90ce3f0edf92d04ffe235.webp": [],
+    "data/tickets/images/69072aaa8ec8be9faf8feadebaf7944b.webp": [],
+    "data/tickets/images/693e24d2a836bed4e0658f34b7fa14c6.webp": [],
+    "data/tickets/images/69b5d71ec61a2a71598979f1487166d2.webp": [],
+    "data/tickets/images/69c0c22a4a5ecc6ec1f341081ea1cef3.webp": [],
+    "data/tickets/images/6a18781905494529aac4a432f94e0443.webp": [],
+    "data/tickets/images/6a317d781a44b356180391dc7f3c5193.webp": [],
+    "data/tickets/images/6b2884ef79c61505ce58a2172b4062fc.webp": [],
+    "data/tickets/images/6b88978ef92622755ed151cf0b089f59.webp": [],
+    "data/tickets/images/6badd5d8c674639024a817176f3a5f87.webp": [],
+    "data/tickets/images/6bfd74b3649a8a4d76bbc83633e4680f.webp": [],
+    "data/tickets/images/6c1f75cb1c21aa67ef53b74233eda3e6.webp": [],
+    "data/tickets/images/6c492a46b366d21a72f3a7b70fc92b4f.webp": [],
+    "data/tickets/images/6ce7e17e143a2f2e4f51f516ed5eb7ec.webp": [],
+    "data/tickets/images/6cf54746857403e7caed949422f912f9.webp": [],
+    "data/tickets/images/6d0aaa58449983d4ed7161f7817215fc.webp": [],
+    "data/tickets/images/6d105f180e0e45f4a01788d3ec37a817.webp": [],
+    "data/tickets/images/6d74e1a36129975840617d32767e88cb.webp": [],
+    "data/tickets/images/6d9b1fd3c78faaef3f782e8f4a283c1a.webp": [],
+    "data/tickets/images/6dddb0f648d4c7373ad19a353a60eaaa.webp": [],
+    "data/tickets/images/6ef40680855f2cdf6d88a20a1456432f.webp": [],
+    "data/tickets/images/6f027dd971f8c7a9689bc5ef78c5aab9.webp": [],
+    "data/tickets/images/708783337df3a92bb3096daa8bd9a52a.webp": [],
+    "data/tickets/images/71b8ccc64dea7b721207bb3d50582e37.webp": [],
+    "data/tickets/images/72d8f515408e97c495051140f3978ccd.webp": [],
+    "data/tickets/images/745309d597da55e61c43c3ddf74336e9.webp": [],
+    "data/tickets/images/74988a5bdfdca0fe129dc7c2ffa2482e.webp": [],
+    "data/tickets/images/74ec754a48eaadc61c087d6dbc562ec5.webp": [],
+    "data/tickets/images/74f99397766ea40c09024fd7443c70e1.webp": [],
+    "data/tickets/images/74f9aa4d6c770b2b5ec5636245f97d72.webp": [],
+    "data/tickets/images/76b15a1a64511314be598ab4a307025d.webp": [],
+    "data/tickets/images/778a6c3e83863334df47d4fd61357124.webp": [],
+    "data/tickets/images/77f726bef8f32a5e1290518e29980cc1.webp": [],
+    "data/tickets/images/78a27223fbe0708c220cb1f404d26990.webp": [],
+    "data/tickets/images/79a9e7d9e19768ba041083dfd273ae63.webp": [],
+    "data/tickets/images/79c195e8039b58e0e8354ff4008ba34a.webp": [],
+    "data/tickets/images/7a221746e6c9812b1f5d36557b69f32b.webp": [],
+    "data/tickets/images/7a5696a157dcb418d1777b92d73aaeeb.webp": [],
+    "data/tickets/images/7aca4aa781a4b60964c2977c499f6571.webp": [],
+    "data/tickets/images/7c5e32aac04d004587d9f6cb49e1dcbb.webp": [],
+    "data/tickets/images/7d8c36ffc2781903e57613c79a103fa9.webp": [],
+    "data/tickets/images/7e265624337a9acfec732dba37fe11fb.webp": [],
+    "data/tickets/images/7fc7239e2f736f8201537e08069be427.webp": [],
+    "data/tickets/images/7fd8bb903310f3e34e0964df0bee87c9.webp": [],
+    "data/tickets/images/801fd0b9a13cdef97a781fa56e85b9a1.webp": [],
+    "data/tickets/images/8179691cf05c807a93c6e6428069166d.webp": [],
+    "data/tickets/images/817fdd1baf5be53924fb3fa830261d03.webp": [],
+    "data/tickets/images/81d55fdc0f163053755fdc365b6a286a.webp": [],
+    "data/tickets/images/81f45d82711773d2dff4ec46aceabdc4.webp": [],
+    "data/tickets/images/826de239097abe0c81a0bcc256ba23de.webp": [],
+    "data/tickets/images/8275c322f5a24b9f5ee3bf7d3db6a509.webp": [],
+    "data/tickets/images/8276c0d5610fa0c4e4b3bf5517c1ae02.webp": [],
+    "data/tickets/images/82b9ab61d11c94fe8d2977dc2764ec74.webp": [],
+    "data/tickets/images/834fab8defa6def8fc3928c8e113f63a.webp": [],
+    "data/tickets/images/840bc3b2ec591aa2e7fce63264ba92bf.webp": [],
+    "data/tickets/images/8432c64b54146c4df4df153f1bf89cdc.webp": [],
+    "data/tickets/images/846c4ff80b2386b0891cdf953bdc41c3.webp": [],
+    "data/tickets/images/84c940503c4376add21c81b7c097fe29.webp": [],
+    "data/tickets/images/856b3a1c4692ab3a01fc4a044627eaf9.webp": [],
+    "data/tickets/images/85a9633c352f9530d716a12ef5b81efc.webp": [],
+    "data/tickets/images/863de79092d97b3acdc0b16c6a259cdd.webp": [],
+    "data/tickets/images/86ca21e5ca1ee7b12e646c93f3886aac.webp": [],
+    "data/tickets/images/87ed725f1a517bd7573573e117b6ef26.webp": [],
+    "data/tickets/images/88b06e5d1e6b2e95e2bdc1459d08effd.webp": [],
+    "data/tickets/images/8948bd2903975e845c90b9f45c804508.webp": [],
+    "data/tickets/images/897fbc70dfc4c4ab337c83a30fe1c4cc.webp": [],
+    "data/tickets/images/8a153a9edf37bc758d30a6229e26a831.webp": [],
+    "data/tickets/images/8a8786618a1e374c5933ceccc79daf5f.webp": [],
+    "data/tickets/images/8ac9039785686e492077d23aa9adbe6f.webp": [],
+    "data/tickets/images/8c41ef25113de562c57a098766b9835a.webp": [],
+    "data/tickets/images/8c5113fe03f745d71c037760b1396d0c.webp": [],
+    "data/tickets/images/8c91007d90a90a6832126350a382a72e.webp": [],
+    "data/tickets/images/8d034f093e77d70f1928a3d4d4192af1.webp": [],
+    "data/tickets/images/8df59441c680aaaf04f351eab07a1f43.webp": [],
+    "data/tickets/images/8ee47be53c5ad87705944b807a7451e8.webp": [],
+    "data/tickets/images/8f219b3a7ef7533f8316db9b8d7a8237.webp": [],
+    "data/tickets/images/8f618bf21ab0e33a5338f92a2fe16564.webp": [],
+    "data/tickets/images/915b07493147c8dd5715846dd389f43b.webp": [],
+    "data/tickets/images/91d9154a48f1c70af4b57aa2c5a9bae4.webp": [],
+    "data/tickets/images/920d1c0ba0bc03880ed773e6e6d73e6f.webp": [],
+    "data/tickets/images/93028c9319f87dbe7f330f3c93718cc0.webp": [],
+    "data/tickets/images/93632cd0aea3a59f0bfe6aa39f3d5b8f.webp": [],
+    "data/tickets/images/93804cdae7275d0fa0591b65d7928078.webp": [],
+    "data/tickets/images/941e0cfc8c88a7916b2a58f48f1e264f.webp": [],
+    "data/tickets/images/9485d48ccce657d345dbd1ae957ecd1d.webp": [],
+    "data/tickets/images/948c27853de87c681b84a770ba2ea884.webp": [],
+    "data/tickets/images/94c1b6e6fa5875359893fe3dce800ec5.webp": [],
+    "data/tickets/images/94cb89456cef046972bbc00110328176.webp": [],
+    "data/tickets/images/95351e994678c1a75416e14cab4c9f75.webp": [],
+    "data/tickets/images/957702fd8f48d8787697def11e908845.webp": [],
+    "data/tickets/images/96a94ae2777014f501fc40877cd6170a.webp": [],
+    "data/tickets/images/96e3b44e8e38df0eb770174212ea6045.webp": [],
+    "data/tickets/images/970700a86f0ea7fe49ed8c1b49bfccd4.webp": [],
+    "data/tickets/images/972cea6df002fc2eda7c2a13117d67a9.webp": [],
+    "data/tickets/images/97b35143c5148fee7ebe09e3c3980979.webp": [],
+    "data/tickets/images/98e7cb8a76ae50f756b17d6b254fb83e.webp": [],
+    "data/tickets/images/9917ac0c258a7727c50004e78a99ea54.webp": [],
+    "data/tickets/images/992f6e16b949441afad7408a4e2fb0d9.webp": [],
+    "data/tickets/images/997c21b93d60b3212b9d0269deaa0c3d.webp": [],
+    "data/tickets/images/99f13668c2223dc0144ea948fb4494e7.webp": [],
+    "data/tickets/images/9a1e009e7ef6e3da9369223b546f1730.webp": [],
+    "data/tickets/images/9a349b0942d52b2a2c53971ae5b78231.webp": [],
+    "data/tickets/images/9a77f1a8007fe07b7bcb69c242f9453a.webp": [],
+    "data/tickets/images/9bc840eb8c9ce40f313edc1d009f2503.webp": [],
+    "data/tickets/images/9c0acbea87795c6d4b712c62bd04f4b7.webp": [],
+    "data/tickets/images/9c9be8b9cefc6398b077d5bed2df4079.webp": [],
+    "data/tickets/images/9cb58ed6d9ac9f16f6a4aa9a65a974ed.webp": [],
+    "data/tickets/images/9ed708bcd2a8e4ffb6f7aa2b1da4bf43.webp": [],
+    "data/tickets/images/9f3298cfb07b5e5c5ce3aa685d42fe25.webp": [],
+    "data/tickets/images/9fa4d0b64507c0d0ac12626ce18aee69.webp": [],
+    "data/tickets/images/9fc0e80ff77372c3a68d4112de134466.webp": [],
+    "data/tickets/images/a0c0104d34d233c1dc6e5bad07e4b3d6.webp": [],
+    "data/tickets/images/a17e52233cefa6214a1d8a57f1e5be47.webp": [],
+    "data/tickets/images/a276b374bc897fc314988119fdd28ce7.webp": [],
+    "data/tickets/images/a2b30166979141a5b0bd88d8f2224e75.webp": [],
+    "data/tickets/images/a3009e7f87fbef70ddf727811abbe441.webp": [],
+    "data/tickets/images/a3549857eabcc2e7efb2d1884f7e3b33.webp": [],
+    "data/tickets/images/a497e154681061efc382c4a54572b5ec.webp": [],
+    "data/tickets/images/a49d4f27cdd5b8881cc394bee274205b.webp": [],
+    "data/tickets/images/a52e16dc846b2503b1f2bdb8ea81bfd4.webp": [],
+    "data/tickets/images/a53fcc7787d1385bdaebdfa58ca88251.webp": [],
+    "data/tickets/images/a551e42739d9728ac40bdc914c47b857.webp": [],
+    "data/tickets/images/a573c9e7ea2890fec2b2b2c8c7c62da1.webp": [],
+    "data/tickets/images/a5cd6662e140d1a28caec1866c561751.webp": [],
+    "data/tickets/images/a5e5f8f41cec989ceb34c4c6667dc209.webp": [],
+    "data/tickets/images/a6425abfb4509eec30ba3dc507517864.webp": [],
+    "data/tickets/images/a66ee730b3a7415278f677d629edcc7a.webp": [],
+    "data/tickets/images/a69aab2cd6b90038960978e6a001b388.webp": [],
+    "data/tickets/images/a6c532e6522f7327d5aef879615e00ed.webp": [],
+    "data/tickets/images/a73a45d4eb4510d7b7e184d452d68875.webp": [],
+    "data/tickets/images/a73fc8b77e5ef6db49f9edb62b7200a1.webp": [],
+    "data/tickets/images/a7501472ae5c79661bbb644750e0828c.webp": [],
+    "data/tickets/images/a815525427cc805f141501623e96f242.webp": [],
+    "data/tickets/images/a82c6bbf32559f5aa9ea4412cec6f820.webp": [],
+    "data/tickets/images/a843be2e4ab0cd101f02ea7484dde880.webp": [],
+    "data/tickets/images/a84a572ef05fe203eba63c29b512c56a.webp": [],
+    "data/tickets/images/a854d0e3eeb61975bff905933ea8d4a2.webp": [],
+    "data/tickets/images/a901a6df4efe1f0194956b18590bb438.webp": [],
+    "data/tickets/images/a90ac50aad4ce8f7773826aa21c5154c.webp": [],
+    "data/tickets/images/a92009b687252fda88ba245f8079af36.webp": [],
+    "data/tickets/images/a965330003625428f32684c0f8d16ce1.webp": [],
+    "data/tickets/images/ab09a818b4a1da3462b479d68d67d82e.webp": [],
+    "data/tickets/images/abd6a7d028b30d7b5369f7545d943821.webp": [],
+    "data/tickets/images/abfdbab322268654603c6c188699d3a5.webp": [],
+    "data/tickets/images/acb0d69d171c14b9b0fb07001d735dc7.webp": [],
+    "data/tickets/images/ad06160d8fa36463f1f3646edc751608.webp": [],
+    "data/tickets/images/ad7e8bbe7d82b0c55d7aa55dbaea21e8.webp": [],
+    "data/tickets/images/ada6530c6d442d10c457e6adb6610857.webp": [],
+    "data/tickets/images/ae308e46e30f7986118f1a9888dd1c51.webp": [],
+    "data/tickets/images/ae40558159556ea34892a5cba3290a8d.webp": [],
+    "data/tickets/images/afea0a6337230eae76b7a8316e6d50d5.webp": [],
+    "data/tickets/images/b03e468e4d53912276ef9ae575b747a1.webp": [],
+    "data/tickets/images/b062e295f859ab0c5db9a13d67392ac8.webp": [],
+    "data/tickets/images/b11d8c99953cdb01f390ea4c8e78c80e.webp": [],
+    "data/tickets/images/b2562dbb9a1bd25008703ef27dfca29f.webp": [],
+    "data/tickets/images/b288f5e262250f34f36be062a772b8e5.webp": [],
+    "data/tickets/images/b44e43f69122c803b039a3dd3b5bb90b.webp": [],
+    "data/tickets/images/b473de0e186e7f8ba55b4280150f8ecc.webp": [],
+    "data/tickets/images/b4c550da979791e37bb9c2f1aea84e0e.webp": [],
+    "data/tickets/images/b59edf3a9a51149602816f106801cc3d.webp": [],
+    "data/tickets/images/b5e21cb097753091ce789cf2328e4b32.webp": [],
+    "data/tickets/images/b64896f0b095b1dd40b2d4926495614b.webp": [],
+    "data/tickets/images/b652b1fc736ea4aa0f8110ee44733b1f.webp": [],
+    "data/tickets/images/b6ec3d39c1d402e9a51966ac735c2da6.webp": [],
+    "data/tickets/images/b70caa94cf5e8bc7379cfac868d0b004.webp": [],
+    "data/tickets/images/b72089d025bd203dcb4a2b9ca161af4d.webp": [],
+    "data/tickets/images/b7567041eab43f56eacfd0c11e8e0dc9.webp": [],
+    "data/tickets/images/b89eaaeced09a1f551959900e08101ba.webp": [],
+    "data/tickets/images/b8da133f8754727fd7a9d38b18f19319.webp": [],
+    "data/tickets/images/b996a6dae6014e677c3aef67089c62b6.webp": [],
+    "data/tickets/images/ba09fe661c64e49788f59499e73bad56.webp": [],
+    "data/tickets/images/bc2a6686a980b449ad203b26854bc2e7.webp": [],
+    "data/tickets/images/bcda1ba802061116f9b906225772235b.webp": [],
+    "data/tickets/images/bcea1964411fe28a7e7c0d42a0aa79a9.webp": [],
+    "data/tickets/images/bd05dced43b932312735857d7337dd14.webp": [],
+    "data/tickets/images/bd48cd22335f257fb53856be248b7144.webp": [],
+    "data/tickets/images/bd50517f07fe7d9c94001727eb5693ca.webp": [],
+    "data/tickets/images/bd51e545be6264c00ea4341e22f75fc2.webp": [],
+    "data/tickets/images/bd7c8effc70a8fe82e893c3ac634d91c.webp": [],
+    "data/tickets/images/bda671f2c48193e8bd88668d28cedba1.webp": [],
+    "data/tickets/images/bdd62e2ed1636a77257a1693c677ca4b.webp": [],
+    "data/tickets/images/be0f4d97f22edf1ae64fd94899715bf8.webp": [],
+    "data/tickets/images/bf84a24dab861f0c98e5a73b3f0610d2.webp": [],
+    "data/tickets/images/bfb35055b7803d9a58d5f3c4125ce87d.webp": [],
+    "data/tickets/images/c071f021a8e940d358c3db22de1fd34d.webp": [],
+    "data/tickets/images/c2c189778c213cdccbf3fcca103081c0.webp": [],
+    "data/tickets/images/c2d103ea6e0b12ea0529b5097ed9e714.webp": [],
+    "data/tickets/images/c30382bfe9ad32dc32b02b481dcb965f.webp": [],
+    "data/tickets/images/c4bb66cea650d9ddeaf413c8ee3c2d6e.webp": [],
+    "data/tickets/images/c4bbd21f0d172457209a67fbd3430ad8.webp": [],
+    "data/tickets/images/c4ff0e791ebf698d113efc7f424b04a2.webp": [],
+    "data/tickets/images/c673f95351dca30eb05681f5077cfa53.webp": [],
+    "data/tickets/images/c6b5d807dcf42a963da6523ff2816981.webp": [],
+    "data/tickets/images/c7d649444945c428efe993ec5cfc2b10.webp": [],
+    "data/tickets/images/c7daad6ec169b4bb4944935614537b7f.webp": [],
+    "data/tickets/images/c8340497b00196738ad7c020b5a3870f.webp": [],
+    "data/tickets/images/c84199ab357f857fadc18f2c736f5030.webp": [],
+    "data/tickets/images/c898dfdd53b152e290759bd2d3750048.webp": [],
+    "data/tickets/images/c8f9926b38fc92a58012521155e789a7.webp": [],
+    "data/tickets/images/c960f409282e0b2d589ef79e31cb6204.webp": [],
+    "data/tickets/images/c96230403b794805316ec101c10c7bc1.webp": [],
+    "data/tickets/images/c964740880f428feb5734e0b15e7c430.webp": [],
+    "data/tickets/images/c96a22ae3908cafe6db866a5b09eeaa9.webp": [],
+    "data/tickets/images/c9ffb9d6192fb93cfe2ac87ea791f52a.webp": [],
+    "data/tickets/images/ca9047675ad7163762ecc6d4c2d689dc.webp": [],
+    "data/tickets/images/cadb2415ef90bec7d74b5d92f722e3cd.webp": [],
+    "data/tickets/images/cc0eb7bbd9004eeba37fdc66c4dcb2c3.webp": [],
+    "data/tickets/images/cd9ab8d405daa1ca0d431a581d65b11a.webp": [],
+    "data/tickets/images/ce1122bb8f7252667a3bf51162387249.webp": [],
+    "data/tickets/images/ceb132f66a1994f4dece641a54a6e5b0.webp": [],
+    "data/tickets/images/cf523bb9c0a786867f3b13211e8b938e.webp": [],
+    "data/tickets/images/cf8cd8c04e50066de93946e2bac309fd.webp": [],
+    "data/tickets/images/cff2be81e46665bb2fb0c9d1eea35e76.webp": [],
+    "data/tickets/images/d03b1dc90764bddfd38e1d82bcb49cc9.webp": [],
+    "data/tickets/images/d0513af67bf1644ce66c3f4ef6fbb47e.webp": [],
+    "data/tickets/images/d09e0997ef6cdba358f51f083e706aff.webp": [],
+    "data/tickets/images/d1d327fc6eae302be11251328f5b6cc3.webp": [],
+    "data/tickets/images/d1e05a4c39d3098ce00863bba07e10d0.webp": [],
+    "data/tickets/images/d1ff7d510de1e75e8caf3a4eacb3ee3d.webp": [],
+    "data/tickets/images/d238c2fec0423d1b5a943caac514741b.webp": [],
+    "data/tickets/images/d2419ab6f0cecbe07a69a50f9a27b5a9.webp": [],
+    "data/tickets/images/d3223d216e21bf9e4b1d1121a985bfa8.webp": [],
+    "data/tickets/images/d4f1011e3e0f3e3304ce0b60ed8a7bae.webp": [],
+    "data/tickets/images/d6655adec1787d3a0ad8b67b4829c0a9.webp": [],
+    "data/tickets/images/d753a0470476db0fe8858a5206a6a3f6.webp": [],
+    "data/tickets/images/d7e0bafd00f969cb04387165930e60ac.webp": [],
+    "data/tickets/images/d7e18efabd31042faa46c582e396146a.webp": [],
+    "data/tickets/images/d80ba580d14b58905e5ee3f02025d673.webp": [],
+    "data/tickets/images/d80eee983d5c5a7001a418ef4c673dba.webp": [],
+    "data/tickets/images/d827adf3bce00215ed0c23c32e08724d.webp": [],
+    "data/tickets/images/d832a2846110cb682d5895f9360d0d72.webp": [],
+    "data/tickets/images/d8537bf67dc5d656ecb8a19e31a9264f.webp": [],
+    "data/tickets/images/d8d1bfefdb930a9ddf7d31542775bf5b.webp": [],
+    "data/tickets/images/d9368e5c26e97cee22447dd902f47a40.webp": [],
+    "data/tickets/images/db8cdaea0be1965469c4fa4fb13960a7.webp": [],
+    "data/tickets/images/dbb2dd3dfcd02f216b0fafc6dbd88a56.webp": [],
+    "data/tickets/images/dbc746d46e04397d56058a341b2830bb.webp": [],
+    "data/tickets/images/dd4a8db4ffd788247f41b8831c1caf78.webp": [],
+    "data/tickets/images/ddf225177abe90d6f86dcbf545656978.webp": [],
+    "data/tickets/images/df9c1a0ea55c9c55e583307d3f476d90.webp": [],
+    "data/tickets/images/dfb7c51062825662cd354ca76e15b6f7.webp": [],
+    "data/tickets/images/e0083bd50a0d10517c0911a6884feeb5.webp": [],
+    "data/tickets/images/e0ecc4eefd35c67fe3c447a8396726d4.webp": [],
+    "data/tickets/images/e1411ea309b78bd4ca96f6595efdfc8f.webp": [],
+    "data/tickets/images/e2378dfc128f5aad2e3286c57cb92931.webp": [],
+    "data/tickets/images/e27def79e322a71e0a0174eb7cf69908.webp": [],
+    "data/tickets/images/e2b3b3aac8397306a0f64aa7727ca959.webp": [],
+    "data/tickets/images/e38c4aebb924fc1f91a37995332d85d4.webp": [],
+    "data/tickets/images/e49c7f81122131c80a062d8ed03f7117.webp": [],
+    "data/tickets/images/e5d7431eda8c9fd87d949a4764350777.webp": [],
+    "data/tickets/images/e5d93603489e10332039fd9e0f630ec4.webp": [],
+    "data/tickets/images/e631c390253c9780665578de3766fdb9.webp": [],
+    "data/tickets/images/e6bede6db418750862e935841d3c2395.webp": [],
+    "data/tickets/images/e89f36a8781d2939ff62e8edcf4be2da.webp": [],
+    "data/tickets/images/e9b555c1d750ba095dfbbf3178ac5260.webp": [],
+    "data/tickets/images/ea290aa22e6f34919e9f14630eff8a51.webp": [],
+    "data/tickets/images/ea7d3e519f8b9e288f7055cf149e4639.webp": [],
+    "data/tickets/images/ea9afd270042f01f597ec8c978e79f2f.webp": [],
+    "data/tickets/images/eac6b507c3bb612b42221c183267cc9a.webp": [],
+    "data/tickets/images/eb647cae3fe57dd43b5a0dc309dbeac5.webp": [],
+    "data/tickets/images/eb734499318cf458170f43d40101ddbe.webp": [],
+    "data/tickets/images/eb843c53a7c180628ff7ec80979d5d24.webp": [],
+    "data/tickets/images/eca75c729eee0f344e95577419e6d8b1.webp": [],
+    "data/tickets/images/ed25ddd1db39de380378579a796fa139.webp": [],
+    "data/tickets/images/ed3642b99b92f9c4ae3806585cbda29a.webp": [],
+    "data/tickets/images/ed71cfedcadada1ee52af81fe5e283bc.webp": [],
+    "data/tickets/images/ed7e8f294c39a93ce0c765e157a6e08f.webp": [],
+    "data/tickets/images/ee10b91a2eae31aeedd8aaa422c9f9f4.webp": [],
+    "data/tickets/images/ee2f6df263ce36c598038d86177e7f98.webp": [],
+    "data/tickets/images/ee4b0dcfa638ca4260fe65d54c77c019.webp": [],
+    "data/tickets/images/ef1355099ee026e22a33b821328407df.webp": [],
+    "data/tickets/images/f09668e21eb3919526ab4c38db89bc03.webp": [],
+    "data/tickets/images/f10a6583fa38e6f133452f6e9e295099.webp": [],
+    "data/tickets/images/f11750afe6d907e084bb0a9c9eaa8d78.webp": [],
+    "data/tickets/images/f117a6ef03e0ce2d6fb5d85d9ef347f7.webp": [],
+    "data/tickets/images/f1dc0deecff0fbf81b92f6c28be10c80.webp": [],
+    "data/tickets/images/f1e76e531015dc34aa312da750ae4b22.webp": [],
+    "data/tickets/images/f21053634b3226874c8e977c1a831c95.webp": [],
+    "data/tickets/images/f236c622875f9123c1797f2043852328.webp": [],
+    "data/tickets/images/f24b95a352dc25441ea2b32cb823623b.webp": [],
+    "data/tickets/images/f2753619c81e92cd98fe5ad95850be28.webp": [],
+    "data/tickets/images/f28a8eacd01283e3626b2f5718a62fcd.webp": [],
+    "data/tickets/images/f2959021ac0d0944df65720addda5225.webp": [],
+    "data/tickets/images/f409077d8b399508d519da6b06096887.webp": [],
+    "data/tickets/images/f5290c9d2e5d319aafa5d84f8198d14b.webp": [],
+    "data/tickets/images/f5d6d94400738d1a5ad707628846950c.webp": [],
+    "data/tickets/images/f5dd3e57ed7a97395c3fd33d7da8490e.webp": [],
+    "data/tickets/images/f64456ee63938ad7dd7246b6e6da90a5.webp": [],
+    "data/tickets/images/f69ac7221f14c18d1e4c8d93117559c6.webp": [],
+    "data/tickets/images/f6a6101caf25f69bd0addf36273be912.webp": [],
+    "data/tickets/images/f7955aa4c77926c747c88ce21a7939e3.webp": [],
+    "data/tickets/images/f833c912c045d9206f4e1635a14c2897.webp": [],
+    "data/tickets/images/f96b91b60fdd8a77c2b1195d59ba197b.webp": [],
+    "data/tickets/images/f98e478a0ffa666d72158dda1be32089.webp": [],
+    "data/tickets/images/f9fef95fb5b76045e5716626cbdb8de4.webp": [],
+    "data/tickets/images/fa66967e41c52799fae243596cbbe8bf.webp": [],
+    "data/tickets/images/faf72d13e5560338451fb3430b61cec2.webp": [],
+    "data/tickets/images/fb08b995127936ac9c9f0a22da92959c.webp": [],
+    "data/tickets/images/fbc44eafe2e7a275ed97c26ddde198b7.webp": [],
+    "data/tickets/images/fc2e656d58eaaa122f8a6c3055afd31a.webp": [],
+    "data/tickets/images/fc76fb65f633eb70fa4c32d8b9f29112.webp": [],
+    "data/tickets/images/fc7cda05753ce6557e58558943302dc7.webp": [],
+    "data/tickets/images/fd88f575426a4dee9532fadc52cfda23.webp": [],
+    "data/tickets/images/fde8fa81ceb1f65f7ac11705c14d691c.webp": [],
+    "data/tickets/images/fe42c6f7c34a9cc4cee41a71954dffd9.webp": [],
+    "data/tickets/images/fe8fa06785b686a3f1a79cb522cf053f.webp": [],
+    "data/withdrawn-tickets.json": [],
+    "docs/chat-answer-quality-2026-09-14.md": [],
+    "docs/marketing/holafly-facebook.md": [],
+    "docs/research/exam-booking-2026-09-28.md": [],
+    "docs/research/exam-booking-source-check-2026-09-28.json": [],
+    "docs/research/partner-banner-prompts-2026-09-29.md": [],
+    "docs/superpowers/plans/2026-08-26-pdd-tickets-parser.md": [],
+    "docs/superpowers/plans/2026-08-27-exam-trainer.md": [],
+    "docs/superpowers/plans/2026-08-27-tickets-audit.md": [],
+    "docs/superpowers/plans/2026-08-27-training-mode.md": [],
+    "docs/superpowers/plans/2026-08-27-withdrawn-tickets.md": [],
+    "docs/superpowers/specs/2026-08-26-pdd-tickets-db-design.md": [],
+    "docs/superpowers/specs/2026-08-27-exam-trainer-design.md": [],
+    "docs/superpowers/specs/2026-08-27-training-mode-design.md": [],
+    "docs/superpowers/specs/2026-08-31-telegram-bot-design.md": [],
+    "docs/superpowers/specs/2026-09-13-site-trust-and-consent-design.md": [],
+    "docs/tickets-known-issues.md": [],
+    "docs/visual-refresh.md": [],
+    "images/chat-robot-132.webp": [],
+    "index.html": [],
+    "js/affiliate-analytics.js": [],
+    "js/analytics.js": [],
+    "js/answer-marking.js": [],
+    "js/booking-form.js": [],
+    "js/chat-api.js": [],
+    "js/chat-logic.js": [],
+    "js/chat.js": [],
+    "js/course-budget-logic.js": [],
+    "js/course-budget.js": [],
+    "js/exam-logic.js": [],
+    "js/exam.js": [],
+    "js/groups-logic.js": [],
+    "js/groups.js": [],
+    "js/learning-next-step.js": [],
+    "js/main.js": [],
+    "js/tests/affiliate-analytics.test.js": [],
+    "js/tests/asset-versions.test.js": [],
+    "js/tests/booking-form.test.js": [
+      "js/booking-form.js"
+    ],
+    "js/tests/chat-api.test.js": [
+      "js/chat-api.js"
+    ],
+    "js/tests/chat-logic.test.js": [
+      "js/chat-logic.js"
+    ],
+    "js/tests/course-budget.test.js": [
+      "js/course-budget-logic.js"
+    ],
+    "js/tests/exam-logic.test.js": [
+      "js/exam-logic.js"
+    ],
+    "js/tests/groups.test.js": [
+      "js/groups-logic.js"
+    ],
+    "js/tests/learning-next-step.test.js": [
+      "js/exam-logic.js",
+      "js/learning-next-step.js"
+    ],
+    "js/tests/ticket-bank.test.js": [
+      "js/ticket-bank.js"
+    ],
+    "js/tests/ticket-catalog.test.js": [
+      "js/training-logic.js"
+    ],
+    "js/tests/ticket-grid.test.js": [
+      "js/ticket-bank.js",
+      "js/ticket-catalog-logic.js"
+    ],
+    "js/tests/training-logic.test.js": [
+      "js/training-logic.js"
+    ],
+    "js/tests/training-session.test.js": [
+      "js/training-logic.js",
+      "js/training-session.js"
+    ],
+    "js/ticket-bank.js": [],
+    "js/ticket-catalog-logic.js": [],
+    "js/ticket-catalog.js": [],
+    "js/training-logic.js": [],
+    "js/training-session.js": [],
+    "js/training.js": [],
+    "llms-full.txt": [],
+    "llms.txt": [],
+    "media/partners/holafly-esim-v1.webp": [],
+    "media/partners/omio-rail-v1.webp": [],
+    "media/partners/trip-travel-v1.webp": [],
+    "media/tbilisi-wide-900.webp": [],
+    "media/tbilisi-wide.webp": [],
+    "package.json": [],
+    "playwright.config.js": [],
+    "privacy/index.html": [],
+    "robots.txt": [],
+    "sitemap.xml": [],
+    "specs/001-deepseek-chat/admin-access-policy.json": [],
+    "specs/001-deepseek-chat/admin-access.md": [],
+    "specs/001-deepseek-chat/data-model.md": [],
+    "specs/001-deepseek-chat/hosting.md": [],
+    "specs/001-deepseek-chat/plan.md": [],
+    "specs/001-deepseek-chat/spec.md": [],
+    "specs/001-deepseek-chat/tasks.md": [],
+    "specs/002-ticket-learning/checklists/requirements.md": [],
+    "specs/002-ticket-learning/plan.md": [],
+    "specs/002-ticket-learning/spec.md": [],
+    "specs/002-ticket-learning/tasks.md": [],
+    "specs/003-holafly-partner/plan.md": [],
+    "specs/003-holafly-partner/spec.md": [],
+    "specs/003-holafly-partner/tasks.md": [],
+    "specs/004-learning-missions/checklists/requirements.md": [],
+    "specs/004-learning-missions/plan.md": [],
+    "specs/004-learning-missions/spec.md": [],
+    "specs/004-learning-missions/tasks.md": [],
+    "specs/005-ticket-navigation/plan.md": [],
+    "specs/005-ticket-navigation/spec.md": [],
+    "specs/005-ticket-navigation/tasks.md": [],
+    "specs/006-topic-pages-resume/checklists/requirements.md": [],
+    "specs/006-topic-pages-resume/plan.md": [],
+    "specs/006-topic-pages-resume/spec.md": [],
+    "specs/006-topic-pages-resume/tasks.md": [],
+    "specs/007-frontend-polish/plan.md": [],
+    "specs/007-frontend-polish/spec.md": [],
+    "specs/007-frontend-polish/tasks.md": [],
+    "specs/008-ui-polish/plan.md": [],
+    "specs/008-ui-polish/spec.md": [],
+    "specs/008-ui-polish/tasks.md": [],
+    "specs/009-partner-offers/checklists/requirements.md": [],
+    "specs/009-partner-offers/plan.md": [],
+    "specs/009-partner-offers/spec.md": [],
+    "specs/009-partner-offers/tasks.md": [],
+    "specs/010-group-booking/checklists/requirements.md": [],
+    "specs/010-group-booking/contracts/api.md": [],
+    "specs/010-group-booking/data-model.md": [],
+    "specs/010-group-booking/plan.md": [],
+    "specs/010-group-booking/quickstart.md": [],
+    "specs/010-group-booking/research.md": [],
+    "specs/010-group-booking/review.md": [],
+    "specs/010-group-booking/spec.md": [],
+    "specs/010-group-booking/tasks.md": [],
+    "specs/011-home-entry-ux/plan.md": [],
+    "specs/011-home-entry-ux/spec.md": [],
+    "specs/011-home-entry-ux/tasks.md": [],
+    "specs/012-recurring-course-ux/checklists/requirements.md": [],
+    "specs/012-recurring-course-ux/contracts/ui.md": [],
+    "specs/012-recurring-course-ux/data-model.md": [],
+    "specs/012-recurring-course-ux/plan.md": [],
+    "specs/012-recurring-course-ux/quickstart.md": [],
+    "specs/012-recurring-course-ux/research.md": [],
+    "specs/012-recurring-course-ux/review.md": [],
+    "specs/012-recurring-course-ux/spec.md": [],
+    "specs/012-recurring-course-ux/tasks.md": [],
+    "specs/013-chat-invitation/plan.md": [],
+    "specs/013-chat-invitation/spec.md": [],
+    "specs/013-chat-invitation/tasks.md": [],
+    "tests/browser/README.md": [],
+    "tests/browser/admin-booking.spec.js": [],
+    "tests/browser/chat-invitation.spec.js": [],
+    "tests/browser/course-choice.spec.js": [],
+    "tests/browser/group-booking.spec.js": [],
+    "tests/browser/site.spec.js": [
+      "js/ticket-bank.js"
+    ],
+    "tests/browser/training-start.spec.js": [],
+    "tmp/pdfs/build_media_kit.py": [],
+    "tools/audit_tickets.py": [],
+    "tools/build_kb_txt.py": [],
+    "tools/build_llms_full.py": [],
+    "tools/build_topic_pages.py": [],
+    "tools/import_ticket_topics.py": [],
+    "tools/parse_tickets.py": [],
+    "tools/requirements-dev.txt": [],
+    "tools/requirements.txt": [],
+    "tools/test_booking_migrations.py": [],
+    "tools/tests/__init__.py": [],
+    "tools/tests/fixtures/tickets-page-ka.html": [],
+    "tools/tests/fixtures/tickets-page-ru.html": [],
+    "tools/tests/test_audit_tickets.py": [],
+    "tools/tests/test_build_kb_txt.py": [],
+    "tools/tests/test_build_llms_full.py": [
+      "tools/build_llms_full.py"
+    ],
+    "tools/tests/test_build_topic_pages.py": [],
+    "tools/tests/test_import_ticket_topics.py": [],
+    "tools/tests/test_kb_artifacts.py": [],
+    "tools/tests/test_parse_tickets.py": [],
+    "tools/tests/test_update_sitemap.py": [
+      "tools/update_sitemap.py"
+    ],
+    "tools/update_sitemap.py": [],
+    "voprosy/index.html": [],
+    "docs/agent-guide.md": []
+  },
+  "contentDigest": "0009923040104e7c3842dbc926516c85d6fc3063c08e0b58eb9573c8c7607aa9"
+}

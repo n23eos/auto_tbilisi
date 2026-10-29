@@ -1,0 +1,101 @@
+{
+  "validatedAt": "2026-10-27T14:47:07.459Z",
+  "success": true,
+  "issues": [],
+  "warnings": [
+    "31 узлов без связей; это не ошибка покрытия файлов."
+  ],
+  "stats": {
+    "scannedFiles": 856,
+    "coveredFiles": 856,
+    "byCategory": {
+      "docs": 133,
+      "infra": 1,
+      "config": 22,
+      "script": 6,
+      "markup": 27,
+      "code": 660,
+      "data": 7
+    },
+    "nodes": 1300,
+    "edges": 2719,
+    "nodeTypes": {
+      "file": 161,
+      "function": 381,
+      "endpoint": 16,
+      "class": 29,
+      "pipeline": 1,
+      "table": 23,
+      "document": 133,
+      "config": 23,
+      "schema": 2,
+      "service": 1,
+      "resource": 530
+    },
+    "edgeTypes": {
+      "contains": 444,
+      "exports": 224,
+      "calls": 275,
+      "imports": 148,
+      "tested_by": 79,
+      "depends_on": 971,
+      "reads_from": 32,
+      "defines_schema": 18,
+      "migrates": 4,
+      "related": 115,
+      "documents": 294,
+      "configures": 35,
+      "deploys": 2,
+      "triggers": 57,
+      "serves": 1,
+      "writes_to": 20
+    },
+    "layers": 8,
+    "tourSteps": 13,
+    "orphanNodes": 31
+  },
+  "missingFiles": [],
+  "unexpectedFiles": [],
+  "limitations": [
+    "Статический анализ локального кода; production и платные API не проверялись.",
+    "WebP представлены ресурсами без анализа содержимого изображений.",
+    "Полнота динамических вызовов и runtime-связей не гарантируется.",
+    "Действуют согласованные и встроенные исключения scanner.",
+    "Автоматическое обновление выключено."
+  ],
+  "applicationTestsRun": false,
+  "independentReview": {
+    "fixedSectionOk": true,
+    "nodesRecovered": 0,
+    "edgesRestored": 0,
+    "crossBatchEdgesAdded": 0,
+    "typesRemapped": 0,
+    "complexityRemapped": 0,
+    "notes": [
+      "Merge исправил 20 направлений tested_by и отбросил 3 невалидные пары.",
+      "Все 148 imports из importMap уже учтены, пропусков межпакетных импортов нет.",
+      "Из 977 дополненных связей удалены 6 слишком широких CI triggers; остальные 971 подтверждены локальными источниками.",
+      "Граф покрывает все 856 файлов scan-result без дубликатов и висячих ссылок."
+    ],
+    "reviewMode": "independent-read-only-review",
+    "counts": {
+      "nodes": 1300,
+      "edges": 2719,
+      "coveredFiles": 856
+    }
+  },
+  "uiVerification": {
+    "passed": true,
+    "method": "Codex cua_repl in-app browser",
+    "checks": [
+      "Отображены 8 слоев и 13 шагов.",
+      "Запущен guided tour и проверен переход с 1 на 2 шаг.",
+      "Скриншот сохранен в .ua/dashboard-preview.png, вкладка сохранена как результат."
+    ],
+    "viewerMode": "installed-vite-fallback",
+    "warnings": [
+      "Prebuilt viewer v2.9.6 недоступен по release URL (404); установленный локальный dashboard запущен успешно.",
+      "Viewer показывает dirty-warning для трех незакоммиченных файлов документации. Их актуальное содержимое включено в анализ и fingerprints; commit не создавался."
+    ]
+  }
+}

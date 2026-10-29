@@ -1,0 +1,13 @@
+{
+  "lastAnalyzedAt": "2026-10-27T14:47:07.299714+00:00",
+  "gitCommitHash": "1de5a269a92b792f8f95cbfdbc93a14ddff389cc",
+  "version": "1.0.0",
+  "analyzedFiles": 856,
+  "analysisScope": "working-tree",
+  "sourceContentDigest": "0009923040104e7c3842dbc926516c85d6fc3063c08e0b58eb9573c8c7607aa9",
+  "notes": [
+    "Базовый commit не включает незакоммиченные изменения рабочей копии.",
+    "Исходная чужая правка .plan.md сохранена; добавлена только запись этой задачи.",
+    "Автообновление выключено."
+  ]
+}
