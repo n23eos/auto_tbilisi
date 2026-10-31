@@ -1,6 +1,7 @@
 """Регрессии маршрутизации и проверки, внешний провайдер заменён на протокол fixtures."""
 
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -130,7 +131,9 @@ def test_generic_training_price_still_clarifies(tmp_path):
     assert len(model.calls) == 2
 
 
-def test_group_object_is_rejected_then_source_id_renders_canonical_date(tmp_path):
+def test_group_object_is_rejected_then_source_id_renders_canonical_date(tmp_path, monkeypatch):
+    # Иначе каноническая дата протухнет и тест начнёт проверять ветку stale.
+    monkeypatch.setattr('chat_agent.facts.today_tbilisi', lambda: date(2026, 10, 17))
     catalog = Catalog(tmp_path/'facts')
     catalog.save_group('theory_group', '2026-10-19', 'planned',
                        expected_revision=0, actor='fixture')
